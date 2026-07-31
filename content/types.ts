@@ -1,0 +1,127 @@
+/**
+ * The shape of every piece of content on the site.
+ *
+ * These types are the intake form. A missing field is a build error, which is the point: it is not
+ * possible to ship a service page with no meta description, or an image with no alt text, by
+ * forgetting. The compiler asks for the fact.
+ */
+
+export type Weekday =
+  | "Monday"
+  | "Tuesday"
+  | "Wednesday"
+  | "Thursday"
+  | "Friday"
+  | "Saturday"
+  | "Sunday";
+
+export type OpeningHours = {
+  days: Weekday[];
+  /** 24-hour, e.g. "08:00". Omitted when closed. */
+  opens?: string;
+  closes?: string;
+  closed?: boolean;
+};
+
+/** Everything a page needs to describe itself to a search engine. */
+export type Seo = {
+  /** The <title>. Unique per page. ~50-60 chars before Google truncates. */
+  title: string;
+  /** The meta description. Unique per page. ~140-160 chars. Written to earn a click. */
+  description: string;
+};
+
+/** One service the business sells. Drives /services/[service]/ and the city×service pages. */
+export type Service = {
+  slug: string;
+  /** The client's own name for this work. */
+  name: string;
+  /** The <h1>. May differ from `name` — the h1 targets a query, the name is a label. */
+  heading: string;
+  /** One sentence, used in grids and link previews. */
+  summary: string;
+  seo: Seo;
+  /** Ordered body content for the service page. */
+  body: ContentBlock[];
+  /** Whether this service gets city×service pages generated for it. */
+  hasCityPages: boolean;
+  segment: "residential" | "commercial";
+};
+
+/** One place served. Municipalities get their own page; neighbourhoods are sections of one. */
+export type City = {
+  slug: string;
+  name: string;
+  /** Two-letter state code. */
+  region: string;
+  county: string;
+  zips: string[];
+  /**
+   * Neighbourhoods covered by this page. Deliberately NOT separate URLs — a set of
+   * near-identical neighbourhood pages is the doorway-page pattern and gets sites discounted.
+   * A neighbourhood earns its own URL when it has real distinct content behind it.
+   */
+  neighborhoods?: string[];
+  seo: Seo;
+  body: ContentBlock[];
+};
+
+/** The authored body of a page, as typed blocks rather than a slab of HTML. */
+export type ContentBlock =
+  | { kind: "prose"; heading?: string; paragraphs: string[] }
+  | { kind: "list"; heading?: string; intro?: string; items: string[] }
+  | { kind: "steps"; heading?: string; steps: { title: string; detail: string }[] }
+  | { kind: "faq"; heading?: string; items: FaqItem[] }
+  | { kind: "cta"; heading: string; detail?: string; buttonLabel: string; href: string };
+
+export type FaqItem = {
+  question: string;
+  answer: string;
+};
+
+/** A real customer quote. Rendered as content — never as review structured data (see lib/schema.ts). */
+export type Review = {
+  quote: string;
+  /** First name only. */
+  name: string;
+  city: string;
+  /** ISO date the review was left. */
+  date: string;
+};
+
+export type PricePlan = {
+  id: string;
+  name: string;
+  /** What the buyer gets. */
+  summary: string;
+  /** Real price in whole dollars. */
+  price: number;
+  /** e.g. "per week", "per visit". */
+  unit: string;
+  /** Real, honest qualifiers — dog count limits, yard size, first-cleanup fees. */
+  notes: string[];
+  featured?: boolean;
+};
+
+/**
+ * An image. Note there is no `src` on the component that renders these — a page asks for an
+ * asset by key, so alt text cannot be omitted or duplicated by accident.
+ */
+export type Asset = {
+  /** Path under /public, or a Cloudflare Images key once phase 5 lands. */
+  src: string;
+  /**
+   * REQUIRED. Describes the image for someone who cannot see it. Not a keyword dump —
+   * a description. An empty string is only correct for purely decorative images, and there
+   * are none in this registry.
+   */
+  alt: string;
+  width: number;
+  height: number;
+};
+
+export type NavLink = {
+  label: string;
+  href: string;
+  children?: NavLink[];
+};

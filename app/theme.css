@@ -1,0 +1,158 @@
+/**
+ * THE THEME FILE. The only place in this repo where a color, a font, a type size, or a radius
+ * is written as a literal value.
+ *
+ * Every Tailwind default scale is cleared to `initial` below. That is not tidiness — it means
+ * `bg-blue-500`, `text-4xl`, `rounded-xl` and `p-[13px]` DO NOT COMPILE. A developer who wants a
+ * color that is not in this file gets a build error, not a slightly-off shade that ships.
+ *
+ * To restyle the entire site: edit this file. Nothing else.
+ *
+ * ── The palette ──────────────────────────────────────────────────────────────
+ * Client-supplied brand colors are marked ✱. Everything else is derived from them, and every
+ * derivation exists because a supplied color could not do that job at WCAG AA — the numbers live
+ * in theme.test.ts, which fails the build rather than letting an illegible pair ship.
+ *
+ * The three supplied colors that CANNOT carry light text, measured:
+ *   ✱ #5dade2 sky    — white on it is 2.46:1. Background only, with ink text (5.14:1).
+ *   ✱ #f9c15f amber  — white on it is 1.64:1. Background only, with ink text (7.71:1).
+ *   ✱ #98c96c green  — white on it is 1.93:1. Background only, with ink text (6.56:1).
+ * And one that cannot draw a visible border:
+ *   ✱ #a0b5bb grey   — 1.95:1 on cream, under the 3:1 non-text minimum. Decorative dividers only;
+ *                      `line-strong` is the derived shade for input borders.
+ */
+
+@import "tailwindcss";
+
+@theme {
+  /* ── Clear every default scale ─────────────────────────────────────────────
+     Without these, Tailwind ships ~300 colors and a dozen type sizes that
+     bypass this file entirely. */
+  --color-*: initial;
+  --font-*: initial;
+  --text-*: initial;
+  --radius-*: initial;
+  --shadow-*: initial;
+  --breakpoint-*: initial;
+  --ease-*: initial;
+
+  /* ── Breakpoints ──────────────────────────────────────────────────────── */
+  --breakpoint-sm: 40rem;
+  --breakpoint-md: 48rem;
+  --breakpoint-lg: 64rem;
+  --breakpoint-xl: 80rem;
+
+  /* ── Brand ────────────────────────────────────────────────────────────── */
+  --color-brand: #0b4e70; /* ✱ the logo navy. 8.18:1 on cream — text, borders, dark surfaces */
+  --color-brand-dark: #083a54; /* derived — hover and pressed states */
+  --color-brand-tint: #dceaf2; /* derived — soft wash behind callouts */
+
+  /* Sky. BACKGROUND ONLY — ink text on it, never white. */
+  --color-sky: #5dade2; /* ✱ */
+  --color-sky-tint: #e2f0fa; /* derived — the lightest band */
+
+  /* Amber. BACKGROUND ONLY — this is the primary CTA fill, with ink text. */
+  --color-amber: #f9c15f; /* ✱ */
+  --color-amber-dark: #e8a83c; /* derived — CTA hover */
+  --color-amber-tint: #fdefd2; /* derived */
+
+  /* ── Text ─────────────────────────────────────────────────────────────── */
+  --color-ink: #333333; /* ✱ body and headings. 11.51:1 on cream */
+  --color-ink-muted: #54646a; /* derived — #a0b5bb is unreadable as text (1.95:1) */
+  --color-ink-inverse: #fff3de; /* cream text on navy — on-brand, and 8.18:1 */
+
+  /* ── Surfaces ─────────────────────────────────────────────────────────── */
+  --color-surface: #fff3de; /* ✱ the cream page background — the brand's signature */
+  --color-surface-raised: #ffffff; /* cards lift off the cream by going white */
+  --color-surface-alt: #f7e7ca; /* derived — deeper cream for alternating bands */
+  --color-surface-dark: #0b4e70; /* the navy, for footer and dark CTA bands */
+
+  /* ── Lines ────────────────────────────────────────────────────────────────
+     `line` is decorative (dividers, card edges) and is exempt from contrast
+     rules. `line-strong` is for INTERACTIVE borders — inputs, toggles — and is
+     held to 3:1. Use the right one; the supplied grey cannot do the second job. */
+  --color-line: #a0b5bb; /* ✱ */
+  --color-line-strong: #6b8a93; /* derived — 3.37:1 on cream */
+
+  /* ── Status ───────────────────────────────────────────────────────────────
+     The supplied green is a fill, not a text color. Each has an `-ink` partner
+     for the words that sit on or beside it. */
+  --color-success: #98c96c; /* ✱ fill only */
+  --color-success-ink: #3f6b23; /* derived — 5.73:1 on cream */
+  --color-danger: #f7d7d5; /* derived fill — no red was supplied */
+  --color-danger-ink: #9e2b25; /* derived — 6.77:1 on cream, for form errors */
+
+  /* Required by Tailwind's reset and the outline utilities. */
+  --color-transparent: transparent;
+  --color-current: currentColor;
+
+  /* ── Typography ───────────────────────────────────────────────────────────
+     Bitter and Montserrat — the client's own brand faces, the same pairing used
+     in the logo. Both are open-licensed and self-hosted through next/font, so
+     there is no licensing question and no request to a third-party host.
+     Bound to next/font in app/layout.tsx; swapping them is two lines there. */
+  --font-display: var(--font-display-face), ui-serif, Georgia, serif;
+  --font-body: var(--font-body-face), ui-sans-serif, system-ui, sans-serif;
+
+  /* Fluid scale. Headings scale with the viewport so there is no separate
+     mobile type scale to keep in sync. */
+  --text-display: clamp(2.5rem, 1.75rem + 3.4vw, 4rem);
+  --text-display--line-height: 1.05;
+  --text-display--letter-spacing: -0.02em;
+
+  --text-h1: clamp(2rem, 1.5rem + 2.4vw, 3rem);
+  --text-h1--line-height: 1.1;
+  --text-h1--letter-spacing: -0.018em;
+
+  --text-h2: clamp(1.625rem, 1.35rem + 1.35vw, 2.25rem);
+  --text-h2--line-height: 1.18;
+  --text-h2--letter-spacing: -0.014em;
+
+  --text-h3: clamp(1.375rem, 1.2rem + 0.85vw, 1.75rem);
+  --text-h3--line-height: 1.25;
+  --text-h3--letter-spacing: -0.01em;
+
+  --text-h4: 1.25rem;
+  --text-h4--line-height: 1.35;
+
+  --text-h5: 1.125rem;
+  --text-h5--line-height: 1.4;
+
+  --text-h6: 1rem;
+  --text-h6--line-height: 1.45;
+
+  --text-lead: 1.1875rem;
+  --text-lead--line-height: 1.6;
+
+  --text-body: 1.0625rem;
+  --text-body--line-height: 1.65;
+
+  --text-small: 0.9375rem;
+  --text-small--line-height: 1.55;
+
+  --text-caption: 0.8125rem;
+  --text-caption--line-height: 1.45;
+
+  /* ── Spacing ──────────────────────────────────────────────────────────────
+     One step. `p-4` is 4 steps. Changing this rescales the whole site. */
+  --spacing: 0.25rem;
+
+  /* ── Radius ───────────────────────────────────────────────────────────── */
+  --radius-sm: 0.25rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.875rem;
+  --radius-pill: 999px;
+
+  /* ── Elevation ────────────────────────────────────────────────────────────
+     Navy-tinted rather than neutral grey, so shadows sit correctly on cream. */
+  --shadow-sm: 0 1px 2px rgb(11 78 112 / 0.07), 0 1px 3px rgb(11 78 112 / 0.06);
+  --shadow-md: 0 4px 12px rgb(11 78 112 / 0.09), 0 2px 4px rgb(11 78 112 / 0.06);
+  --shadow-lg: 0 12px 32px rgb(11 78 112 / 0.14), 0 4px 8px rgb(11 78 112 / 0.07);
+
+  /* ── Motion ───────────────────────────────────────────────────────────── */
+  --ease-out: cubic-bezier(0.2, 0.8, 0.3, 1);
+
+  /* ── Layout ───────────────────────────────────────────────────────────── */
+  --container-page: 75rem;
+  --container-prose: 42rem;
+}

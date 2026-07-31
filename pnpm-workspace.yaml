@@ -1,0 +1,6 @@
+# pnpm 11 reads settings from this file rather than the "pnpm" field in package.json.
+# Both of these need their postinstall to fetch a platform binary: vitest does not run
+# without esbuild, and next/image cannot optimise without sharp.
+allowBuilds:
+  esbuild: true
+  sharp: true
