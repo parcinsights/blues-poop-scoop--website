@@ -87,12 +87,12 @@
   --color-current: currentColor;
 
   /* ── Typography ───────────────────────────────────────────────────────────
-     Bitter and Montserrat — the client's own brand faces, the same pairing used
-     in the logo. Both are open-licensed and self-hosted through next/font, so
-     there is no licensing question and no request to a third-party host.
+     LINE Seed Sans throughout — headings and body are the same face, separated
+     by weight and size rather than by family. Self-hosted through next/font, so
+     there is no request to a third-party host and no layout shift.
      Bound to next/font in app/layout.tsx; swapping them is two lines there. */
-  --font-display: var(--font-display-face), ui-serif, Georgia, serif;
-  --font-body: var(--font-body-face), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-sans-face), ui-sans-serif, system-ui, sans-serif;
+  --font-body: var(--font-sans-face), ui-sans-serif, system-ui, sans-serif;
 
   /* Fluid scale. Headings scale with the viewport so there is no separate
      mobile type scale to keep in sync. */
