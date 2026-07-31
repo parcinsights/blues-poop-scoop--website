@@ -1,5 +1,4 @@
-import Link from "next/link";
-
+import { Link } from "@/components/ui/Link";
 import type { Crumb } from "@/lib/schema";
 
 /**
@@ -26,9 +25,7 @@ export function Breadcrumbs({ crumbs }: { crumbs: Crumb[] }) {
                   {crumb.name}
                 </span>
               ) : (
-                <Link href={crumb.path} className="text-brand">
-                  {crumb.name}
-                </Link>
+                <Link href={crumb.path}>{crumb.name}</Link>
               )}
               {!isLast && (
                 <span aria-hidden="true" className="text-ink-muted">

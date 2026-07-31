@@ -6,6 +6,7 @@ import { JsonLd } from "@/components/seo/JsonLd";
 import { Button } from "@/components/ui/Button";
 import { Container, Grid, Section, Stack } from "@/components/ui/layout";
 import { Card } from "@/components/ui/surfaces";
+import { Heading, Text } from "@/components/ui/typography";
 import { residentialServices } from "@/content/services";
 import { routes } from "@/lib/routes";
 import { standardPageGraph, type Crumb } from "@/lib/schema";
@@ -44,8 +45,12 @@ export default function ServicesIndexPage() {
             {residentialServices.map((service) => (
               <Card key={service.slug}>
                 <Stack gap={3}>
-                  <h2 className="text-h4">{service.name}</h2>
-                  <p className="text-ink-muted">{service.summary}</p>
+                  {/* Level 2 because these are the page's sections; sized down because a grid of
+                      cards at full h2 size shouts. Exactly the split Heading exists for. */}
+                  <Heading level={2} size="h4">
+                    {service.name}
+                  </Heading>
+                  <Text tone="muted">{service.summary}</Text>
                   <Button href={routes.service(service.slug)} variant="link">
                     Learn more
                   </Button>

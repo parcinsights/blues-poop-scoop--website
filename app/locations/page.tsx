@@ -6,6 +6,7 @@ import { JsonLd } from "@/components/seo/JsonLd";
 import { Button } from "@/components/ui/Button";
 import { Container, Grid, Section, Stack } from "@/components/ui/layout";
 import { Card } from "@/components/ui/surfaces";
+import { Heading, Text } from "@/components/ui/typography";
 import { cities } from "@/content/cities";
 import { routes } from "@/lib/routes";
 import { standardPageGraph, type Crumb } from "@/lib/schema";
@@ -48,14 +49,14 @@ export default function LocationsIndexPage() {
             {cities.map((city) => (
               <Card key={city.slug}>
                 <Stack gap={3}>
-                  <h2 className="text-h4">
+                  <Heading level={2} size="h4">
                     {city.name}, {city.region}
-                  </h2>
-                  <p className="text-ink-muted text-small">
+                  </Heading>
+                  <Text size="small" tone="muted">
                     {city.neighborhoods
                       ? city.neighborhoods.join(" · ")
                       : `${city.county} · ${city.zips.join(", ")}`}
-                  </p>
+                  </Text>
                   <Button href={routes.city(city.slug)} variant="link">
                     {city.name} service
                   </Button>

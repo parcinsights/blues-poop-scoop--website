@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/Button";
 import { Field, Honeypot, Input, Select } from "@/components/ui/Field";
 import { Callout } from "@/components/ui/surfaces";
 import { Stack } from "@/components/ui/layout";
+import { Text } from "@/components/ui/typography";
 import { quickLeadSchema } from "@/lib/validation";
 
 /**
@@ -57,7 +58,7 @@ export function QuickLeadForm({ compact = false }: { compact?: boolean }) {
     return (
       <Callout tone="success">
         <strong>Thanks — we&apos;ve got it.</strong>
-        <p>We&apos;ll be in touch shortly with a price for your yard.</p>
+        <Text>We&apos;ll be in touch shortly with a price for your yard.</Text>
       </Callout>
     );
   }

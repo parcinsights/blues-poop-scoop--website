@@ -4,6 +4,7 @@ import { BlockRenderer } from "@/components/blocks/blocks";
 import { PageShell } from "@/components/blocks/PageShell";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { Container, Section, Stack } from "@/components/ui/layout";
+import { Link } from "@/components/ui/Link";
 import { Definitions } from "@/components/ui/surfaces";
 import { areaServedNames } from "@/content/cities";
 import { contact } from "@/content/pages/standing";
@@ -44,9 +45,9 @@ export default function ContactPage() {
               items={[
                 {
                   term: "Phone",
-                  detail: <a href={`tel:${site.phone.e164}`}>{site.phone.display}</a>,
+                  detail: <Link href={`tel:${site.phone.e164}`}>{site.phone.display}</Link>,
                 },
-                { term: "Email", detail: <a href={`mailto:${site.email}`}>{site.email}</a> },
+                { term: "Email", detail: <Link href={`mailto:${site.email}`}>{site.email}</Link> },
                 { term: "Serving", detail: areaServedNames.join(" · ") },
                 {
                   term: "Hours",

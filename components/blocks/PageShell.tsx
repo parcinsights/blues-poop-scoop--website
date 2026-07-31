@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 
 import { Breadcrumbs } from "@/components/seo/Breadcrumbs";
 import { Container, Section, Stack } from "@/components/ui/layout";
+import { Heading, Text } from "@/components/ui/typography";
 import type { Crumb } from "@/lib/schema";
 
 /**
@@ -28,8 +29,12 @@ export function PageShell({
       <Container>
         <Stack gap={5}>
           <Breadcrumbs crumbs={crumbs} />
-          <h1>{heading}</h1>
-          {intro && <p className="text-lead text-ink-muted max-w-prose">{intro}</p>}
+          <Heading level={1}>{heading}</Heading>
+          {intro && (
+            <Text size="lead" tone="muted" measure>
+              {intro}
+            </Text>
+          )}
           {children}
         </Stack>
       </Container>

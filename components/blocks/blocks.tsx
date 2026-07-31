@@ -1,8 +1,8 @@
-import Link from "next/link";
-
 import { Button } from "@/components/ui/Button";
 import { Cluster, Container, Grid, Section, Stack } from "@/components/ui/layout";
+import { Link } from "@/components/ui/Link";
 import { Card, Callout } from "@/components/ui/surfaces";
+import { Heading, List, Quote, Text } from "@/components/ui/typography";
 import { priceTiers, pricing } from "@/content/pricing";
 import { primaryCta } from "@/content/nav";
 import { site } from "@/content/site";
@@ -29,8 +29,12 @@ export function Hero({
     <Section spacing="lg">
       <Container>
         <Stack gap={6}>
-          <h1>{heading}</h1>
-          {subheading && <p className="text-lead text-ink-muted max-w-prose">{subheading}</p>}
+          <Heading level={1}>{heading}</Heading>
+          {subheading && (
+            <Text size="lead" tone="muted" measure>
+              {subheading}
+            </Text>
+          )}
           <Cluster gap={4}>
             <Button href={primaryCta.href} size="lg">
               {primaryCta.label}
@@ -60,13 +64,13 @@ export function FeatureGrid({
     <Section tone="alt">
       <Container>
         <Stack gap={8}>
-          <h2>{heading}</h2>
+          <Heading level={2}>{heading}</Heading>
           <Grid columns={3}>
             {features.map((feature) => (
               <Card key={feature.title}>
                 <Stack gap={2}>
-                  <h3>{feature.title}</h3>
-                  <p className="text-ink-muted">{feature.detail}</p>
+                  <Heading level={3}>{feature.title}</Heading>
+                  <Text tone="muted">{feature.detail}</Text>
                 </Stack>
               </Card>
             ))}
@@ -89,7 +93,7 @@ export function PriceTable({ heading }: { heading: string }) {
     <Section>
       <Container>
         <Stack gap={8}>
-          <h2>{heading}</h2>
+          <Heading level={2}>{heading}</Heading>
           <div className="overflow-x-auto">
             <table className="w-full border-collapse text-body">
               <caption className="sr-only">
@@ -116,11 +120,15 @@ export function PriceTable({ heading }: { heading: string }) {
                     </th>
                     <td className="py-4 pr-4">
                       ${tier.weekly}
-                      <span className="text-ink-muted text-small"> {pricing.unit}</span>
+                      <Text as="span" size="small" tone="muted">
+                        {` ${pricing.unit}`}
+                      </Text>
                     </td>
                     <td className="py-4">
                       ${tier.biweekly}
-                      <span className="text-ink-muted text-small"> {pricing.unit}</span>
+                      <Text as="span" size="small" tone="muted">
+                        {` ${pricing.unit}`}
+                      </Text>
                     </td>
                   </tr>
                 ))}
@@ -146,7 +154,7 @@ export function ServiceAreaList({
     <Section tone="alt">
       <Container>
         <Stack gap={6}>
-          <h2>{heading}</h2>
+          <Heading level={2}>{heading}</Heading>
           <Cluster gap={3}>
             {cities.map((city) => (
               <Button key={city.slug} href={routes.city(city.slug)} variant="ghost" size="sm">
@@ -173,14 +181,16 @@ export function FaqAccordion({ heading, items }: { heading: string; items: FaqIt
     <Section>
       <Container width="prose">
         <Stack gap={6}>
-          <h2>{heading}</h2>
+          <Heading level={2}>{heading}</Heading>
           <div className="flex flex-col">
             {items.map((item) => (
               <details key={item.question} className="border-b border-line py-4">
                 <summary className="cursor-pointer font-display font-semibold text-h5 text-ink">
                   {item.question}
                 </summary>
-                <p className="pt-3 text-ink-muted">{item.answer}</p>
+                <div className="pt-3">
+                  <Text tone="muted">{item.answer}</Text>
+                </div>
               </details>
             ))}
           </div>
@@ -208,17 +218,13 @@ export function ReviewWall({
     <Section tone="alt">
       <Container>
         <Stack gap={8}>
-          <h2>{heading}</h2>
+          <Heading level={2}>{heading}</Heading>
           <Grid columns={3}>
             {reviews.map((review) => (
               <Card key={review.quote}>
-                <figure className="flex flex-col gap-3 h-full">
-                  <blockquote className="grow">{review.quote}</blockquote>
-                  <figcaption className="text-small font-semibold text-ink">
-                    {review.name}
-                    <span className="font-normal text-ink-muted"> — {review.city}</span>
-                  </figcaption>
-                </figure>
+                <Quote attribution={review.name} detail={review.city}>
+                  {review.quote}
+                </Quote>
               </Card>
             ))}
           </Grid>
@@ -235,8 +241,14 @@ export function CtaBand({ heading, detail }: { heading: string; detail?: string 
     <Section tone="dark" spacing="md">
       <Container>
         <Stack gap={5} align="center">
-          <h2 className="text-ink-inverse">{heading}</h2>
-          {detail && <p className="text-ink-inverse max-w-prose">{detail}</p>}
+          <Heading level={2} tone="inverse">
+            {heading}
+          </Heading>
+          {detail && (
+            <Text tone="inverse" measure>
+              {detail}
+            </Text>
+          )}
           <Cluster gap={4} justify="center">
             <Button href={primaryCta.href} size="lg">
               {primaryCta.label}
@@ -266,45 +278,43 @@ export function BlockRenderer({ blocks }: { blocks: ContentBlock[] }) {
               case "prose":
                 return (
                   <div key={index}>
-                    {block.heading && <h2>{block.heading}</h2>}
+                    {block.heading && <Heading level={2}>{block.heading}</Heading>}
                     {block.paragraphs.map((paragraph) => (
-                      <p key={paragraph}>{paragraph}</p>
+                      <Text key={paragraph}>{paragraph}</Text>
                     ))}
                   </div>
                 );
               case "list":
                 return (
                   <div key={index}>
-                    {block.heading && <h2>{block.heading}</h2>}
-                    {block.intro && <p>{block.intro}</p>}
-                    <ul>
-                      {block.items.map((item) => (
-                        <li key={item}>{item}</li>
-                      ))}
-                    </ul>
+                    {block.heading && <Heading level={2}>{block.heading}</Heading>}
+                    {block.intro && <Text>{block.intro}</Text>}
+                    <List items={block.items} />
                   </div>
                 );
               case "steps":
                 return (
                   <div key={index}>
-                    {block.heading && <h2>{block.heading}</h2>}
-                    <ol>
-                      {block.steps.map((step) => (
-                        <li key={step.title}>
-                          <strong>{step.title}</strong> — {step.detail}
-                        </li>
+                    {block.heading && <Heading level={2}>{block.heading}</Heading>}
+                    <List
+                      variant="number"
+                      items={block.steps.map((step) => (
+                        <span key={step.title}>
+                          <strong>{step.title}</strong>
+                          {` — ${step.detail}`}
+                        </span>
                       ))}
-                    </ol>
+                    />
                   </div>
                 );
               case "faq":
                 return (
                   <div key={index}>
-                    {block.heading && <h2>{block.heading}</h2>}
+                    {block.heading && <Heading level={2}>{block.heading}</Heading>}
                     {block.items.map((item) => (
                       <details key={item.question} className="border-b border-line py-3">
                         <summary className="cursor-pointer font-semibold">{item.question}</summary>
-                        <p>{item.answer}</p>
+                        <Text>{item.answer}</Text>
                       </details>
                     ))}
                   </div>
@@ -314,7 +324,7 @@ export function BlockRenderer({ blocks }: { blocks: ContentBlock[] }) {
                   <Callout key={index}>
                     <Stack gap={3}>
                       <strong>{block.heading}</strong>
-                      {block.detail && <p>{block.detail}</p>}
+                      {block.detail && <Text>{block.detail}</Text>}
                       <Link href={block.href}>{block.buttonLabel}</Link>
                     </Stack>
                   </Callout>

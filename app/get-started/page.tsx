@@ -4,7 +4,9 @@ import { PageShell } from "@/components/blocks/PageShell";
 import { QuickLeadForm } from "@/components/forms/QuickLeadForm";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { Container, Grid, Section, Stack } from "@/components/ui/layout";
+import { Link } from "@/components/ui/Link";
 import { Card } from "@/components/ui/surfaces";
+import { Heading, Text } from "@/components/ui/typography";
 import { getStarted } from "@/content/pages/standing";
 import { priceTiers, pricing } from "@/content/pricing";
 import { site } from "@/content/site";
@@ -49,26 +51,27 @@ export default function GetStartedPage() {
             </Card>
 
             <Stack gap={6}>
-              <h2>What it costs</h2>
+              <Heading level={2}>What it costs</Heading>
               <Grid columns={2} gap={4}>
                 {priceTiers.map((tier) => (
                   <Card key={tier.id} tone={tier.featured ? "featured" : "default"}>
                     <Stack gap={2}>
-                      <h3 className="text-h5">{tier.dogs}</h3>
-                      <p className="text-ink-muted text-small">
+                      <Heading level={3} size="h5">
+                        {tier.dogs}
+                      </Heading>
+                      <Text size="small" tone="muted">
                         Weekly — ${tier.weekly} {pricing.unit}
-                      </p>
-                      <p className="text-ink-muted text-small">
+                      </Text>
+                      <Text size="small" tone="muted">
                         Every other week — ${tier.biweekly} {pricing.unit}
-                      </p>
+                      </Text>
                     </Stack>
                   </Card>
                 ))}
               </Grid>
-              <p className="text-ink-muted">
-                Prefer to talk? Call{" "}
-                <a href={`tel:${site.phone.e164}`}>{site.phone.display}</a>.
-              </p>
+              <Text tone="muted">
+                Prefer to talk? Call <Link href={`tel:${site.phone.e164}`}>{site.phone.display}</Link>.
+              </Text>
             </Stack>
           </div>
         </Container>

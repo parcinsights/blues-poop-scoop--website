@@ -6,6 +6,7 @@ import { PageShell } from "@/components/blocks/PageShell";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { Button } from "@/components/ui/Button";
 import { Cluster, Container, Section, Stack } from "@/components/ui/layout";
+import { Heading } from "@/components/ui/typography";
 import { cities, cityBySlug } from "@/content/cities";
 import { moneyPage } from "@/content/money-pages";
 import { cityPageServices, serviceBySlug } from "@/content/services";
@@ -82,7 +83,7 @@ export default async function CityServicePage({ params }: Params) {
       <Section tone="alt">
         <Container>
           <Stack gap={6}>
-            <h2>Other options in {city.name}</h2>
+            <Heading level={2}>Other options in {city.name}</Heading>
             <Cluster gap={3}>
               {cityPageServices
                 .filter((other) => other.slug !== service.slug)

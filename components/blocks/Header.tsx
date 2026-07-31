@@ -1,11 +1,10 @@
-import Link from "next/link";
-
 import { headerNav, primaryCta } from "@/content/nav";
 import { site } from "@/content/site";
 import { routes } from "@/lib/routes";
 import { Button } from "@/components/ui/Button";
 import { Image } from "@/components/ui/Image";
 import { Container, Cluster } from "@/components/ui/layout";
+import { Link } from "@/components/ui/Link";
 
 /**
  * Site header. Server component — no client JS at all on desktop.
@@ -21,17 +20,19 @@ export function Header() {
         <div className="flex items-center justify-between gap-4 py-4">
           {/* The mark as an image, the wordmark as live text in Bitter — the same face the logo
               uses, so it stays crisp at any size and remains selectable and translatable. */}
-          <Link href={routes.home()} className="no-underline flex items-center gap-3">
-            <Image asset="logoMark" priority className="w-11 h-11 rounded-md" />
-            <span className="font-display font-bold text-h5 text-brand leading-none">
-              {site.name}
+          <Link href={routes.home()} variant="quiet">
+            <span className="flex items-center gap-3">
+              <Image asset="logoMark" priority className="w-11 h-11 rounded-md" />
+              <span className="font-display font-bold text-h5 text-brand leading-none">
+                {site.name}
+              </span>
             </span>
           </Link>
 
           <nav aria-label="Main" className="hidden lg:block">
             <Cluster gap={6}>
               {headerNav.map((link) => (
-                <Link key={link.href} href={link.href} className="no-underline text-ink text-small font-semibold">
+                <Link key={link.href} href={link.href} variant="nav" size="small">
                   {link.label}
                 </Link>
               ))}
@@ -55,7 +56,7 @@ export function Header() {
               <ul className="list-none pl-0 flex flex-col gap-3">
                 {headerNav.map((link) => (
                   <li key={link.href}>
-                    <Link href={link.href} className="no-underline text-ink font-semibold">
+                    <Link href={link.href} variant="nav">
                       {link.label}
                     </Link>
                   </li>

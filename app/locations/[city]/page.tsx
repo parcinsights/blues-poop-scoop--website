@@ -6,6 +6,7 @@ import { PageShell } from "@/components/blocks/PageShell";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { Button } from "@/components/ui/Button";
 import { Cluster, Container, Section, Stack } from "@/components/ui/layout";
+import { Heading } from "@/components/ui/typography";
 import { cities, cityBySlug } from "@/content/cities";
 import { cityPageServices } from "@/content/services";
 import { isPublishable } from "@/lib/content";
@@ -67,7 +68,7 @@ export default async function CityPage({ params }: Params) {
       <Section tone="alt">
         <Container>
           <Stack gap={6}>
-            <h2>Plans available in {city.name}</h2>
+            <Heading level={2}>Plans available in {city.name}</Heading>
             <Cluster gap={3}>
               {cityPageServices.map((service) => (
                 <Button

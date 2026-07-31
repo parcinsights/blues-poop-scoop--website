@@ -1,10 +1,10 @@
-import Link from "next/link";
-
 import { cities } from "@/content/cities";
 import { footerNav } from "@/content/nav";
 import { site } from "@/content/site";
 import { routes } from "@/lib/routes";
 import { Container } from "@/components/ui/layout";
+import { Link } from "@/components/ui/Link";
+import { Text } from "@/components/ui/typography";
 
 /**
  * Site footer.
@@ -26,16 +26,16 @@ export function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-10 py-14">
           <div className="flex flex-col gap-3">
             <span className="font-display font-bold text-h5">{site.name}</span>
-            <p className="text-small">{site.tagline}</p>
-            <a href={`tel:${site.phone.e164}`} className="text-ink-inverse font-semibold">
+            <Text size="small">{site.tagline}</Text>
+            <Link href={`tel:${site.phone.e164}`} variant="quiet" weight="semibold">
               {site.phone.display}
-            </a>
-            <a href={`mailto:${site.email}`} className="text-ink-inverse text-small">
+            </Link>
+            <Link href={`mailto:${site.email}`} variant="quiet" size="small">
               {site.email}
-            </a>
-            <p className="text-caption">
+            </Link>
+            <Text size="caption">
               Serving {site.baseCity}, {site.baseRegion} and the surrounding area.
-            </p>
+            </Text>
           </div>
 
           {footerNav.map((group) => (
@@ -46,7 +46,7 @@ export function Footer() {
               <ul className="list-none pl-0 flex flex-col gap-2">
                 {group.links.map((link) => (
                   <li key={link.href}>
-                    <Link href={link.href} className="text-ink-inverse no-underline text-small">
+                    <Link href={link.href} variant="quiet" size="small">
                       {link.label}
                     </Link>
                   </li>
@@ -62,7 +62,7 @@ export function Footer() {
             <ul className="list-none pl-0 flex flex-col gap-2">
               {cities.map((city) => (
                 <li key={city.slug}>
-                  <Link href={routes.city(city.slug)} className="text-ink-inverse no-underline text-small">
+                  <Link href={routes.city(city.slug)} variant="quiet" size="small">
                     {city.name}
                   </Link>
                 </li>

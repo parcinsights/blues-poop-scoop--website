@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/Button";
 import { Cluster, Container, Section, Stack } from "@/components/ui/layout";
+import { Heading, Text } from "@/components/ui/typography";
 import { routes } from "@/lib/routes";
 
 /**
@@ -15,10 +16,10 @@ export default function NotFound() {
     <Section spacing="lg">
       <Container>
         <Stack gap={6}>
-          <h1>We couldn&apos;t find that page</h1>
-          <p className="text-lead text-ink-muted max-w-prose">
+          <Heading level={1}>We couldn&apos;t find that page</Heading>
+          <Text size="lead" tone="muted" measure>
             The link may be out of date. Here&apos;s where most people are headed.
-          </p>
+          </Text>
           <Cluster gap={3}>
             <Button href={routes.home()}>Home</Button>
             <Button href={routes.services()} variant="ghost">

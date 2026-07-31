@@ -12,6 +12,7 @@ import { JsonLd } from "@/components/seo/JsonLd";
 import { Button } from "@/components/ui/Button";
 import { Container, Grid, Section, Stack } from "@/components/ui/layout";
 import { Card } from "@/components/ui/surfaces";
+import { Heading, Text } from "@/components/ui/typography";
 import { cities } from "@/content/cities";
 import { home } from "@/content/pages/home";
 import { reviews } from "@/content/reviews";
@@ -40,13 +41,13 @@ export default function HomePage() {
       <Section>
         <Container>
           <Stack gap={8}>
-            <h2>What we do</h2>
+            <Heading level={2}>What we do</Heading>
             <Grid columns={3}>
               {residentialServices.map((service) => (
                 <Card key={service.slug}>
                   <Stack gap={3}>
-                    <h3>{service.name}</h3>
-                    <p className="text-ink-muted">{service.summary}</p>
+                    <Heading level={3}>{service.name}</Heading>
+                    <Text tone="muted">{service.summary}</Text>
                     <Button href={routes.service(service.slug)} variant="link">
                       Learn more
                     </Button>
