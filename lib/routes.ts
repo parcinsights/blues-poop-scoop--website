@@ -14,7 +14,9 @@
  */
 
 import { cities } from "@/content/cities";
+import { moneyPage } from "@/content/money-pages";
 import { cityPageServices, services } from "@/content/services";
+import { isPublishable } from "./content";
 
 /**
  * The one origin this build knows about. Every canonical, OG url, sitemap entry and schema @id
@@ -76,22 +78,30 @@ export type RouteEntry = {
 export function allRoutes(): RouteEntry[] {
   const entries: RouteEntry[] = [
     { path: routes.home(), priority: 1.0, changeFrequency: "weekly", implemented: true },
-    { path: routes.services(), priority: 0.8, changeFrequency: "monthly", implemented: false },
-    { path: routes.locations(), priority: 0.8, changeFrequency: "monthly", implemented: false },
-    { path: routes.pricing(), priority: 0.9, changeFrequency: "monthly", implemented: false },
+    { path: routes.services(), priority: 0.8, changeFrequency: "monthly", implemented: true },
+    { path: routes.locations(), priority: 0.8, changeFrequency: "monthly", implemented: true },
+    { path: routes.pricing(), priority: 0.9, changeFrequency: "monthly", implemented: true },
+    { path: routes.faq(), priority: 0.6, changeFrequency: "monthly", implemented: true },
+    { path: routes.about(), priority: 0.5, changeFrequency: "yearly", implemented: true },
+    { path: routes.contact(), priority: 0.7, changeFrequency: "yearly", implemented: true },
+    { path: routes.getStarted(), priority: 0.9, changeFrequency: "monthly", implemented: true },
+    // Commercial stays unpublished until the client confirms they actually sell it — their
+    // current site says "Coming Soon", and a page offering a service nobody performs is worse
+    // than no page.
     { path: routes.commercial(), priority: 0.7, changeFrequency: "monthly", implemented: false },
-    { path: routes.about(), priority: 0.5, changeFrequency: "yearly", implemented: false },
-    { path: routes.contact(), priority: 0.7, changeFrequency: "yearly", implemented: false },
-    { path: routes.faq(), priority: 0.6, changeFrequency: "monthly", implemented: false },
-    { path: routes.getStarted(), priority: 0.9, changeFrequency: "monthly", implemented: false },
   ];
 
+  /**
+   * From here down, CONTENT decides publication, not a developer's memory. A page whose body has
+   * never been authored renders (so it can be reviewed and linked) but is noindexed and absent
+   * from the sitemap — see lib/content.ts for why that matters on a site shaped like this one.
+   */
   for (const service of services) {
     entries.push({
       path: routes.service(service.slug),
       priority: 0.8,
       changeFrequency: "monthly",
-      implemented: false,
+      implemented: isPublishable(service.body),
     });
   }
 
@@ -100,7 +110,7 @@ export function allRoutes(): RouteEntry[] {
       path: routes.city(city.slug),
       priority: 0.7,
       changeFrequency: "monthly",
-      implemented: false,
+      implemented: isPublishable(city.body),
     });
   }
 
@@ -111,7 +121,7 @@ export function allRoutes(): RouteEntry[] {
         path: routes.cityService(city.slug, service.slug),
         priority: 0.9,
         changeFrequency: "monthly",
-        implemented: false,
+        implemented: isPublishable(moneyPage(city.slug, service.slug)?.body ?? []),
       });
     }
   }

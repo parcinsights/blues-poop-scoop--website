@@ -12,11 +12,23 @@
  * empty slot, because an empty slot gets filled and filler gets forgotten.
  */
 
-const isProductionDeploy =
-  process.env.VERCEL_ENV === "production" || process.env.NEXT_PUBLIC_ALLOW_PLACEHOLDERS === "never";
+/**
+ * Evaluated per call rather than once at module load, so a test can stub the environment.
+ *
+ * Test runs are exempt: the guard exists to stop placeholder content reaching a real deployment,
+ * not to make the production code path untestable. lib/seo.test.ts stubs VERCEL_ENV=production to
+ * exercise indexability, and without this exemption merely importing the content would throw.
+ */
+function isProductionDeploy(): boolean {
+  if (process.env.VITEST) return false;
+  return (
+    process.env.VERCEL_ENV === "production" ||
+    process.env.NEXT_PUBLIC_ALLOW_PLACEHOLDERS === "never"
+  );
+}
 
 export function todo<T>(value: T): T {
-  if (isProductionDeploy) {
+  if (isProductionDeploy()) {
     throw new Error(
       `Placeholder content reached a production build: "${String(value).slice(0, 60)}…"\n` +
         `Replace every todo() call in content/ with the client's real facts before launch.`,
