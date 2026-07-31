@@ -4,6 +4,9 @@
  * The NAP block (name, address, phone) must match the Google Business Profile CHARACTER FOR
  * CHARACTER. Inconsistent NAP across a website, a GBP, and directory listings is one of the
  * few genuinely well-evidenced local ranking problems, and it is free to get right.
+ *
+ * Facts supplied by the client 2026-07-31. Anything still wrapped in todo() is outstanding and
+ * will fail a production build rather than ship as a guess.
  */
 
 import { todo } from "./todo";
@@ -12,9 +15,12 @@ import type { OpeningHours } from "./types";
 export const site = {
   /** Trading name. Exactly as it appears on the Google Business Profile. */
   name: "Blue's Poop Scoop",
-  /** Registered legal entity. Used in the footer and in schema `legalName`. */
-  legalName: todo("Blue's Poop Scoop LLC"),
-  tagline: todo("Philadelphia's pet waste removal pros"),
+  legalName: "Blue's Poop Scoop",
+  /** Their own headline, from the current site. Their words beat ours. */
+  tagline: "More than just a poop scoop service",
+
+  /** The owner. Named on the site because a name outperforms "our team" in a local trade. */
+  owner: "George",
 
   /**
    * SERVICE-AREA BUSINESS. The owner works out of a home address, so no street address is
@@ -28,19 +34,23 @@ export const site = {
 
   phone: {
     /** E.164, for tel: links and structured data. */
-    e164: todo("+12155550147"),
+    e164: "+16104100506",
     /** ONE display format, used everywhere. */
-    display: todo("(215) 555-0147"),
+    display: "(610) 410-0506",
   },
-  email: todo("hello@bluespoopscoop.com"),
+  email: "bluespoopscoop@gmail.com",
 
   foundedYear: todo(2021),
 
-  hours: [
+  /**
+   * OUTSTANDING — real hours needed. These are a placeholder and will fail a production build.
+   * They feed `openingHoursSpecification` in structured data and must match the GBP exactly.
+   */
+  hours: todo([
     { days: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"], opens: "08:00", closes: "17:00" },
     { days: ["Saturday"], opens: "09:00", closes: "14:00" },
     { days: ["Sunday"], closed: true },
-  ] satisfies OpeningHours[],
+  ] satisfies OpeningHours[]),
 
   /**
    * Every profile the business genuinely owns. Feeds schema `sameAs`, which is how a search

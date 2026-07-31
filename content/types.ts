@@ -89,17 +89,20 @@ export type Review = {
   date: string;
 };
 
-export type PricePlan = {
+/**
+ * Pricing is a matrix: number of dogs × visit frequency. That is how the client actually quotes,
+ * so it is how the site states it. Publishing the real grid is worth more than a "call for a
+ * quote" button — price is one of the top query intents in this vertical, and a page that answers
+ * it is the page that gets the call.
+ */
+export type PriceTier = {
   id: string;
-  name: string;
-  /** What the buyer gets. */
-  summary: string;
-  /** Real price in whole dollars. */
-  price: number;
-  /** e.g. "per week", "per visit". */
-  unit: string;
-  /** Real, honest qualifiers — dog count limits, yard size, first-cleanup fees. */
-  notes: string[];
+  /** Human label for the row, e.g. "1–2 dogs". */
+  dogs: string;
+  /** Whole dollars per month, weekly visits. */
+  weekly: number;
+  /** Whole dollars per month, every-other-week visits. */
+  biweekly: number;
   featured?: boolean;
 };
 

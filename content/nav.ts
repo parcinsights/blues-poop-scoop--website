@@ -20,7 +20,7 @@ export const footerNav: { heading: string; links: NavLink[] }[] = [
     heading: "Services",
     links: [
       { label: "Weekly Scooping", href: routes.service("weekly-scooping") },
-      { label: "Twice-Weekly Scooping", href: routes.service("twice-weekly-scooping") },
+      { label: "Bi-Weekly Scooping", href: routes.service("biweekly-scooping") },
       { label: "One-Time Cleanup", href: routes.service("one-time-cleanup") },
       { label: "Commercial", href: routes.commercial() },
     ],

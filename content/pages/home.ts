@@ -1,41 +1,49 @@
+import { startingPrice } from "../pricing";
 import { todo } from "../todo";
 import type { Seo } from "../types";
 
 /**
- * The homepage. PLACEHOLDER copy — every string here is waiting on the owner interview.
+ * The homepage.
  *
- * What this page needs to earn its ranking, once the facts arrive: how long they have been doing
- * this, how many yards they service now, what happens if they miss a visit, what the gate/dog
- * protocol is, and where the waste actually goes. Specifics a franchise cannot copy. Not
- * "reliable, professional, affordable" — every competitor in Philadelphia says that already.
+ * The three value props are the client's own words, lifted from their current site. They are kept
+ * verbatim on purpose: "We never enter when your dog is outside" is a real operating policy, and a
+ * specific policy is worth more than any amount of "reliable, professional, affordable" — which
+ * every competitor in Philadelphia is already saying.
+ *
+ * Still outstanding: how long they have been doing this, how many yards they service now, what
+ * happens if they miss a visit, and where the waste actually goes. Those are the details that make
+ * a homepage impossible for a franchise to copy.
  */
 export const home = {
   seo: {
-    title: todo("Dog Poop Removal in Philadelphia & the Main Line | Blue's Poop Scoop"),
-    description: todo(
-      "Weekly pooper scooper service across Philadelphia, Ardmore, Bryn Mawr and the Main Line. Flat rate, no contracts, same day every week.",
-    ),
+    title: "Dog Poop Removal in Philadelphia & the Main Line",
+    description: `Weekly and bi-weekly pet waste removal in Chestnut Hill, Mt. Airy, Roxborough, Ardmore, Bryn Mawr and more. Plans from $${startingPrice} a month.`,
   } satisfies Seo,
 
   hero: {
-    heading: todo("Never scoop the yard again"),
-    subheading: todo(
-      "Weekly dog waste removal across Philadelphia and the Main Line. Same day, every week, flat rate.",
-    ),
+    heading: "More than just a poop scoop service",
+    subheading: `Weekly and every-other-week dog waste removal across Philadelphia and the Main Line. Plans from $${startingPrice} a month.`,
   },
 
+  /** Verbatim from the client. Do not smooth these out — the specificity is the value. */
   valueProps: [
     {
-      title: todo("Same day every week"),
-      detail: todo("You get a fixed route day, not a four-hour window and a maybe."),
+      title: "Honest & Dependable",
+      detail:
+        "We show up when we say we will. No excuses, no surprises. Just a clean yard, every time.",
     },
     {
-      title: todo("Flat monthly rate"),
-      detail: todo("No contracts, no per-visit surprises. Cancel any time."),
+      title: "Pet Safety First",
+      detail:
+        "We never enter when your dog is outside. Your pet's safety always comes first — no exceptions.",
     },
     {
-      title: todo("We haul it away"),
-      detail: todo("Waste leaves with us. Nothing sits in your bin until trash day."),
+      title: "Locally Owned",
+      detail:
+        "We live and work in the neighborhoods we serve. This is our community, and we treat every yard like it's our own.",
     },
   ],
+
+  /** OUTSTANDING — the owner interview. See the note above. */
+  story: todo(""),
 } as const;
