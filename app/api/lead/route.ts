@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 
+import { deliverToGhl, missingIntegrationIsFatal } from "@/lib/integrations";
 import { quickLeadSchema, isServicedZip } from "@/lib/validation";
 
 /**
@@ -9,10 +10,11 @@ import { quickLeadSchema, isServicedZip } from "@/lib/validation";
  * Sweep&Go is deliberately NOT called here. Its onboarding endpoint creates a real client and
  * requires a full address, a frequency and an initial-cleanup decision — data this form does not
  * collect, and should not, because asking for it up front costs most of the submissions. The full
- * onboarding flow at /get-started/ posts to both.
+ * onboarding flow (phase 5, /api/onboard) will post to both.
  *
- * The webhook URL lives in env and is never committed (it is effectively a credential — anyone
- * holding it can inject leads into the client's CRM).
+ * DEFERRED: GHL_WEBHOOK_URL is not set yet. Until it is, this route accepts and logs leads off
+ * production so the form is reviewable during design, and refuses on production so a lead can
+ * never be silently swallowed. See lib/integrations.ts.
  */
 export async function POST(request: Request) {
   let body: unknown;
@@ -33,13 +35,6 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: true });
   }
 
-  const webhook = process.env.GHL_WEBHOOK_URL;
-  if (!webhook) {
-    // Loud in development, so a missing env var is found now rather than by a lost lead later.
-    console.error("[lead] GHL_WEBHOOK_URL is not set — lead was not delivered", parsed.data);
-    return NextResponse.json({ error: "Lead capture is not configured" }, { status: 503 });
-  }
-
   const lead = {
     ...parsed.data,
     inServiceArea: isServicedZip(parsed.data.zip),
@@ -47,23 +42,25 @@ export async function POST(request: Request) {
     submittedAt: new Date().toISOString(),
   };
 
-  try {
-    const response = await fetch(webhook, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(lead),
-    });
+  const result = await deliverToGhl(lead);
 
-    if (!response.ok) {
-      // Log the whole payload: a lead that failed to deliver is recoverable from logs, and
-      // silently dropping one is the most expensive bug this route can have.
-      console.error("[lead] GHL rejected the webhook", response.status, lead);
-      return NextResponse.json({ error: "Could not send that right now" }, { status: 502 });
+  if (result.status === "not-configured") {
+    if (missingIntegrationIsFatal()) {
+      console.error(`[lead] ${result.missing} is not set — lead NOT delivered`, lead);
+      return NextResponse.json({ error: "Lead capture is not configured" }, { status: 503 });
     }
-  } catch (error) {
-    console.error("[lead] GHL webhook threw", error, lead);
+    // Off production this is expected: no credentials yet. Log it so it is visible, and let the
+    // form complete so its success state can be designed and reviewed.
+    console.warn(`[lead] ${result.missing} not set — accepted without delivery`, lead);
+    return NextResponse.json({ ok: true, delivered: false });
+  }
+
+  if (result.status === "failed") {
+    // Log the whole payload: a lead that failed to deliver is recoverable from logs, and silently
+    // dropping one is the most expensive bug this route can have.
+    console.error("[lead] delivery failed:", result.detail, lead);
     return NextResponse.json({ error: "Could not send that right now" }, { status: 502 });
   }
 
-  return NextResponse.json({ ok: true });
+  return NextResponse.json({ ok: true, delivered: true });
 }
