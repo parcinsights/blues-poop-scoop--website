@@ -68,7 +68,7 @@ export default async function CityPage({ params }: Params) {
       <Section tone="alt">
         <Container>
           <Stack gap={6}>
-            <Heading level={2}>Plans available in {city.name}</Heading>
+            <Heading level={2} align="center-mobile">Plans available in {city.name}</Heading>
             <Cluster gap={3}>
               {cityPageServices.map((service) => (
                 <Button

@@ -51,7 +51,7 @@ export default function GetStartedPage() {
             </Card>
 
             <Stack gap={6}>
-              <Heading level={2}>What it costs</Heading>
+              <Heading level={2} align="center-mobile">What it costs</Heading>
               <Grid columns={2} gap={4}>
                 {priceTiers.map((tier) => (
                   <Card key={tier.id} tone={tier.featured ? "featured" : "default"}>

@@ -82,8 +82,8 @@ export function Section({
   id,
 }: {
   children: ReactNode;
-  tone?: "default" | "alt" | "brand" | "canvas" | "dark";
-  spacing?: "sm" | "md" | "lg" | "hero";
+  tone?: "default" | "alt" | "brand" | "canvas" | "raised" | "dark";
+  spacing?: "sm" | "md" | "lg" | "hero" | "hero-media";
   as?: ElementType;
   id?: string;
 }) {
@@ -93,6 +93,13 @@ export function Section({
     brand: "bg-brand-tint text-ink",
     // The house off-white. See --color-canvas in theme.css.
     canvas: "bg-canvas text-ink",
+    /**
+     * Plain white — the one band with no cream in it. It is the page taking a breath, so use it
+     * where the content itself carries the colour (the review wall's cream cards) rather than as a
+     * general-purpose alternate. Cards inside it must NOT be `tone="default"`: white on white is
+     * an invisible card. See `Card tone="tint"`.
+     */
+    raised: "bg-surface-raised text-ink",
     dark: "bg-surface-dark text-ink-inverse",
   } as const;
 
@@ -107,6 +114,13 @@ export function Section({
      * because the band below it has nothing overlapping to borrow from.
      */
     hero: "pt-6 pb-20 md:pt-10 md:pb-28",
+    /**
+     * The hero WITH a photograph. Same top, but no bottom padding at all while the layout is
+     * stacked: the picture is the end of the band, and a strip of cream under it reads as a gap
+     * rather than as spacing. The bottom padding returns at `lg`, which is exactly where `Split`
+     * puts the picture beside the words instead of under them.
+     */
+    "hero-media": "pt-6 pb-0 md:pt-10 lg:pb-28",
   } as const;
 
   return (

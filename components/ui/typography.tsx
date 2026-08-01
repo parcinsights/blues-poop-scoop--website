@@ -45,10 +45,28 @@ const headingSizes: Record<HeadingSize, string> = {
   h6: "text-h6 font-semibold",
 };
 
+/**
+ * HOUSE RULE — a heading that titles a whole section band is CENTRED ON MOBILE and left-aligned
+ * from `md` up: `align="center-mobile"`. On a phone the band is one narrow column and a left-hung
+ * title reads as the first line of the paragraph under it; centred, it reads as a title. On a
+ * laptop the same centring would float the title away from the content it labels, so it snaps
+ * back to the left edge.
+ *
+ * It is opt-in rather than the default for `level={2}` because plenty of h2s are not band titles —
+ * the card headings on /services and /locations are `level={2} size="h4"` and must stay left.
+ * Every NEW section band should pass it.
+ */
+const headingAligns = {
+  start: "",
+  center: "text-center",
+  "center-mobile": "text-center md:text-left",
+} as const;
+
 export function Heading({
   level,
   size,
   tone,
+  align = "start",
   id,
   children,
 }: {
@@ -57,6 +75,8 @@ export function Heading({
   /** Visual size, when it must differ from the level. Defaults to matching the level. */
   size?: HeadingSize;
   tone?: Tone;
+  /** See the house rule above — section band titles take `center-mobile`. */
+  align?: keyof typeof headingAligns;
   /** Set when something links to this heading — breadcrumbs, in-page anchors, `aria-labelledby`. */
   id?: string;
   children: ReactNode;
@@ -69,7 +89,10 @@ export function Heading({
   return (
     <Tag
       id={id}
-      className={cx(overridesSize && headingSizes[size], tone && tones[tone]) || undefined}
+      className={
+        cx(overridesSize && headingSizes[size], tone && tones[tone], headingAligns[align]) ||
+        undefined
+      }
     >
       {children}
     </Tag>
@@ -224,7 +247,11 @@ export function Quote({
 }) {
   return (
     <figure className="flex flex-col gap-3 h-full">
-      <blockquote className="grow">{children}</blockquote>
+      {/* base.css dresses a bare `blockquote` as a pulled quote in long-form prose — brand rule,
+          grey italic. All three are undone here: this is a testimonial, not an aside, and italic
+          grey is the styling of something the page is quoting *at* you rather than a customer's
+          own words. The card and the star row already say "quote". */}
+      <blockquote className="grow border-0 pl-0 not-italic text-ink">{children}</blockquote>
       <figcaption className="text-small font-semibold text-ink">
         {attribution}
         {detail && <span className="font-normal text-ink-muted">{` — ${detail}`}</span>}

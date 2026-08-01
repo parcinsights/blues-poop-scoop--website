@@ -33,7 +33,7 @@ export default function AboutPage() {
       <BlockRenderer blocks={about.body} />
       <FeatureGrid heading="How we work" features={home.valueProps} />
       {/* Renders nothing until real quotes exist — never a fabricated testimonial. */}
-      <ReviewWall heading="What customers say" reviews={reviews} />
+      <ReviewWall heading="See what our friends are saying about us" reviews={reviews} />
       <CtaBand heading="Let's get your yard sorted" />
     </>
   );

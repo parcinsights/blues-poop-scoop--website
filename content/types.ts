@@ -82,11 +82,16 @@ export type FaqItem = {
 /** A real customer quote. Rendered as content — never as review structured data (see lib/schema.ts). */
 export type Review = {
   quote: string;
-  /** First name only. */
+  /** The reviewer's display name, exactly as it appears on the source profile. */
   name: string;
-  city: string;
-  /** ISO date the review was left. */
-  date: string;
+  /**
+   * Optional, and usually absent. A Google review does not carry the reviewer's town, and a town
+   * is not something to guess at — an invented "— Ardmore" under a real person's name is a
+   * fabricated fact about a real customer. Set it only when the client confirms it.
+   */
+  city?: string;
+  /** ISO date the review was left, when known. */
+  date?: string;
 };
 
 /**

@@ -9,16 +9,21 @@ export function Card({
   as: _as,
 }: {
   children: ReactNode;
-  tone?: "default" | "featured";
+  tone?: "default" | "featured" | "canvas";
   as?: never;
 }) {
   return (
     <div
       className={cx(
+        // `relative` so a card can position its own decoration — see the paw on a review card.
+        "relative rounded-lg p-6 h-full",
         // White on the cream page background — the card lifts by going lighter, not darker.
-        "rounded-lg p-6 h-full",
         tone === "default" && "bg-surface-raised border border-line shadow-sm",
         tone === "featured" && "bg-surface-raised border-2 border-amber shadow-md",
+        // The inverse, for a white band: the card carries the off-white the hero band uses, so a
+        // review card and the top of the page are the same colour. No border and no shadow — the
+        // fill alone separates it, and a hairline on top of a colour change reads as doubled.
+        tone === "canvas" && "bg-canvas",
       )}
     >
       {children}

@@ -1,3 +1,5 @@
+import { PawPrint } from "lucide-react";
+
 import { Button } from "@/components/ui/Button";
 import { Image } from "@/components/ui/Image";
 import { Cluster, Container, Grid, Section, Split, Stack } from "@/components/ui/layout";
@@ -78,7 +80,7 @@ export function Hero({
   );
 
   return (
-    <Section tone="canvas" spacing="hero">
+    <Section tone="canvas" spacing={image ? "hero-media" : "hero"}>
       {image ? (
         <Split
           media={
@@ -113,7 +115,7 @@ export function FeatureGrid({
     <Section tone="alt">
       <Container>
         <Stack gap={8}>
-          <Heading level={2}>{heading}</Heading>
+          <Heading level={2} align="center-mobile">{heading}</Heading>
           <Grid columns={3}>
             {features.map((feature) => (
               <Card key={feature.title}>
@@ -142,7 +144,7 @@ export function PriceTable({ heading }: { heading: string }) {
     <Section>
       <Container>
         <Stack gap={8}>
-          <Heading level={2}>{heading}</Heading>
+          <Heading level={2} align="center-mobile">{heading}</Heading>
           <div className="overflow-x-auto">
             <table className="w-full border-collapse text-body">
               <caption className="sr-only">
@@ -203,7 +205,7 @@ export function ServiceAreaList({
     <Section tone="alt">
       <Container>
         <Stack gap={6}>
-          <Heading level={2}>{heading}</Heading>
+          <Heading level={2} align="center-mobile">{heading}</Heading>
           <Cluster gap={3}>
             {cities.map((city) => (
               <Button key={city.slug} href={routes.city(city.slug)} variant="ghost" size="sm">
@@ -230,7 +232,7 @@ export function FaqAccordion({ heading, items }: { heading: string; items: FaqIt
     <Section>
       <Container width="prose">
         <Stack gap={6}>
-          <Heading level={2}>{heading}</Heading>
+          <Heading level={2} align="center-mobile">{heading}</Heading>
           <div className="flex flex-col">
             {items.map((item) => (
               <details key={item.question} className="border-b border-line py-4">
@@ -254,29 +256,58 @@ export function FaqAccordion({ heading, items }: { heading: string; items: FaqIt
 /**
  * Real quotes, rendered as visible content and deliberately NOT marked up as review structured
  * data — self-serving review markup on your own domain is against Google's guidelines.
+ *
+ * The layout is CSS multi-column, not `Grid`. A grid would put every card in a row on the tallest
+ * card's height, which on quotes of wildly different lengths is a page of half-empty boxes; here
+ * each card is exactly as tall as its own words and the next one starts `mb-6` below it, so the
+ * heights stagger while the spacing stays constant. `break-inside-avoid` is what stops a column
+ * splitting a card down the middle.
+ *
+ * The trade: multi-column reads top-of-column to bottom-of-column, so the visual order is not the
+ * source order. For an unranked set of testimonials that costs nothing — nobody reads review four
+ * expecting it to follow review three.
+ *
+ * A white band with cream cards, which is the inverse of every other section. Reviews are the one
+ * place on the page where the content should feel like it came from outside the brand.
  */
 export function ReviewWall({
   heading,
   reviews,
 }: {
   heading: string;
-  reviews: readonly { quote: string; name: string; city: string }[];
+  reviews: readonly { quote: string; name: string; city?: string }[];
 }) {
   if (reviews.length === 0) return null;
   return (
-    <Section tone="alt">
+    <Section tone="raised">
       <Container>
         <Stack gap={8}>
-          <Heading level={2}>{heading}</Heading>
-          <Grid columns={3}>
+          <Heading level={2} align="center-mobile">{heading}</Heading>
+          <div className="columns-1 gap-6 md:columns-2 lg:columns-3">
             {reviews.map((review) => (
-              <Card key={review.quote}>
-                <Quote attribution={review.name} detail={review.city}>
-                  {review.quote}
-                </Quote>
-              </Card>
+              <div key={review.quote} className="mb-6 break-inside-avoid">
+                <Card tone="canvas">
+                  <Stack gap={4}>
+                    {/* Five filled stars on every card: these are the five-star reviews, and the
+                        row is the same one the hero uses, so the claim up there and the evidence
+                        down here are visibly the same thing. */}
+                    <Rating stars={5} />
+                    <Quote attribution={review.name} detail={review.city}>
+                      <Text>{review.quote}</Text>
+                    </Quote>
+                  </Stack>
+                  {/* The house stamp, bottom-right. Decoration only: hidden from assistive tech,
+                      untouchable by the pointer, and faint enough that the words stay the thing
+                      you read. It sits in the card's padding, so no text ever runs under it. */}
+                  <PawPrint
+                    size={40}
+                    aria-hidden="true"
+                    className="pointer-events-none absolute bottom-4 right-4 -rotate-12 text-brand opacity-15"
+                  />
+                </Card>
+              </div>
             ))}
-          </Grid>
+          </div>
         </Stack>
       </Container>
     </Section>

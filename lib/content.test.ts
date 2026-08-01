@@ -101,12 +101,21 @@ describe("reviews", () => {
   /**
    * Every review that exists must be attributable. The list being empty is fine and correct —
    * the components render nothing rather than inventing a testimonial.
+   *
+   * `city` is optional and usually absent, because a Google review does not carry one and the
+   * alternative is guessing a town on a real person's behalf. What it may not be is present and
+   * blank, which renders as a dangling em dash after the name.
    */
-  it("attributes every quote to a person and a place", () => {
+  it("attributes every quote to a person", () => {
     for (const review of reviews) {
       expect(review.quote.trim().length).toBeGreaterThan(0);
       expect(review.name.trim().length).toBeGreaterThan(0);
-      expect(review.city.trim().length).toBeGreaterThan(0);
+      if (review.city !== undefined) expect(review.city.trim().length).toBeGreaterThan(0);
     }
+  });
+
+  it("has no duplicate quotes", () => {
+    const quotes = reviews.map((review) => review.quote);
+    expect(new Set(quotes).size).toBe(quotes.length);
   });
 });

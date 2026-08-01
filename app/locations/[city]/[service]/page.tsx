@@ -83,7 +83,7 @@ export default async function CityServicePage({ params }: Params) {
       <Section tone="alt">
         <Container>
           <Stack gap={6}>
-            <Heading level={2}>Other options in {city.name}</Heading>
+            <Heading level={2} align="center-mobile">Other options in {city.name}</Heading>
             <Cluster gap={3}>
               {cityPageServices
                 .filter((other) => other.slug !== service.slug)
