@@ -47,13 +47,18 @@ export function Container({
  * line `Container` sits on, so the h1 here and the h2 of the section below it stack flush. Under
  * `lg` the two collapse to one column and the box behaves exactly like a Container.
  *
+ * That is also why there is NO column gap at `lg`: a gap narrows each column by half its width and
+ * drags the text box off the container line by that much. The air between the words and the
+ * picture is `pr-16` on the text column instead, which leaves the midline — and the alignment —
+ * untouched.
+ *
  * `media` is a separate prop rather than a second child so the stacking order on a phone is fixed
  * here — words first, picture second — and cannot be got wrong at a call site.
  */
 export function Split({ children, media }: { children: ReactNode; media: ReactNode }) {
   return (
-    <div className="grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
-      <div className="mx-auto w-full max-w-page px-5 sm:px-6 lg:mr-0 lg:max-w-page-half lg:px-8">
+    <div className="grid items-center gap-10 lg:grid-cols-2 lg:gap-0">
+      <div className="mx-auto w-full max-w-page px-5 sm:px-6 lg:mr-0 lg:max-w-page-half lg:pl-8 lg:pr-16">
         {children}
       </div>
       {/* `self-stretch` hands the picture the row's height; the floor keeps it from going letterbox
