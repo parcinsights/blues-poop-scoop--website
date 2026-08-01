@@ -51,6 +51,46 @@ export const assets = {
     width: 2000,
     height: 3000,
   },
+  /**
+   * ── THE SERVICE CARDS ──────────────────────────────────────────────────────
+   * One per service, for the 2×2 grid on /services/. All four are cropped square-ish by
+   * `object-cover` in a fixed-height box, so what matters in each is that the subject sits near
+   * the middle — the top and bottom of a tall frame are the first things the crop takes.
+   */
+
+  /**
+   * Poop Scoop. The only one of the four that is a photograph of the actual business — the owners,
+   * in branded shirts, with the real scooper. Downsized from the camera's 4000×6000: nothing
+   * renders it wider than ~600 CSS pixels and the original was 4MB.
+   */
+  servicePoopScoop: {
+    src: "/services--poop-scoop.jpg",
+    alt: "Two Blue's Poop Scoop staff beside a dog waste station, one holding a scooper",
+    width: 1200,
+    height: 1800,
+  },
+  /** Deodorizer. Stock — a pump sprayer treating a lawn. Replace when there is a photo of the real work. */
+  serviceDeodorizer: {
+    src: "/services--deodorizer.jpg",
+    alt: "A gloved worker kneeling on a lawn, spraying it with a handheld pump sprayer",
+    width: 1031,
+    height: 797,
+  },
+  /** Haul Away. Stock — a loaded skip on a driveway. */
+  serviceHaulAway: {
+    src: "/services--haul-away.webp",
+    alt: "A blue skip on a driveway, filled with household junk and bagged waste",
+    width: 1920,
+    height: 1280,
+  },
+  /** One-Time Clean. Stock — a caddy of cleaning supplies. */
+  serviceOneTimeClean: {
+    src: "/services--one-time-clean.jpg",
+    alt: "A yellow bucket packed with brushes, cloths, gloves and spray bottles",
+    width: 1200,
+    height: 675,
+  },
+
   /** The full lockup, artwork and wordmark together. For social cards and print, not the header. */
   logoFull: {
     src: "/brand/blues-poop-scoop--logo--full.png",

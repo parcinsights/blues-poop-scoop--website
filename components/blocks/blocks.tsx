@@ -957,16 +957,39 @@ export function ReviewWall({
 
 // ── CTA band ─────────────────────────────────────────────────────────────────
 
-export function CtaBand({ heading, detail }: { heading: string; detail?: string }) {
+/**
+ * The page's closing argument. Full-bleed, an h2 at full size, two buttons, and it sits last.
+ *
+ * KNOWN PROBLEM with `tone="dark"`, which is still the default: `--color-surface-dark` and
+ * `--color-brand` are the SAME navy — one token, two names — so `primary` is a navy fill on a navy
+ * band and `ghost` is navy text on it — both buttons are all but invisible, and only the cream
+ * label on the first one gives it an edge at all. Every page that closes on the dark band has
+ * this. The real fix is a button variant that inverts on a dark surface; until that exists,
+ * `tone="canvas"` is the way out, and it is what /services uses.
+ */
+export function CtaBand({
+  heading,
+  detail,
+  tone = "dark",
+}: {
+  heading: string;
+  detail?: string;
+  /** `canvas` is the light off-white close — same colour as a page's first band. */
+  tone?: "dark" | "canvas";
+}) {
+  // On the cream band the words are the page's normal ink, and the supporting line demotes to
+  // muted as it does everywhere else. `inverse` there would be cream on cream.
+  const dark = tone === "dark";
+
   return (
-    <Section tone="dark" spacing="md">
+    <Section tone={tone} spacing="md">
       <Container>
         <Stack gap={5} align="center">
-          <Heading level={2} tone="inverse">
+          <Heading level={2} tone={dark ? "inverse" : undefined}>
             {heading}
           </Heading>
           {detail && (
-            <Text tone="inverse" measure>
+            <Text tone={dark ? "inverse" : "muted"} measure>
               {detail}
             </Text>
           )}

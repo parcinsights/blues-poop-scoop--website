@@ -6,10 +6,19 @@ import { cx } from "@/lib/cx";
 export function Card({
   children,
   tone = "default",
+  aspect = "auto",
   as: _as,
 }: {
   children: ReactNode;
   tone?: "default" | "featured" | "canvas";
+  /**
+   * `square` locks the card to a 1:1 box — but only from `lg`, and that qualifier is the whole
+   * point. A square is a shape you can only afford when the card is WIDE: at the page width two
+   * of them are ~580px across, so a square is 580px tall and everything inside it has room. In a
+   * 300px tablet column the same rule gives a 300px box that its own contents overflow. Below
+   * `lg` the card is therefore just as tall as what is in it, which is what a phone wants anyway.
+   */
+  aspect?: "auto" | "square";
   as?: never;
 }) {
   return (
@@ -17,6 +26,7 @@ export function Card({
       className={cx(
         // `relative` so a card can position its own decoration — see the paw on a review card.
         "relative rounded-lg p-6 h-full",
+        aspect === "square" && "lg:aspect-square lg:p-8",
         // White on the cream page background — the card lifts by going lighter, not darker.
         tone === "default" && "bg-surface-raised border border-line shadow-sm",
         tone === "featured" && "bg-surface-raised border-2 border-amber shadow-md",
