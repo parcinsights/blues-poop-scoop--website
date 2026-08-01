@@ -115,6 +115,22 @@ export const home = {
   },
 
   /**
+   * The mid-page CTA ribbon, sitting between "why us" and "how it works".
+   *
+   * That seam is the moment it is worth interrupting: the visitor has just read the guarantee and
+   * the safety policy, so they are as convinced as they are going to get, and the band underneath
+   * is process rather than persuasion. Someone already sold does not need to be walked through the
+   * three steps first.
+   *
+   * The line under the title is the cost of clicking, not another claim — the objections are
+   * already answered twice above.
+   */
+  ctaBanner: {
+    heading: "Ready for a yard you don't think about?",
+    detail: "Tell us your zip code and how many dogs. Takes about a minute.",
+  },
+
+  /**
    * The three steps between "interested" and "scooped". Client-supplied, and the second and third
    * exist to answer the one question that stops people booking: do I have to be home? Once for the
    * walkthrough, never again — say it here rather than making them find it in the FAQ.

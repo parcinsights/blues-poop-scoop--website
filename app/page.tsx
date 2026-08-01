@@ -1,6 +1,14 @@
 import type { Metadata } from "next";
 
-import { FaqBand, Hero, HowItWorks, PricingBand, ReviewWall, WhyUs } from "@/components/blocks/blocks";
+import {
+  CtaBanner,
+  FaqBand,
+  Hero,
+  HowItWorks,
+  PricingBand,
+  ReviewWall,
+  WhyUs,
+} from "@/components/blocks/blocks";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { home } from "@/content/pages/home";
 import { ratingSummary, reviews } from "@/content/reviews";
@@ -38,6 +46,10 @@ export default function HomePage() {
         cta={home.whyUs.cta}
         image="whyUs"
       />
+
+      {/* `tone="canvas"` matches the band above, so the "why us" section reads as running on
+          through the ribbon rather than being cut off by it. */}
+      <CtaBanner heading={home.ctaBanner.heading} detail={home.ctaBanner.detail} tone="canvas" />
 
       <HowItWorks heading={home.howItWorks.heading} steps={home.howItWorks.steps} />
 

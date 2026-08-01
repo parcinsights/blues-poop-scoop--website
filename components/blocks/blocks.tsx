@@ -1,4 +1,4 @@
-import { BadgeCheck, Dog, MapPin, MessageCircleHeart, PawPrint } from "lucide-react";
+import { ArrowRight, BadgeCheck, Dog, MapPin, MessageCircleHeart, PawPrint } from "lucide-react";
 
 import { Button } from "@/components/ui/Button";
 import { Image } from "@/components/ui/Image";
@@ -774,6 +774,108 @@ export function CtaBand({ heading, detail }: { heading: string; detail?: string 
         </Stack>
       </Container>
     </Section>
+  );
+}
+
+// ── CTA banner ───────────────────────────────────────────────────────────────
+
+/**
+ * The between-sections CTA. Drop it anywhere in a page's band stack — its job is to catch a
+ * visitor mid-scroll, at the moment they have just been convinced of something, and hand them the
+ * quote form before they have to reach the bottom of the page to find one.
+ *
+ * Deliberately NOT `CtaBand`, and the difference is the point. `CtaBand` is the page's closing
+ * argument: full-bleed navy, an h2 at full size, two buttons, and it sits last. This is a ribbon —
+ * a contained card inside the page width, one line of type, one button — so a page can carry three
+ * of them without reading as three endings. Put a full-bleed band mid-page and the page looks like
+ * it finished and then started again.
+ *
+ * Amber rather than navy for the same reason. Navy is the closing band and the footer, and a navy
+ * ribbon two screens above a navy band is the same colour saying two different things. Amber is a
+ * BACKGROUND ONLY colour — ink on it is 7.71:1, white on it is 1.64:1 — so everything in here is
+ * ink, and the button is the navy `primary`, which is the one fill on the site that carries light
+ * text. See the palette note at the top of theme.css.
+ *
+ * `tone` is the surrounding band, not the ribbon: the ribbon floats on it. Match it to whichever
+ * neighbour should appear to continue through the banner — on the homepage it is `canvas`, so the
+ * "why us" band simply runs on and the ribbon sits inside it rather than cutting it in two.
+ */
+export function CtaBanner({
+  heading,
+  detail,
+  tone = "canvas",
+  cta = primaryCta,
+}: {
+  heading: string;
+  /** One line under the title. Anything longer belongs in a band, not a ribbon. */
+  detail?: string;
+  /** The band behind the ribbon — match it to the neighbour it should read as part of. */
+  tone?: "default" | "alt" | "canvas" | "raised";
+  /** Override only where the page's next step genuinely is not the quote form. */
+  cta?: { label: string; href: string };
+}) {
+  return (
+    // `sm`, the tightest band on the site: the ribbon carries its own padding, and a full-size
+    // band around it would put more air between it and its neighbours than the neighbours have
+    // between their own title and content.
+    <Section tone={tone} spacing="sm">
+      <Container>
+        {/* `overflow-hidden` is what lets the paws hang off the edges — they are positioned
+            outside the box and clipped back to its corner radius, so they read as printed on the
+            ribbon rather than stuck to it. */}
+        <div className="relative overflow-hidden rounded-lg bg-amber px-6 py-8 shadow-md sm:px-10 sm:py-10">
+          <CtaBannerPaws />
+
+          {/* Stacked and centred on a phone, then a row with the words left and the button right.
+              `relative` lifts it above the paws; `gap-6` is the air between the two on a phone. */}
+          <div className="relative flex flex-col items-center gap-6 md:flex-row md:justify-between md:gap-10">
+            {/* The house `center-mobile` rule, applied to the block rather than to the title
+                alone, so the line under it follows the title instead of sitting centred beneath a
+                left-hung one. */}
+            <div className="text-center md:text-left">
+              <Stack gap={2}>
+                <Heading level={2} size="h3">
+                  {heading}
+                </Heading>
+                {/* Ink, not `muted`: ink-muted on amber is 3.75:1 and fails AA. On this ribbon
+                    the supporting line is the same colour as the title — the size does the
+                    demoting. */}
+                {detail && <Text>{detail}</Text>}
+              </Stack>
+            </div>
+
+            {/* `shrink-0` or the label wraps mid-word as the heading beside it grows. The arrow is
+                the consequence of the action — where it takes you — which is why it sits right. */}
+            <div className="shrink-0">
+              <Button href={cta.href} size="lg" icon={ArrowRight}>
+                {cta.label}
+              </Button>
+            </div>
+          </div>
+        </div>
+      </Container>
+    </Section>
+  );
+}
+
+/**
+ * The paws on the ribbon. Decoration — hidden from assistive tech, untouchable by the pointer, and
+ * in `amber-dark`, which is the ribbon's own hover shade: a tone-on-tone watermark rather than a
+ * second colour arriving.
+ *
+ * Both hang off a corner and are clipped by the parent's `overflow-hidden`. They are drawn at
+ * every width — unlike the FAQ band's, which need gutters to live in — because the ribbon's own
+ * padding keeps them clear of the words even on a phone.
+ */
+function CtaBannerPaws() {
+  return (
+    <div aria-hidden="true" className="pointer-events-none absolute inset-0">
+      <PawPrint size={96} className="absolute -left-7 -top-7 rotate-12 text-amber-dark opacity-50" />
+      <PawPrint
+        size={72}
+        className="absolute -bottom-6 right-8 -rotate-12 text-amber-dark opacity-40"
+      />
+    </div>
   );
 }
 
