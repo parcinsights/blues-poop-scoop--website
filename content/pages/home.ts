@@ -97,6 +97,31 @@ export const home = {
     cta: "About us",
   },
 
+  /**
+   * The three steps between "interested" and "scooped". Client-supplied, and the second and third
+   * exist to answer the one question that stops people booking: do I have to be home? Once for the
+   * walkthrough, never again — say it here rather than making them find it in the FAQ.
+   */
+  howItWorks: {
+    heading: "How it works",
+    steps: [
+      {
+        title: "Get a free quote",
+        detail: "Fill out our quick online form — takes 60 seconds.",
+      },
+      {
+        title: "We text you back",
+        detail:
+          "Confirm your schedule. For your first visit, someone should be home to show us the yard.",
+      },
+      {
+        title: "Enjoy your yard",
+        detail:
+          "After the first visit, no need to be home — we scoop, double-bag, and text you when done.",
+      },
+    ],
+  },
+
   /** OUTSTANDING — the owner interview. See the note above. */
   story: todo(""),
 } as const;

@@ -106,17 +106,29 @@ export function Hero({
 // ── Why us ───────────────────────────────────────────────────────────────────
 
 /**
- * The medallion behind each point's glyph. Four hues that are NOT the brand palette — see the
- * accent block in theme.css for why. They cycle in source order, so a point's colour is a
- * property of its position in the band rather than of what it says: nothing here means "green
- * equals safe", and a fifth point would simply start the cycle again.
+ * The medallion behind a point's glyph or a step's number. Four hues that are NOT the brand
+ * palette — see the accent block in theme.css for why. They cycle in source order, so an item's
+ * colour is a property of its position in the band rather than of what it says: nothing here means
+ * "green equals safe", and a fifth item would simply start the cycle again.
+ *
+ * Shared by "why us" and "how it works" on purpose — two bands of the same page using two different
+ * sets of circles would read as two unrelated things.
+ *
+ * `edge` is the same hue as a card outline. It is only ever a BORDER: these fills are pastels and
+ * carry accent ink at 4.5:1, but nothing else — muted body text on one of them lands around 4.2:1,
+ * so a step card stays white and wears its colour on the rim.
  */
-const whyUsAccents = [
-  "bg-accent-mint text-accent-mint-ink",
-  "bg-accent-peach text-accent-peach-ink",
-  "bg-accent-lilac text-accent-lilac-ink",
-  "bg-accent-lemon text-accent-lemon-ink",
+const medallionAccents = [
+  { fill: "bg-accent-mint text-accent-mint-ink", edge: "border-accent-mint" },
+  { fill: "bg-accent-peach text-accent-peach-ink", edge: "border-accent-peach" },
+  { fill: "bg-accent-lilac text-accent-lilac-ink", edge: "border-accent-lilac" },
+  { fill: "bg-accent-lemon text-accent-lemon-ink", edge: "border-accent-lemon" },
 ] as const;
+
+/** The cycle. The modulo cannot miss, but a number index is still `| undefined` to the compiler. */
+function medallion(index: number) {
+  return medallionAccents[index % medallionAccents.length] ?? medallionAccents[0];
+}
 
 /** Content names an icon by key; this is the only place that turns one into a picture. */
 const whyUsIcons = {
@@ -177,7 +189,7 @@ export function WhyUs({
                       className={cx(
                         // `shrink-0` or the circle squashes into an oval as the text wraps.
                         "flex size-11 shrink-0 items-center justify-center rounded-pill",
-                        whyUsAccents[index % whyUsAccents.length],
+                        medallion(index).fill,
                       )}
                     >
                       <Icon size={22} />
@@ -202,6 +214,84 @@ export function WhyUs({
             </Cluster>
           </Stack>
         </div>
+      </Container>
+    </Section>
+  );
+}
+
+// ── How it works ─────────────────────────────────────────────────────────────
+
+/**
+ * The three steps from "interested" to "scooped". Centred throughout — at three short items this
+ * band is a row of equals, and a centred row says that where left-hung text would read as a list
+ * you work down.
+ *
+ * A real `<ol>`: the order is the meaning. The drawn numerals are therefore decoration and hidden
+ * from assistive tech, which announces the ordering itself — otherwise a screen reader says "one"
+ * twice per step.
+ *
+ * White band, with each step on an outlined card. Not `Card`: its tones are all white-on-cream, and
+ * this band is white, so a step card inverts the idea — white fill, a fat pastel rim, and the
+ * numeral straddling the rim like a sticker. That is deliberately the opposite of a review card
+ * (filled, borderless, paw stamped in the corner) so the two never blur into one house card look.
+ */
+export function HowItWorks({
+  heading,
+  steps,
+}: {
+  heading: string;
+  steps: readonly { title: string; detail: string }[];
+}) {
+  return (
+    <Section tone="raised">
+      <Container>
+        <Stack gap={10} align="center">
+          {/* Centred at every width, not `center-mobile`: the whole band is centred, so a title
+              that snapped left at `md` would be the only thing in it that did. */}
+          <Heading level={2} align="center">
+            {heading}
+          </Heading>
+
+          {/* One column, then three — never two. Three steps in a two-column grid leaves the last
+              one hanging alone under the other two, which reads as an afterthought rather than as
+              the payoff.
+
+              `mt-7` gives back the numeral's overhang — half of `size-14` — so the first card's
+              badge does not crowd the heading above it. The row gap is a step wider than the
+              column gap for the same reason, once the cards are stacked on a phone. */}
+          <ol className="mt-7 grid w-full list-none grid-cols-1 gap-x-6 gap-y-14 pl-0 sm:grid-cols-3">
+            {steps.map((step, index) => (
+              <li
+                key={step.title}
+                className={cx(
+                  // `h-full` keeps the three rims level when one step's words wrap further.
+                  "relative flex h-full flex-col items-center gap-3 rounded-lg border-2 bg-surface-raised px-6 pb-8 pt-12 text-center shadow-sm",
+                  medallion(index).edge,
+                )}
+              >
+                {/* Straddles the top rim: `-top-7` is half the circle, so the border cuts it
+                    exactly in half, and the fill is opaque so the rim runs behind rather than
+                    through it. Decoration — the `<ol>` is what tells assistive tech this is step
+                    two of three, and reading the numeral out loud says the number twice. */}
+                <span
+                  aria-hidden="true"
+                  className={cx(
+                    "absolute -top-7 left-1/2 flex size-14 -translate-x-1/2 items-center justify-center rounded-pill font-display text-h4 font-bold",
+                    medallion(index).fill,
+                  )}
+                >
+                  {index + 1}
+                </span>
+                <Heading level={3} size="h5">
+                  {step.title}
+                </Heading>
+                <Text tone="muted" size="small">
+                  {step.detail}
+                </Text>
+              </li>
+            ))}
+          </ol>
+        </Stack>
       </Container>
     </Section>
   );

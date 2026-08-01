@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-import { Hero, ReviewWall, WhyUs } from "@/components/blocks/blocks";
+import { Hero, HowItWorks, ReviewWall, WhyUs } from "@/components/blocks/blocks";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { home } from "@/content/pages/home";
 import { ratingSummary, reviews } from "@/content/reviews";
@@ -38,6 +38,8 @@ export default function HomePage() {
         cta={home.whyUs.cta}
         image="whyUs"
       />
+
+      <HowItWorks heading={home.howItWorks.heading} steps={home.howItWorks.steps} />
 
       {/* REBUILD IN PROGRESS — the rest of the homepage is being redesigned one band at a time.
           The blocks that used to sit here (value props, services grid, pricing, service area, CTA)
