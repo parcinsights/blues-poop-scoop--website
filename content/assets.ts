@@ -40,6 +40,17 @@ export const assets = {
     width: 3000,
     height: 2000,
   },
+  /**
+   * The "why us" band. Portrait, and cropped to a band on a phone — see the note in `WhyUs`.
+   * Downsized from the 4000×6000 original: nothing on the page renders it wider than ~600 CSS
+   * pixels, and shipping the camera's file is 2.7MB of nothing.
+   */
+  whyUs: {
+    src: "/why-us.jpg",
+    alt: "The owners of Blue's Poop Scoop kneeling on a lawn with their small white dog",
+    width: 2000,
+    height: 3000,
+  },
   /** The full lockup, artwork and wordmark together. For social cards and print, not the header. */
   logoFull: {
     src: "/brand/blues-poop-scoop--logo--full.png",

@@ -83,7 +83,7 @@ export function Section({
 }: {
   children: ReactNode;
   tone?: "default" | "alt" | "brand" | "canvas" | "raised" | "dark";
-  spacing?: "sm" | "md" | "lg" | "hero" | "hero-media";
+  spacing?: "sm" | "md" | "lg" | "lg-tight-top" | "hero" | "hero-media";
   as?: ElementType;
   id?: string;
 }) {
@@ -107,6 +107,12 @@ export function Section({
     sm: "py-10 md:py-14",
     md: "py-14 md:py-20",
     lg: "py-20 md:py-28",
+    /**
+     * `lg`, with the top half taken back on a phone. Use it where the band's own first element is
+     * a photograph: the picture carries its own visual weight, so a full `pt-20` above it on a
+     * narrow screen is dead space you have to scroll past before anything starts.
+     */
+    "lg-tight-top": "pt-10 pb-20 md:py-28",
     /**
      * The FIRST band of a page, sitting directly under the header. Asymmetric on purpose: the
      * header already supplies the air above, so a symmetric `lg` reads as a gap rather than as

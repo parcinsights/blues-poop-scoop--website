@@ -95,6 +95,25 @@
   --color-danger: #f7d7d5; /* derived fill — no red was supplied */
   --color-danger-ink: #9e2b25; /* derived — 6.77:1 on cream, for form errors */
 
+  /* ── Accents ──────────────────────────────────────────────────────────────
+     Four hues that are NOT the brand palette, for the icon medallions on the
+     "why us" band. They exist because four identical navy circles read as a
+     spec sheet, and this is the one part of the page whose job is warmth.
+
+     Each is a pair: a fill, and the only ink allowed to sit on that fill. The
+     pairing is checked in lib/theme.test.ts at 4.5:1 — the medallion glyph is
+     small, so it is held to the text minimum rather than the 3:1 icons would
+     otherwise get. Fills are deliberately mid-tone; a pastel disappears on the
+     cream band behind it. */
+  --color-accent-mint: #a7e3c4;
+  --color-accent-mint-ink: #0f5c3f; /* 5.50:1 on mint */
+  --color-accent-peach: #ffcdae;
+  --color-accent-peach-ink: #9c3f12; /* 4.66:1 on peach */
+  --color-accent-lilac: #d3c8f7;
+  --color-accent-lilac-ink: #4a35a6; /* 5.69:1 on lilac */
+  --color-accent-lemon: #ffe08a;
+  --color-accent-lemon-ink: #7a5600; /* 5.15:1 on lemon */
+
   /* Required by Tailwind's reset and the outline utilities. */
   --color-transparent: transparent;
   --color-current: currentColor;
@@ -118,7 +137,10 @@
   --text-h1--line-height: 1.1;
   --text-h1--letter-spacing: -0.018em;
 
-  --text-h2: clamp(1.625rem, 1.35rem + 1.35vw, 2.25rem);
+  /* Section titles. Deliberately close to h1: a band title is the second thing
+     a visitor reads on a scroll, and the earlier, smaller step let it blend
+     into the paragraph beneath it on a phone. */
+  --text-h2: clamp(1.875rem, 1.5rem + 1.6vw, 2.625rem);
   --text-h2--line-height: 1.18;
   --text-h2--letter-spacing: -0.014em;
 

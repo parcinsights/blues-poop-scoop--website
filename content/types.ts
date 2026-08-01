@@ -79,6 +79,18 @@ export type FaqItem = {
   answer: string;
 };
 
+/**
+ * One reason to hire this business, for the "why us" band.
+ *
+ * `icon` is a KEY, not a component: content files describe what a point is about and the block
+ * decides what that looks like, which is what keeps a lucide import out of the content layer.
+ */
+export type WhyUsPoint = {
+  icon: "guarantee" | "safety" | "local" | "flexible";
+  title: string;
+  detail: string;
+};
+
 /** A real customer quote. Rendered as content — never as review structured data (see lib/schema.ts). */
 export type Review = {
   quote: string;

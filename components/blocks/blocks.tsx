@@ -1,4 +1,4 @@
-import { PawPrint } from "lucide-react";
+import { BadgeCheck, Dog, MapPin, MessageCircleHeart, PawPrint } from "lucide-react";
 
 import { Button } from "@/components/ui/Button";
 import { Image } from "@/components/ui/Image";
@@ -11,7 +11,8 @@ import type { AssetKey } from "@/content/assets";
 import { priceTiers, pricing } from "@/content/pricing";
 import { phoneCtaLabel, primaryCta } from "@/content/nav";
 import { site } from "@/content/site";
-import type { ContentBlock, FaqItem } from "@/content/types";
+import type { ContentBlock, FaqItem, WhyUsPoint } from "@/content/types";
+import { cx } from "@/lib/cx";
 import { routes } from "@/lib/routes";
 
 /**
@@ -98,6 +99,110 @@ export function Hero({
       ) : (
         <Container>{body}</Container>
       )}
+    </Section>
+  );
+}
+
+// ── Why us ───────────────────────────────────────────────────────────────────
+
+/**
+ * The medallion behind each point's glyph. Four hues that are NOT the brand palette — see the
+ * accent block in theme.css for why. They cycle in source order, so a point's colour is a
+ * property of its position in the band rather than of what it says: nothing here means "green
+ * equals safe", and a fifth point would simply start the cycle again.
+ */
+const whyUsAccents = [
+  "bg-accent-mint text-accent-mint-ink",
+  "bg-accent-peach text-accent-peach-ink",
+  "bg-accent-lilac text-accent-lilac-ink",
+  "bg-accent-lemon text-accent-lemon-ink",
+] as const;
+
+/** Content names an icon by key; this is the only place that turns one into a picture. */
+const whyUsIcons = {
+  guarantee: BadgeCheck,
+  safety: Dog,
+  local: MapPin,
+  flexible: MessageCircleHeart,
+} as const;
+
+export function WhyUs({
+  heading,
+  intro,
+  points,
+  cta,
+  image,
+}: {
+  heading: string;
+  intro: string;
+  points: readonly WhyUsPoint[];
+  /** The label on the button through to the about page. */
+  cta: string;
+  image: AssetKey;
+}) {
+  return (
+    <Section tone="canvas" spacing="lg-tight-top">
+      <Container>
+        {/* Picture first in the DOM as well as on the left, so the reading order on a phone is
+            face-then-argument — the photograph is what earns the four claims underneath it. */}
+        <div className="grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
+          {/* The photograph is portrait, and at full height a 2:3 frame is most of a phone screen
+              before a single word of the argument appears. So it is cropped to a band and never
+              shown whole: `object-cover` with the default centre anchor, which is where the two
+              faces and the dog are. The top of this frame is tree, so `object-top` would crop to
+              foliage — if the picture is ever swapped for a landscape one, revisit this line. */}
+          <Image
+            asset={image}
+            sizes="(min-width: 64rem) 50vw, 100vw"
+            className="h-96 w-full rounded-lg object-cover sm:h-120 lg:h-160"
+          />
+
+          <Stack gap={6}>
+            <Stack gap={4}>
+              <Heading level={2} align="center-mobile">
+                {heading}
+              </Heading>
+              <Text tone="muted">{intro}</Text>
+            </Stack>
+
+            {/* A real list: four parallel claims are a list, and a screen reader saying "four
+                items" up front is the summary a sighted reader gets from the medallions. */}
+            <ul className="list-none pl-0 flex flex-col gap-5">
+              {points.map((point, index) => {
+                const Icon = whyUsIcons[point.icon];
+                return (
+                  <li key={point.title} className="flex items-start gap-4">
+                    <span
+                      aria-hidden="true"
+                      className={cx(
+                        // `shrink-0` or the circle squashes into an oval as the text wraps.
+                        "flex size-11 shrink-0 items-center justify-center rounded-pill",
+                        whyUsAccents[index % whyUsAccents.length],
+                      )}
+                    >
+                      <Icon size={22} />
+                    </span>
+                    <div>
+                      <Heading level={3} size="h5">
+                        {point.title}
+                      </Heading>
+                      <Text tone="muted" size="small">
+                        {point.detail}
+                      </Text>
+                    </div>
+                  </li>
+                );
+              })}
+            </ul>
+
+            <Cluster gap={4}>
+              <Button href={routes.about()} variant="secondary" size="md">
+                {cta}
+              </Button>
+            </Cluster>
+          </Stack>
+        </div>
+      </Container>
     </Section>
   );
 }

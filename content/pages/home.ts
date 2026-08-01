@@ -1,6 +1,6 @@
 import { startingPrice } from "../pricing";
 import { todo } from "../todo";
-import type { Seo } from "../types";
+import type { Seo, WhyUsPoint } from "../types";
 
 /**
  * The homepage.
@@ -58,6 +58,44 @@ export const home = {
         "We live and work in the neighborhoods we serve. This is our community, and we treat every yard like it's our own.",
     },
   ],
+
+  /**
+   * The "why us" band. Three of the four points are the client's existing commitments restated —
+   * the pet-safety policy, being locally owned, and the no-contract terms already promised in the
+   * hero. The guarantee is the new one, and it is the strongest thing on the page: it is the only
+   * claim here that costs the business money if it turns out to be false.
+   */
+  whyUs: {
+    heading: "Why your yard is in good hands",
+    intro:
+      "We're a small local outfit, not a franchise — the people who scoop your yard are the same ones who answer the phone. If we ever leave you unhappy, we'd rather give the money back than argue about it.",
+    points: [
+      {
+        icon: "guarantee",
+        title: "30-day satisfaction guarantee",
+        detail:
+          "Not happy with the work in your first 30 days? We refund it in full, no questions asked.",
+      },
+      {
+        icon: "safety",
+        title: "Your dog's safety comes first",
+        detail:
+          "We never enter the yard while your dog is outside. No exceptions, no matter the schedule.",
+      },
+      {
+        icon: "local",
+        title: "Your actual neighbors",
+        detail:
+          "We live and work in the same neighborhoods we serve, and we treat every yard like our own.",
+      },
+      {
+        icon: "flexible",
+        title: "No contracts, ever",
+        detail: "Cancel any time, and reach a real person by text when something changes.",
+      },
+    ] satisfies WhyUsPoint[],
+    cta: "About us",
+  },
 
   /** OUTSTANDING — the owner interview. See the note above. */
   story: todo(""),

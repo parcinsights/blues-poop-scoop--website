@@ -130,6 +130,20 @@ describe("palette meets WCAG AA", () => {
   }
 
   /**
+   * The accent medallions on the "why us" band. Each fill has exactly one ink partner, and the
+   * glyph inside it is small enough to be held to the text minimum rather than 3:1.
+   */
+  describe("accent pairs", () => {
+    for (const name of ["mint", "peach", "lilac", "lemon"]) {
+      it(`accent-${name}-ink clears ${AA_NORMAL_TEXT}:1 on accent-${name}`, () => {
+        expect(
+          contrastRatio(token(`color-accent-${name}-ink`), token(`color-accent-${name}`)),
+        ).toBeGreaterThanOrEqual(AA_NORMAL_TEXT);
+      });
+    }
+  });
+
+  /**
    * The inverse assertions. Three of the client's brand colors are light fills that look like
    * button colors and are not — white on amber is 1.64:1. Encoding that as a test means the
    * mistake gets caught the first time somebody tries it, rather than shipping and being found
