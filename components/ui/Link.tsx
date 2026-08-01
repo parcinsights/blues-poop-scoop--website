@@ -28,10 +28,10 @@ const variants: Record<LinkVariant, string> = {
   // Navigation: no underline, ink-coloured, weighted so it reads as a control.
   // The hover colour is set here rather than left to base.css, because `text-ink` is a utility and
   // would win over the base-layer `a:hover` rule — a nav link with no hover feedback at all.
-  // The size is baked in, not left to the `size` prop — a nav item is 18px/800 everywhere it
+  // The size is baked in, not left to the `size` prop — a nav item is 18px/600 everywhere it
   // appears, and passing `size="small"` alongside this would produce two competing text sizes.
   nav:
-    "no-underline text-ink text-control font-extrabold " +
+    "no-underline text-ink text-control font-semibold " +
     "transition-colors duration-150 ease-out hover:text-brand",
   // Footer and other lists: no underline, inherits the surrounding colour.
   quiet: "no-underline text-inherit",
@@ -47,7 +47,7 @@ const variants: Record<LinkVariant, string> = {
    * a gap between the rows would do it as stripes of white through the open menu instead.
    */
   menu:
-    "no-underline text-ink text-control font-extrabold block px-4 py-3 " +
+    "no-underline text-ink text-control font-semibold block px-4 py-3 " +
     "transition-colors duration-150 ease-out hover:bg-brand-tint hover:text-brand-dark",
 };
 

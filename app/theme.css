@@ -100,9 +100,10 @@
   --color-current: currentColor;
 
   /* ── Typography ───────────────────────────────────────────────────────────
-     LINE Seed Sans throughout — headings and body are the same face, separated
-     by weight and size rather than by family. Self-hosted through next/font, so
-     there is no request to a third-party host and no layout shift.
+     Fredoka throughout — headings and body are the same face, separated by
+     weight and size rather than by family. Self-hosted through next/font, so
+     there is no request to a third-party host and no layout shift. Its weight
+     axis stops at 700: `font-extrabold` clamps there. See app/layout.tsx.
      Bound to next/font in app/layout.tsx; swapping them is two lines there. */
   --font-display: var(--font-sans-face), ui-sans-serif, system-ui, sans-serif;
   --font-body: var(--font-sans-face), ui-sans-serif, system-ui, sans-serif;
@@ -147,7 +148,7 @@
    * copy, it is a target, and it wants a tighter line box and the freedom to be resized without
    * dragging every paragraph on the site along with it.
    */
-  --text-control: 1.25rem;
+  --text-control: 1.1rem;
   --text-control--line-height: 1.3;
 
   --text-small: 0.9375rem;

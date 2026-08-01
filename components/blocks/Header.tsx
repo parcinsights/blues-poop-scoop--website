@@ -29,7 +29,7 @@ import { Link } from "@/components/ui/Link";
 
 /** Top-level bar items — the trigger `<button>` matches `Link variant="nav"`. */
 const triggerClasses =
-  "inline-flex items-center gap-1 cursor-pointer bg-transparent text-control font-extrabold " +
+  "inline-flex items-center gap-1 cursor-pointer bg-transparent text-control font-semibold " +
   "text-ink transition-colors duration-150 ease-out hover:text-brand group-hover:text-brand";
 
 /**
@@ -109,10 +109,11 @@ export function Header() {
           <Link href={routes.home()} variant="quiet">
             <span className="flex items-center gap-3">
               <Image asset="logoMark" priority className="h-16 w-auto" />
-              {/* 18px/800, the same as the nav items beside it — the lockup and the navigation are
-                  one row of type, and the mark to its left is what gives the brand its size. LINE
-                  Seed ships a real 800 weight, so nothing here is synthetically emboldened. */}
-              <span className="font-display font-extrabold text-control text-brand leading-none">
+              {/* 18px/600, the same as the nav items beside it — the lockup and the navigation are
+                  one row of type, and the mark to its left is what gives the brand its size.
+                  Fredoka is variable across 300–700, so 600 is a real design, not an interpolation
+                  the browser faked. */}
+              <span className="font-display font-semibold text-control text-brand leading-none">
                 {site.name}
               </span>
             </span>
@@ -167,7 +168,7 @@ export function Header() {
                         ) : (
                           // A menu-only group is a heading here, not a dead link — there is no
                           // hover on a phone, so the dropdown it opens on desktop is just a list.
-                          <span className="text-control font-extrabold text-ink">{item.label}</span>
+                          <span className="text-control font-semibold text-ink">{item.label}</span>
                         )}
                         {item.children?.length ? (
                           <ul className="list-none mt-3 flex flex-col gap-3 border-l border-line pl-4">

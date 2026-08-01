@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import localFont from "next/font/local";
+import { Fredoka } from "next/font/google";
 
 import { Footer } from "@/components/blocks/Footer";
 import { Header } from "@/components/blocks/Header";
@@ -11,27 +11,28 @@ import "./theme.css";
 import "./base.css";
 
 /**
- * LINE Seed Sans, one face for the whole site — headings and body differ by weight and size, not
- * by family. Self-hosted through next/font/local: the .woff2 files in app/fonts are served from
- * our own origin, preloaded, and given a stable fallback metric, so there is no render-blocking
- * request to a font CDN and no layout shift when the face swaps in.
+ * Fredoka, one face for the whole site — headings and body differ by weight and size, not by
+ * family. Rounded terminals and a wide, friendly bowl: the tone a neighbourhood pet-waste service
+ * wants, where the previous grotesque read corporate.
  *
- * The Latin family ships Regular / Bold / ExtraBold (plus Thin and Heavy, unused). CSS weight
- * matching covers the gaps on its own: rules asking for 500 resolve to Regular, 600 to Bold. No
- * synthetic emboldening happens, so nothing in base.css needs to change.
+ * `next/font/google` still self-hosts. The face is fetched once at BUILD time and emitted into our
+ * own /_next/static output, so the browser never touches fonts.googleapis.com — no render-blocking
+ * third-party request, no privacy hop, and a stable fallback metric so nothing shifts on swap.
  *
- * Licensed under the LINE Seed font license — free for commercial use and web embedding; see
- * app/fonts/LICENSE.md.
+ * VARIABLE, and `weight` is deliberately omitted so the whole axis ships in one file. That axis is
+ * 300–700, which is the one thing to know before adding a rule here: `font-extrabold` (800) has no
+ * design to resolve to and CLAMPS to 700 — it renders identically to `font-bold`, with no synthetic
+ * emboldening. Button labels ask for 800 and get Fredoka's Bold; that is the intended top of the
+ * ramp, not a bug. Anything wanting more weight than that needs a different face, not a heavier
+ * number.
+ *
+ * Licensed under the SIL Open Font License 1.1 — free for commercial use and web embedding.
  *
  * Changing the font is this one call and nothing else — every rule reads --font-display and
  * --font-body from theme.css.
  */
-const lineSeedSans = localFont({
-  src: [
-    { path: "./fonts/LINESeedSans_Rg.woff2", weight: "400", style: "normal" },
-    { path: "./fonts/LINESeedSans_Bd.woff2", weight: "700", style: "normal" },
-    { path: "./fonts/LINESeedSans_XBd.woff2", weight: "800", style: "normal" },
-  ],
+const fredoka = Fredoka({
+  subsets: ["latin"],
   variable: "--font-sans-face",
   display: "swap",
   fallback: ["ui-sans-serif", "system-ui", "sans-serif"],
@@ -57,7 +58,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en-US" className={lineSeedSans.variable}>
+    <html lang="en-US" className={fredoka.variable}>
       <body>
         {/* First focusable element on the page — lets keyboard users skip the nav. */}
         <a href="#main" className="skip-link">
