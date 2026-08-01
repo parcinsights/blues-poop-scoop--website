@@ -98,10 +98,10 @@ function Dropdown({ item }: { item: NavGroup }) {
 
 export function Header() {
   return (
-    // No border. `header-lift` (base.css) fades a shadow in on scroll instead, so at the top of
-    // the page the header is indistinguishable from the band beneath it — which is why the
-    // background is `canvas`, the same off-white the hero and every page's top band use.
-    <header className="header-lift sticky top-0 z-50 bg-canvas">
+    // No border, and no background class: the bar is TRANSPARENT at the top of the page — the first
+    // band runs up underneath it — and fades to white as the page moves, at the same moment the
+    // shadow arrives. Both are one scroll-driven animation in base.css; see `.header-lift`.
+    <header className="header-lift sticky top-0 z-50">
       <Container>
         <div className="flex items-center justify-between gap-6 py-4">
           {/* The mark as an image, the wordmark as live text in the site face — so it stays crisp

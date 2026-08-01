@@ -1,19 +1,9 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
-import {
-  BlockRenderer,
-  CtaBand,
-  FaqBand,
-  Hero,
-  HowItWorks,
-  PricingBand,
-  ServiceAreaList,
-  ServiceIncludes,
-  WhyUs,
-} from "@/components/blocks/blocks";
+import { CtaBand, ServiceDetails, ServiceHero } from "@/components/blocks/blocks";
 import { JsonLd } from "@/components/seo/JsonLd";
-import { cities } from "@/content/cities";
+import { SectionDivider } from "@/components/ui/layout";
 import { servicePage } from "@/content/pages/service-page";
 import { serviceBySlug, services } from "@/content/services";
 import { isPublishable } from "@/lib/content";
@@ -23,28 +13,32 @@ import { buildMetadata } from "@/lib/seo";
 
 /**
  * THE service page. Singular on purpose: every service — the scooping plan, each add-on,
- * commercial — renders through this one file, in the same band order, with the same styling. Only
- * the words and the photographs change, and both of those come from `content/services.ts`.
+ * commercial — renders through this one file, in the same three bands, with the same styling. Only
+ * the words and the photograph change, and both come from `content/services.ts`.
  *
- * So: never fork this template for one service. If a band has to vary, it varies as optional DATA
- * on the `Service` type — an absent field drops its band — not as a second layout. A service page
- * that looks different from its siblings is a bug.
+ * So: never fork this template for one service. If something has to vary, it varies as optional
+ * DATA on the `Service` type — an absent field drops its chips, its photo or its tab content — not
+ * as a second layout. A service page that looks different from its siblings is a bug.
  *
- * The band order, and why:
+ * Three bands, and that is the whole page:
  *
- *   Hero            what this is, with the trail and the two buttons.
- *   What's included the only genuinely per-service band, so it goes first while attention is high.
- *   Authored body   long-form copy when there is any. Usually empty — see the publish gate below.
- *   Why us          the guarantee and the safety policy. Shared, from content/pages/service-page.ts.
- *   How it works    the three steps. Shared.
- *   Prices          the real grid. Shared — a frequency is a price decision, not a page.
- *   Coverage        "do you come to my street", asked after the price rather than before it.
- *   FAQ             the service's own questions, falling back to the site-wide four.
- *   CTA             the closing band.
+ *   Hero      chips, the h1, the summary, price and quote buttons, and the service's photograph.
+ *   Details   About / Includes / Benefits behind chip toggles, with the quote form beside them.
+ *   CTA       the closing band, on the light surface.
  *
- * The homepage runs the same rhythm (hero → argument → steps → prices → questions → CTA), which is
- * the point: someone who lands here from a search and then clicks through to the homepage should
- * not feel they have changed sites.
+ * The first two are BOTH white and are separated by a rule on the container line rather than by a
+ * change of tone — see `SectionDivider`. The page therefore runs one colour from the header down to
+ * the closing band, which is what lets the photograph and the chips carry it instead.
+ *
+ * IT USED TO BE NINE. Under the old template the hero was followed by what's included, the authored
+ * body, the guarantee band, the three steps, the price grid, the coverage list and the FAQ — of
+ * which everything from the guarantee down was identical on all four services. That is most of the
+ * homepage, re-served to someone who had already clicked past it to ask about one specific job.
+ * The bands still exist and still run on the homepage; this page stopped repeating them.
+ *
+ * The three questions that survived — what is it, what happens, what do I get — are now the three
+ * tabs, so the copy that genuinely differs is the first thing under the h1 and the page ends one
+ * screen later instead of six.
  *
  * The services INDEX at /services/ is a different design and is not governed by this note.
  */
@@ -71,7 +65,8 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
   return buildMetadata({
     ...service.seo,
     path: routes.service(slug),
-    // No authored body yet — render it for review, but keep it out of the index.
+    // No authored body yet — render it for review, but keep it out of the index. That body is the
+    // About tab, so the gate and the page's first panel are now the same fact.
     noindex: !isPublishable(service.body),
   });
 }
@@ -86,52 +81,37 @@ export default async function ServicePage({ params }: Params) {
 
   return (
     <>
+      {/* No `faqs` argument: the FAQ band is gone from this page, and FAQPage markup for questions
+          a visitor cannot see is what Google's structured-data guidelines call out. The service's
+          own questions are still on the record — see `Service.faq`. */}
       <JsonLd graph={servicePageGraph({ path, service, crumbs })} />
 
-      {/* This hero replaces `PageShell`, which is why it carries the crumbs. A service page is
-          where a search lands, so it gets the same treatment as the homepage rather than the
-          plain heading strip the standing pages use. */}
-      <Hero
+      <ServiceHero
         heading={service.heading}
-        subheading={service.summary}
+        summary={service.summary}
+        tags={service.tags}
         image={service.image}
         crumbs={crumbs}
-        assurances={service.assurances}
+        pricingLabel={servicePage.hero.pricingCta}
       />
 
-      {service.includes && <ServiceIncludes {...service.includes} />}
+      {/* Both bands are white, so nothing marks the seam between them. This is that mark: a
+          hairline on the container line, so it starts and stops where the h1 above and the chips
+          below do. A full-bleed rule would cut the page in two instead. */}
+      <SectionDivider tone="raised" />
 
-      <BlockRenderer blocks={service.body} />
-
-      {/* Shared from here down. The photograph is the owners-and-dog shot on every service page on
-          purpose: these four claims are about the business, not about the service, and swapping in
-          a picture of the work would make the band look like it is arguing something it isn't. */}
-      <WhyUs
-        heading={servicePage.whyUs.heading}
-        intro={servicePage.whyUs.intro}
-        points={servicePage.whyUs.points}
-        cta={servicePage.whyUs.cta}
-        image="whyUs"
+      <ServiceDetails
+        labels={servicePage.tabs}
+        body={service.body}
+        includes={service.includes}
+        benefits={service.benefits}
+        pending={servicePage.pending}
+        form={servicePage.form}
       />
 
-      <HowItWorks heading={servicePage.howItWorks.heading} steps={servicePage.howItWorks.steps} />
-
-      <PricingBand
-        heading={servicePage.pricing.heading}
-        assurances={servicePage.pricing.assurances}
-        promise={servicePage.pricing.promise}
-        cta={servicePage.pricing.cta}
-      />
-
-      <ServiceAreaList heading={servicePage.area.heading} cities={cities} />
-
-      <FaqBand
-        heading={servicePage.faq.heading}
-        items={service.faq ?? servicePage.faq.items}
-        cta={servicePage.faq.cta}
-      />
-
-      <CtaBand heading={servicePage.cta.heading} detail={servicePage.cta.detail} />
+      {/* `canvas`, not the site-default dark navy: on the dark band the navy buttons disappear into
+          it, because --color-surface-dark and --color-brand are the same hex. See CtaBand. */}
+      <CtaBand heading={servicePage.cta.heading} detail={servicePage.cta.detail} tone="canvas" />
     </>
   );
 }

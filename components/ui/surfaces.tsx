@@ -41,6 +41,48 @@ export function Card({
   );
 }
 
+// ── Chip ─────────────────────────────────────────────────────────────────────
+
+/**
+ * The outlined pill. A hairline border, a full radius, and a short phrase inside it — the service
+ * hero's qualities ("Weekly or bi-weekly", "No contracts") and the tab toggles under it.
+ *
+ * Deliberately not `Badge`: a badge is a FILLED chip that labels the thing it sits on ("Most
+ * popular" on a price card). This is an outline that reads as a tag in a row of tags, which is why
+ * the two must not converge — a filled toggle row would look like four "most popular" stickers.
+ *
+ * `quiet` is the resting state and the only one a static chip ever takes. `selected` is the navy
+ * fill, for the chosen tab: cream on navy is 8.18:1, and it is the one fill on this site that can
+ * carry light text at all. See the palette note at the top of theme.css.
+ */
+const chipBase =
+  "inline-flex items-center justify-center rounded-pill border px-4 py-1.5 " +
+  "text-small font-semibold whitespace-nowrap";
+
+const chipTones = {
+  // `line-strong`, not `line`: this is a visible edge doing the work of a control, and the supplied
+  // grey is 1.95:1 on cream — under the 3:1 non-text minimum. See theme.css.
+  quiet: "border-line-strong bg-transparent text-ink",
+  selected: "border-brand bg-brand text-ink-inverse",
+} as const;
+
+export type ChipTone = keyof typeof chipTones;
+
+/**
+ * The class shape, exported for the ONE case that cannot use `Chip` itself: a tab toggle is a real
+ * `<button>` carrying `role="tab"`, its own ref and a roving tabindex, and wrapping a span in it
+ * would put the border on the span while the focus ring landed on the button. See ServiceTabs.
+ * Nothing else may reach for this — a new chip shape is a tone here, not a class at a call site.
+ */
+export function chipClasses(tone: ChipTone = "quiet"): string {
+  return cx(chipBase, chipTones[tone]);
+}
+
+/** A static chip. For the interactive one, see the note on `chipClasses` above. */
+export function Chip({ children, tone = "quiet" }: { children: ReactNode; tone?: ChipTone }) {
+  return <span className={chipClasses(tone)}>{children}</span>;
+}
+
 /** Small status or category label. Never interactive — use Button for that. */
 export function Badge({
   children,

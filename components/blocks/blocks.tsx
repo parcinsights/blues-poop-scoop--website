@@ -1,12 +1,14 @@
-import { ArrowRight, BadgeCheck, Check, Dog, MapPin, MessageCircleHeart, PawPrint } from "lucide-react";
+import { ArrowRight, BadgeCheck, Dog, MapPin, MessageCircleHeart, PawPrint } from "lucide-react";
 
+import { ServiceTabs, type ServiceTab } from "@/components/blocks/ServiceTabs";
+import { QuickLeadForm } from "@/components/forms/QuickLeadForm";
 import { Breadcrumbs } from "@/components/seo/Breadcrumbs";
 import { Button } from "@/components/ui/Button";
 import { Image } from "@/components/ui/Image";
 import { Cluster, Container, Grid, Section, Split, Stack } from "@/components/ui/layout";
 import { Link } from "@/components/ui/Link";
 import { Rating } from "@/components/ui/Rating";
-import { Badge, Card, Callout } from "@/components/ui/surfaces";
+import { Badge, Card, Callout, Chip } from "@/components/ui/surfaces";
 import { Heading, InlineList, List, Quote, Text } from "@/components/ui/typography";
 import type { AssetKey } from "@/content/assets";
 import { priceTiers, pricing } from "@/content/pricing";
@@ -111,6 +113,98 @@ export function Hero({
       ) : (
         <Container>{body}</Container>
       )}
+    </Section>
+  );
+}
+
+// ── Service hero ─────────────────────────────────────────────────────────────
+
+/**
+ * The top of a service page. Same bones as the homepage hero — words left, photograph right — with
+ * one deliberate difference: the picture STOPS AT THE CONTAINER. `Hero` runs its image off the
+ * right edge of the screen, which is the treatment the front door gets and only the front door; a
+ * service page that did the same would make every one of the four look like a second homepage.
+ *
+ * So this is a plain two-column grid inside a `Container`, not `Split`.
+ *
+ * The chips above the h1 are the service's own qualities, not the site's assurances — three or four
+ * words each, read before the heading is. They are `Chip`, the outlined pill, which is the same
+ * shape the tab toggles in the band below take: a visitor sees the vocabulary once as a label and
+ * again as a control, which is what makes the second one obviously clickable.
+ *
+ * Two buttons, price first. On a service page the live question is what it costs — someone reading
+ * about the work has already decided they want it done — so the pricing link takes the filled
+ * treatment and the quote form follows it. That is the reverse of the homepage, on purpose.
+ *
+ * With no `image` the words simply take the full width. A stock photo would be worse than the
+ * single column; see the note on `Service.image`.
+ */
+export function ServiceHero({
+  heading,
+  summary,
+  tags,
+  image,
+  crumbs,
+  pricingLabel,
+}: {
+  heading: string;
+  summary: string;
+  /** The outlined chips above the h1 — "Weekly or bi-weekly", "No contracts". */
+  tags?: readonly string[];
+  image?: AssetKey;
+  crumbs: Crumb[];
+  /** Words on the pricing button. The quote button is the site-wide `primaryCta`. */
+  pricingLabel: string;
+}) {
+  return (
+    // White, not the cream `canvas` the homepage hero uses: this page runs white from the header to
+    // the closing band, and the two bands inside it are separated by a rule rather than by a tone
+    // change. The photograph and the chips are what give the band its colour.
+    <Section tone="raised" spacing="hero">
+      <Container>
+        <div className={cx("grid items-center gap-10", image && "lg:grid-cols-2 lg:gap-16")}>
+          <Stack gap={6}>
+            {/* Above everything, as it is in the structured data: the trail is where you are. */}
+            <Breadcrumbs crumbs={crumbs} />
+
+            <Stack gap={4}>
+              {tags && tags.length > 0 && (
+                <Cluster gap={2}>
+                  {tags.map((tag) => (
+                    <Chip key={tag}>{tag}</Chip>
+                  ))}
+                </Cluster>
+              )}
+              <Heading level={1}>{heading}</Heading>
+              <Text size="lead" tone="muted" measure>
+                {summary}
+              </Text>
+            </Stack>
+
+            <Cluster gap={4}>
+              <Button href={routes.pricing()} size="lg">
+                {pricingLabel}
+              </Button>
+              <Button href={primaryCta.href} variant="secondary" size="lg">
+                {primaryCta.label}
+              </Button>
+            </Cluster>
+          </Stack>
+
+          {image && (
+            /* The page's LCP element, and the only image on it. Fixed height with `object-cover`
+               rather than a natural aspect: the four service photographs are three different
+               shapes, and letting each set its own height would make one page's hero half again
+               as tall as the next one's. */
+            <Image
+              asset={image}
+              priority
+              sizes="(min-width: 64rem) 50vw, 100vw"
+              className="h-80 w-full rounded-lg object-cover sm:h-112 lg:h-140"
+            />
+          )}
+        </div>
+      </Container>
     </Section>
   );
 }
@@ -309,89 +403,138 @@ export function HowItWorks({
   );
 }
 
-// ── What's included ──────────────────────────────────────────────────────────
+// ── Service details ──────────────────────────────────────────────────────────
 
 /**
- * The band directly under a service page's hero: what actually happens when we turn up.
+ * A tab's copy: paragraphs, not bullets.
  *
- * It is the ONE band on a service page that is genuinely about that service — everything below it
- * (why us, how it works, prices, coverage) is the same on all four. So it gets the position
- * immediately after the h1 and the only per-service photograph on the page.
- *
- * Ticks rather than the "why us" band's glyph medallions, and every tick identical: those are four
- * different claims and each earns its own symbol, while these are one promise repeated — a
- * checklist. Cycling the four medallion colours through a checklist would imply a grouping that is
- * not there, so every tick takes the first of them and the list reads as one thing.
- *
- * `image` is optional and usually absent for now. Without it the list simply takes the full column
- * width, which is a plainer band rather than a broken one — see the note on `Service.image`.
+ * The tabs used to be ticked lists, and a list is the wrong shape for this. "What's included" as
+ * five ticks is a spec sheet — five fragments that each answer half a question and read as though
+ * they were written to be skimmed past. In sentences the same facts explain themselves, and the
+ * page has room for it now that the tab is carrying one thing at a time.
  */
-export function ServiceIncludes({
-  heading,
-  intro,
-  items,
-  image,
-}: {
-  heading: string;
-  intro?: string;
-  items: readonly string[];
-  image?: AssetKey;
-}) {
-  if (items.length === 0) return null;
-
-  const body = (
-    <Stack gap={6}>
-      <Stack gap={4}>
-        <Heading level={2} align="center-mobile">
-          {heading}
-        </Heading>
-        {intro && <Text tone="muted">{intro}</Text>}
-      </Stack>
-
-      {/* A real list: parallel promises are a list, and a screen reader announcing the count up
-          front is the summary a sighted reader gets from the column of ticks. */}
-      <ul className="list-none pl-0 flex flex-col gap-4">
-        {items.map((item) => (
-          <li key={item} className="flex items-start gap-4">
-            <span
-              aria-hidden="true"
-              // `shrink-0` or the circle squashes into an oval as the sentence wraps. `mt-0.5`
-              // sits it on the text's cap height rather than its line box, so the tick lines up
-              // with the first letter instead of floating above it.
-              className="mt-0.5 flex size-7 shrink-0 items-center justify-center rounded-pill bg-accent-mint text-accent-mint-ink"
-            >
-              <Check size={16} strokeWidth={3} />
-            </span>
-            <Text tone="muted">{item}</Text>
-          </li>
-        ))}
-      </ul>
+function Paragraphs({ items }: { items: readonly string[] }) {
+  return (
+    <Stack gap={4}>
+      {items.map((paragraph) => (
+        <Text key={paragraph} tone="muted" measure>
+          {paragraph}
+        </Text>
+      ))}
     </Stack>
   );
+}
+
+/**
+ * The second and last band of a service page: everything the page has to say about the service, in
+ * one place, behind three chip toggles — and the quote form beside it.
+ *
+ * WHY TABS. The old template answered "what is this service" across five stacked bands, four of
+ * which were word-for-word identical on all four services. A visitor scrolled past the guarantee,
+ * the three steps, the price grid and the coverage list to reach two paragraphs that actually
+ * differed. Toggles put the differing copy first and let the reader choose which part of it they
+ * want, and the page ends one screen later instead of six.
+ *
+ * The three are fixed — About, Includes, Benefits — because they are the three questions every
+ * service gets asked, and a page whose tab row changed service to service would stop reading as one
+ * template. A tab with nothing behind it yet says so; see `pending`.
+ *
+ * The form is the whole conversion path on this page now, which is why it sits BESIDE the copy
+ * rather than under it: on a laptop it is visible the moment the band is, and someone convinced by
+ * the first tab never has to go looking. It is the short form — five fields — and the compact
+ * variant at that. See QuickLeadForm for what it deliberately does not ask.
+ */
+export function ServiceDetails({
+  labels,
+  body,
+  includes,
+  benefits,
+  pending,
+  form,
+}: {
+  /** Tab words, plus the tablist's own name for screen readers. */
+  labels: { tablist: string; about: string; includes: string; benefits: string };
+  /** The authored body — the About tab. Empty until someone writes it, which is also the page's publish gate. */
+  body: ContentBlock[];
+  includes?: readonly string[];
+  benefits?: readonly string[];
+  /** Stand-in for a tab whose content the client has not supplied yet. */
+  pending: string;
+  form: { heading: string; intro: string };
+}) {
+  /** A tab with no content behind it. One muted line — never an invented paragraph. */
+  const note = (
+    <Text tone="muted" measure>
+      {pending}
+    </Text>
+  );
+
+  const tabs: ServiceTab[] = [
+    {
+      id: "about",
+      label: labels.about,
+      panel: body.length > 0 ? <AuthoredBlocks blocks={body} /> : note,
+    },
+    {
+      id: "includes",
+      label: labels.includes,
+      panel: includes && includes.length > 0 ? <Paragraphs items={includes} /> : note,
+    },
+    {
+      id: "benefits",
+      label: labels.benefits,
+      panel: benefits && benefits.length > 0 ? <Paragraphs items={benefits} /> : note,
+    },
+  ];
 
   return (
-    // `alt` against the canvas hero above and the canvas "why us" below — this band is the page's
-    // one piece of service-specific argument, and the tone change is what separates it from the
-    // standing bands on either side.
-    <Section tone="alt">
+    // White, same as the hero above it — the two are separated by a rule drawn to the container
+    // width rather than by a change of colour. See `SectionDivider`.
+    <Section tone="raised">
       <Container>
-        {image ? (
-          /* Words LEFT, picture right — the reverse of the "why us" band directly below it. Two
-             adjacent bands with the photograph on the same side read as one long column of images
-             with text stuck beside them. Source order is words-then-picture, so on a phone the
-             promise arrives first and the photo is the evidence under it — the opposite of the
-             "why us" band, where the faces are what earn the claims. */
-          <div className="grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
-            {body}
-            <Image
-              asset={image}
-              sizes="(min-width: 64rem) 50vw, 100vw"
-              className="h-80 w-full rounded-lg object-cover sm:h-112 lg:h-140"
-            />
+        {/* Three fifths to the copy, two to the form. The form is the only conversion path on this
+            page, so it is deliberately wider than the third of the row a sidebar would take — at
+            that width it is a panel someone fills in, not a thing parked beside the text.
+
+            The air between the two columns is the `gap` PLUS `pr-8` on the copy: about 6rem, and
+            deliberately more than a grid gap would give. A paragraph that runs right up to the edge
+            of the card beside it reads as one wide thing with a box in it — the gutter is what
+            makes the copy and the form two separate offers on the same row. It also pulls the line
+            length down to roughly 70 characters, which is the measure the rest of the site uses. */}
+        <div className="grid gap-10 lg:grid-cols-5 lg:gap-16">
+          <div className="lg:col-span-3 lg:pr-8">
+            <ServiceTabs label={labels.tablist} tabs={tabs} />
           </div>
-        ) : (
-          body
-        )}
+
+          {/* `canvas`, not `default`: a white card on a white band is an invisible card. */}
+          <div className="lg:col-span-2">
+            <Card tone="canvas">
+              {/* Centred throughout, and the mark at the top is why: the logo is a symmetrical
+                  object, and left-hanging the words under a centred mark would read as two blocks
+                  that had come apart. The form's own controls are centred to match — see the
+                  `pill` variant in Field. */}
+              <Stack gap={6} align="center">
+                <Stack gap={4} align="center">
+                  {/* The mark alone, not the full lockup: the wordmark is already in the header
+                      two hundred pixels above, and the picture is what makes this card read as
+                      ours rather than as an embedded third-party form. */}
+                  <Image asset="logoMark" sizes="80px" className="h-20 w-auto" />
+                  {/* h2 — the h1 in the hero is the only thing above it. The tab chips are
+                      controls, not headings, so nothing sits between the two levels. */}
+                  <Heading level={2} size="h3" align="center">
+                    {form.heading}
+                  </Heading>
+                  <Text tone="muted">{form.intro}</Text>
+                </Stack>
+                {/* `w-full` — the Stack centres its children by shrinking them, and a form that
+                    shrink-wraps its fields is a column of half-width boxes. */}
+                <div className="w-full">
+                  <QuickLeadForm compact variant="pill" />
+                </div>
+              </Stack>
+            </Card>
+          </div>
+        </div>
       </Container>
     </Section>
   );
@@ -1111,73 +1254,89 @@ function CtaBannerPaws() {
 
 // ── Authored block renderer ──────────────────────────────────────────────────
 
-/** Renders a page's authored body. One branch per block kind; no HTML is ever authored. */
+/**
+ * A page's authored body, WITHOUT the band around it. One branch per block kind; no HTML is ever
+ * authored.
+ *
+ * Separate from `BlockRenderer` because the same blocks are rendered in two places now: as a band
+ * of their own on the money pages, and inside a tab panel on a service page — where a `Section`
+ * would put a second full-width band inside the band it is already in.
+ */
+export function AuthoredBlocks({ blocks }: { blocks: ContentBlock[] }) {
+  if (blocks.length === 0) return null;
+
+  return (
+    <div className="prose">
+      {blocks.map((block, index) => {
+        switch (block.kind) {
+          case "prose":
+            return (
+              <div key={index}>
+                {block.heading && <Heading level={2}>{block.heading}</Heading>}
+                {block.paragraphs.map((paragraph) => (
+                  <Text key={paragraph}>{paragraph}</Text>
+                ))}
+              </div>
+            );
+          case "list":
+            return (
+              <div key={index}>
+                {block.heading && <Heading level={2}>{block.heading}</Heading>}
+                {block.intro && <Text>{block.intro}</Text>}
+                <List items={block.items} />
+              </div>
+            );
+          case "steps":
+            return (
+              <div key={index}>
+                {block.heading && <Heading level={2}>{block.heading}</Heading>}
+                <List
+                  variant="number"
+                  items={block.steps.map((step) => (
+                    <span key={step.title}>
+                      <strong>{step.title}</strong>
+                      {` — ${step.detail}`}
+                    </span>
+                  ))}
+                />
+              </div>
+            );
+          case "faq":
+            return (
+              <div key={index}>
+                {block.heading && <Heading level={2}>{block.heading}</Heading>}
+                {block.items.map((item) => (
+                  <details key={item.question} className="border-b border-line py-3">
+                    <summary className="cursor-pointer font-semibold">{item.question}</summary>
+                    <Text>{item.answer}</Text>
+                  </details>
+                ))}
+              </div>
+            );
+          case "cta":
+            return (
+              <Callout key={index}>
+                <Stack gap={3}>
+                  <strong>{block.heading}</strong>
+                  {block.detail && <Text>{block.detail}</Text>}
+                  <Link href={block.href}>{block.buttonLabel}</Link>
+                </Stack>
+              </Callout>
+            );
+        }
+      })}
+    </div>
+  );
+}
+
+/** The same blocks as a band of their own — the money pages' authored middle. */
 export function BlockRenderer({ blocks }: { blocks: ContentBlock[] }) {
   if (blocks.length === 0) return null;
 
   return (
     <Section>
       <Container width="prose">
-        <div className="prose">
-          {blocks.map((block, index) => {
-            switch (block.kind) {
-              case "prose":
-                return (
-                  <div key={index}>
-                    {block.heading && <Heading level={2}>{block.heading}</Heading>}
-                    {block.paragraphs.map((paragraph) => (
-                      <Text key={paragraph}>{paragraph}</Text>
-                    ))}
-                  </div>
-                );
-              case "list":
-                return (
-                  <div key={index}>
-                    {block.heading && <Heading level={2}>{block.heading}</Heading>}
-                    {block.intro && <Text>{block.intro}</Text>}
-                    <List items={block.items} />
-                  </div>
-                );
-              case "steps":
-                return (
-                  <div key={index}>
-                    {block.heading && <Heading level={2}>{block.heading}</Heading>}
-                    <List
-                      variant="number"
-                      items={block.steps.map((step) => (
-                        <span key={step.title}>
-                          <strong>{step.title}</strong>
-                          {` — ${step.detail}`}
-                        </span>
-                      ))}
-                    />
-                  </div>
-                );
-              case "faq":
-                return (
-                  <div key={index}>
-                    {block.heading && <Heading level={2}>{block.heading}</Heading>}
-                    {block.items.map((item) => (
-                      <details key={item.question} className="border-b border-line py-3">
-                        <summary className="cursor-pointer font-semibold">{item.question}</summary>
-                        <Text>{item.answer}</Text>
-                      </details>
-                    ))}
-                  </div>
-                );
-              case "cta":
-                return (
-                  <Callout key={index}>
-                    <Stack gap={3}>
-                      <strong>{block.heading}</strong>
-                      {block.detail && <Text>{block.detail}</Text>}
-                      <Link href={block.href}>{block.buttonLabel}</Link>
-                    </Stack>
-                  </Callout>
-                );
-            }
-          })}
-        </div>
+        <AuthoredBlocks blocks={blocks} />
       </Container>
     </Section>
   );

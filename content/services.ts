@@ -41,30 +41,40 @@ export const services: Service[] = [
       description:
         "Weekly or every-other-week dog poop removal across Chestnut Hill, Mt. Airy, Ardmore, Bryn Mawr and more. From $70 a month. No contracts.",
     },
-    assurances: ["No contracts", "Cancel anytime", "We reply by text"],
+    image: "servicePoopScoop",
     /**
-     * Five promises, and every one is something the client has actually committed to — the
-     * schedule, the double-bagging, the texts, the pet-safety policy, the no-contract terms. Not
-     * one of them is a sentence a franchise site could not also write; what makes them worth
-     * printing is that they are true here and someone will be held to them.
-     *
-     * OUTSTANDING, and this band is where they go the moment George supplies them: the sweep
-     * pattern (does he do edges and fence lines, or open lawn only), what he does with a gate left
-     * unlatched, and where the waste finally ends up. Those are the three details a competitor
-     * cannot copy, and this list stays generic until they arrive.
+     * Three chips, and not one of them is an adjective: "Weekly or bi-weekly" is the schedule,
+     * "No contracts" is the terms, "Pet-safe" is the policy of never entering while a dog is out.
+     * A chip is the first thing read on this page, so it is the last place to put a claim nobody
+     * has committed to.
      */
-    includes: {
-      heading: "What every visit includes",
-      intro:
-        "Two schedules, one standard of work. Whether we're out weekly or every other week, this is what happens each time we're in your yard.",
-      items: [
-        "A visit every week, or every other week — whichever suits your yard and your dogs.",
-        "All waste collected and double-bagged, for sanitation and odor control.",
-        "A text before we arrive, and another once the yard is clear.",
-        "We never enter while your dog is outside. No exceptions, whatever the schedule says.",
-        "No contract. Pause or cancel any time by text.",
-      ],
-    },
+    tags: ["Weekly or bi-weekly", "No contracts", "Pet-safe"],
+    /**
+     * The INCLUDES tab. Every sentence here is something the client has actually committed to —
+     * the schedule, the texts, the double-bagging, the pet-safety policy, the first-visit
+     * walkthrough. Nothing in it is a claim a franchise site could not also make; what makes it
+     * worth printing is that it is true here and someone will be held to it.
+     *
+     * OUTSTANDING, and this is where they go the moment George supplies them: the sweep pattern
+     * (edges and fence lines, or open lawn only), what he does with a gate left unlatched, and
+     * where the waste finally ends up. Those are the three details a competitor cannot copy, and
+     * this stays general until they arrive.
+     */
+    includes: [
+      "Every visit runs the same way, whichever schedule you're on. You get a text before we set off, so nobody is surprised by a van in the driveway. We work through the yard and collect what's there, and everything we pick up is double-bagged for sanitation and odor control. When it's clear, you get a second text — so you know the job is done without having to go and look.",
+      "The one thing we won't do is let ourselves in while your dog is outside. That holds no matter what the schedule says: if we arrive and your dog is in the yard, you get a text instead of a scooped lawn, and we sort out a better time. The only visit you need to be home for is the first one, so you can walk us around and get gate access set up. After that, come and go as you like.",
+    ],
+    /**
+     * The BENEFITS tab, and the only part of this record that is not a fact somebody supplied.
+     * These are reasonable things to say about a clean yard, but they are OURS rather than
+     * George's, which is what `todo()` is for: it reads fine in review and throws on a production
+     * build. Replace it with what his customers actually tell him they got out of it — that will
+     * be better than this, and it will be true.
+     */
+    benefits: todo([
+      "The obvious one is the chore itself: it stops being yours. No hunting around the yard on a Saturday morning, no putting it off in the rain until the job is twice the size, no arguments about whose turn it is.",
+      "The less obvious one is that you start using the yard again. A lawn nobody has scooped in three weeks is somewhere you cross carefully on the way to the car; a clean one is somewhere the kids sit down and the dog gets played with. Through the summer it is also the difference between a garden with flies in it and one without.",
+    ]),
     /**
      * Four questions, and the first one is the one this page created by merging the frequency
      * pages: a visitor now has to pick a schedule here rather than by clicking a different page,
@@ -93,16 +103,35 @@ export const services: Service[] = [
           "It's collected and double-bagged for sanitation and odor control. If you'd rather it left the property altogether instead of going in your bin, add Haul Away to your plan.",
       },
     ],
-    body: [],
+    /**
+     * The ABOUT tab, and the publish gate: this is the field that decides whether the page is
+     * indexed at all (see lib/content.ts). It is written from the facts already in this record —
+     * the two schedules, the no-contract terms, the coverage — rather than from anything new, which
+     * is why it needs no `todo()` and why it is the shortest honest version of this page.
+     *
+     * It gets richer the moment George answers the outstanding questions: how long he has been
+     * doing this, how many yards he is on now, and what happens the week it snows.
+     */
+    body: [
+      {
+        kind: "prose",
+        paragraphs: [
+          "Poop Scoop is the recurring service most of our customers are on. We come to your yard every week, or every other week, and clear out everything the dogs have left behind since we were last there. One dog or six, a small city yard or half an acre on the Main Line — it is the same job and the same standard either way.",
+          "Which of the two schedules you want is really the only decision, and it is not a permanent one. Weekly suits most yards with more than one dog in them; every other week is usually enough for a single dog and a bit of grass. If you guess wrong, you send us a text and we change it — there is no contract to renegotiate, and nothing to cancel beyond telling us to stop.",
+          "We are a local outfit rather than a franchise, so the person scooping your yard is the person who answers your text. If we get it wrong in your first thirty days, we refund the lot and part on good terms.",
+        ],
+      },
+    ],
     hasCityPages: true,
     segment: "residential",
   },
   {
     slug: "deodorizer",
     // OUTSTANDING: needs the product used, whether it is pet- and lawn-safe (the first question
-    // every customer asks), the coverage area per treatment, and the price. Until those land, this
-    // page has no `includes` band — an add-on whose whole pitch is "it's safe around your dog"
-    // cannot have that sentence invented for it.
+    // every customer asks), the coverage area per treatment, and the price. EVERY tab below is
+    // written around those gaps rather than filling them in — an add-on whose whole pitch is "it's
+    // safe around your dog" cannot have that sentence invented for it, so the copy says what the
+    // treatment is for and stops where the facts stop. All of it is `todo()`.
     name: todo("Deodorizer"),
     heading: todo("Yard deodorizing treatment"),
     summary: todo("An add-on treatment that neutralizes odor after the yard is cleared."),
@@ -112,7 +141,25 @@ export const services: Service[] = [
         "A pet-safe deodorizing treatment added to any scooping visit. Philadelphia and the Main Line.",
       ),
     },
-    body: [],
+    image: "serviceDeodorizer",
+    tags: todo(["Add-on", "Pet-safe", "Per treatment"]),
+    includes: todo([
+      "The deodorizer is something we do at the end of a scooping visit rather than a trip of its own. Once the yard is clear, the areas the dogs actually use get treated — the patch of grass they favour, the run along the fence, the corner by the back door — because that is where the smell is, and treating the whole lawn would be spending your money on ground that does not need it.",
+      "It goes on after the waste is gone, never instead of it. A deodorizer over a yard that has not been scooped is an air freshener in a room nobody has cleaned: it works for an afternoon and then you are back where you started.",
+    ]),
+    benefits: todo([
+      "It is the difference between a yard that is clean and a yard that smells clean. Scooping deals with what you can see; hot weather brings the rest of it back out of the grass for days afterwards, and this is what handles that part.",
+      "It matters most in exactly the situations where the yard has to be pleasant to be in — the stretch of summer when the back door is open, or the weekend you are having people over.",
+    ]),
+    body: todo([
+      {
+        kind: "prose",
+        paragraphs: [
+          "Deodorizing is an add-on rather than a service you book on its own. When the smell is the actual problem — and in July, in a yard with two dogs in it, the smell is usually the actual problem — clearing the waste is only half the answer. What is left in the grass keeps going long after the yard looks fine.",
+          "Add it to any scooping plan and we treat the yard at the end of the visit. There is no separate appointment to be in for, and no commitment: it can go on one visit, every visit, or just the ones through the warm months.",
+        ],
+      },
+    ]),
     hasCityPages: false,
     segment: "residential",
     addOn: true,
@@ -132,7 +179,25 @@ export const services: Service[] = [
         "Add haul-away to any plan and the waste leaves with us — nothing sits in your trash can between pickups.",
       ),
     },
-    body: [],
+    image: "serviceHaulAway",
+    tags: todo(["Add-on", "Off your property", "No bin smell"]),
+    includes: todo([
+      "Everything we collect is double-bagged, exactly as it is on a normal visit. The difference is what happens next: instead of the bags going into your trash can, they leave in the van with us and are disposed of off your property.",
+      "Nothing else about the visit changes. Same schedule, same text before we arrive and after we finish, same policy about never entering while your dog is outside.",
+    ]),
+    benefits: todo([
+      "Your own bin stops being part of the arrangement. Nothing sits in it through a warm week waiting for collection day, which is the point at which most people notice their trash can at all.",
+      "It also solves the case where there is no good bin to use — a shared alley, a small building's cans, a pickup that only comes once a fortnight. If the waste never lands on your property, none of that is your problem.",
+    ]),
+    body: todo([
+      {
+        kind: "prose",
+        paragraphs: [
+          "Haul Away is the add-on for people whose objection was never the scooping — it was the bag of it sitting in their own trash can for the next five days.",
+          "Add it to any plan and the waste leaves with us at the end of every visit. It is billed alongside your scooping plan and can be turned on or off by text, the same as everything else.",
+        ],
+      },
+    ]),
     hasCityPages: false,
     segment: "residential",
     addOn: true,
@@ -150,7 +215,25 @@ export const services: Service[] = [
         "A single deep clean of a backyard that has gotten away from you. Philadelphia and the Main Line.",
       ),
     },
-    body: [],
+    image: "serviceOneTimeClean",
+    tags: todo(["One visit", "No plan needed", "Thorough"]),
+    includes: todo([
+      "A one-time clean is a single visit with no schedule attached. We work through the whole yard rather than the areas a regular visit would concentrate on, because on a yard that has been left a while there is no such thing as a light patch.",
+      "Everything is collected and double-bagged as it would be on any other visit, and you get a text when the yard is clear. How long it takes depends on the size of the yard and how long it has been — we would rather tell you that honestly after seeing it than quote a number here.",
+    ]),
+    benefits: todo([
+      "It is the fastest way out of a yard that has got away from you — after a winter, after a stretch of rain, or after the month when nobody quite got round to it.",
+      "It also has nothing attached to it. No plan, no schedule, no phone call in a month asking whether you'd like to continue. Book it when you need it, and if the state of the yard afterwards makes a regular visit look worthwhile, that conversation can happen then.",
+    ]),
+    body: todo([
+      {
+        kind: "prose",
+        paragraphs: [
+          "A one-time clean is exactly what it sounds like: we come once, clear the whole yard, and that is the end of the arrangement unless you want more.",
+          "It is what most people book before something — a party, a viewing, a family visit, the first warm weekend after a long winter — and it is also how a lot of our recurring customers started, because a yard that has been left for a few months is a bigger job than a normal visit and is priced as its own thing.",
+        ],
+      },
+    ]),
     hasCityPages: false,
     segment: "residential",
     // Sold both ways: on its own for a yard that has gotten away from someone, and as the first
@@ -171,7 +254,32 @@ export const services: Service[] = [
         "Scheduled pet waste removal and station servicing for apartment communities, HOAs and dog parks around Philadelphia.",
       ),
     },
-    body: [],
+    // No photograph: there is no picture of commercial work because there may be no commercial work
+    // yet. The hero drops to a single column, which is the honest version of that.
+    tags: todo(["HOAs & apartments", "On a schedule"]),
+    /**
+     * Note what none of this says: how many properties we look after, or how long we have been
+     * doing it. The client's current site lists commercial as "Coming Soon", so the copy offers
+     * the service and claims no track record — and the whole page stays unpublished (see
+     * lib/routes.ts) until they confirm they actually sell it.
+     */
+    includes: todo([
+      "Commercial work is quoted per property rather than per dog, because the thing that decides the job is the ground: how much of it there is, how much of it the dogs use, and how often people are walking across it.",
+      "A visit covers the common areas the property manager nominates — the dog run, the lawns between buildings, the strip along the parking lot — and everything collected leaves with us. Frequency is whatever keeps the grounds presentable, from twice a week upwards.",
+    ]),
+    benefits: todo([
+      "For a property manager the value is the complaints that stop arriving. Pet waste in common areas is one of the most reliable sources of them, and it is one of the few that a scheduled service simply removes.",
+      "It is also visible in a way most maintenance is not. Grounds that are obviously looked after are part of what a prospective tenant is shown, and this is the cheapest part of that.",
+    ]),
+    body: todo([
+      {
+        kind: "prose",
+        paragraphs: [
+          "We service apartment communities, HOAs and dog parks around Philadelphia and the Main Line on a schedule that fits the property rather than a residential plan stretched to cover it.",
+          "The arrangement is the same as it is for a homeowner in the ways that matter — a set schedule, no long contract, and a real person on the end of a phone — with the paperwork a managed property needs: one invoice, one point of contact, and proof of what was done and when.",
+        ],
+      },
+    ]),
     hasCityPages: false,
     segment: "commercial",
   },

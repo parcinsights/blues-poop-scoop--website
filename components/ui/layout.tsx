@@ -71,6 +71,28 @@ export function Split({ children, media }: { children: ReactNode; media: ReactNo
 // ── Section ──────────────────────────────────────────────────────────────────
 
 /**
+ * The surfaces a band can take. Shared by `Section` and `SectionDivider` — a divider has to be able
+ * to paint the same colour as the two bands it sits between, or it shows up as a stripe.
+ */
+const sectionTones = {
+  default: "bg-surface text-ink",
+  alt: "bg-surface-alt text-ink",
+  brand: "bg-brand-tint text-ink",
+  // The house off-white. See --color-canvas in theme.css.
+  canvas: "bg-canvas text-ink",
+  /**
+   * Plain white — the one band with no cream in it. It is the page taking a breath, so use it
+   * where the content itself carries the colour (the review wall's cream cards) rather than as a
+   * general-purpose alternate. Cards inside it must NOT be `tone="default"`: white on white is
+   * an invisible card. See `Card tone="tint"`.
+   */
+  raised: "bg-surface-raised text-ink",
+  dark: "bg-surface-dark text-ink-inverse",
+} as const;
+
+export type SectionTone = keyof typeof sectionTones;
+
+/**
  * One band of the page. `tone` selects a surface — alternating bands are how a long landing page
  * stays readable without a border on everything.
  */
@@ -82,26 +104,12 @@ export function Section({
   id,
 }: {
   children: ReactNode;
-  tone?: "default" | "alt" | "brand" | "canvas" | "raised" | "dark";
+  tone?: SectionTone;
   spacing?: "sm" | "md" | "lg" | "lg-tight-top" | "hero" | "hero-media";
   as?: ElementType;
   id?: string;
 }) {
-  const tones = {
-    default: "bg-surface text-ink",
-    alt: "bg-surface-alt text-ink",
-    brand: "bg-brand-tint text-ink",
-    // The house off-white. See --color-canvas in theme.css.
-    canvas: "bg-canvas text-ink",
-    /**
-     * Plain white — the one band with no cream in it. It is the page taking a breath, so use it
-     * where the content itself carries the colour (the review wall's cream cards) rather than as a
-     * general-purpose alternate. Cards inside it must NOT be `tone="default"`: white on white is
-     * an invisible card. See `Card tone="tint"`.
-     */
-    raised: "bg-surface-raised text-ink",
-    dark: "bg-surface-dark text-ink-inverse",
-  } as const;
+  const tones = sectionTones;
 
   const spacings = {
     sm: "py-10 md:py-14",
@@ -133,6 +141,32 @@ export function Section({
     <Tag id={id} className={cx(tones[tone], spacings[spacing])}>
       {children}
     </Tag>
+  );
+}
+
+// ── Section divider ──────────────────────────────────────────────────────────
+
+/**
+ * A hairline between two bands of the SAME tone, drawn to the container width rather than to the
+ * edge of the screen.
+ *
+ * It exists because a tone change is the site's normal way of ending a band, and two white bands in
+ * a row have none — the seam between them reads as one enormous section. A full-bleed rule would
+ * say something different again: it would cut the page in half. This one starts and stops on the
+ * same line the words above and below it do, so it reads as punctuation inside one page.
+ *
+ * `tone` must match its neighbours, and it carries the colour itself rather than sitting on a
+ * transparent background: the divider is a band of its own in the flow, and an unpainted one shows
+ * up as a stripe of whatever is behind the page.
+ */
+export function SectionDivider({ tone = "default" }: { tone?: SectionTone }) {
+  return (
+    <div className={sectionTones[tone]}>
+      <Container>
+        {/* Styled in base.css — a bare `hr` is already a `--color-line` hairline. */}
+        <hr />
+      </Container>
+    </div>
   );
 }
 

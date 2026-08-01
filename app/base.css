@@ -19,10 +19,10 @@
     }
     /**
      * `.header-lift` is excluded deliberately. This rule kills TIME-based animation, and the
-     * header's shadow is not time-based — it is a scroll-driven animation, i.e. a state that
-     * tracks scroll position, with nothing in it that moves on its own. Collapsing its duration
-     * to 0.01ms would pin it to its end state and leave a shadow sitting under the header at the
-     * top of the page, which is the one thing it exists to avoid.
+     * header's is not time-based — it is scroll-driven, i.e. a state that tracks scroll position,
+     * with nothing in it that moves on its own. Collapsing its duration to 0.01ms would pin it to
+     * its end state and leave a white bar and a shadow sitting at the top of the page, which is
+     * the one thing it exists to avoid.
      */
     *:not(.header-lift),
     *::before,
@@ -31,6 +31,37 @@
       animation-iteration-count: 1 !important;
       transition-duration: 0.01ms !important;
     }
+  }
+
+  /**
+   * ── The page runs UNDER the header ──────────────────────────────────────────
+   * The header is transparent until the page scrolls (see `.header-lift` below), so at the top of
+   * a page whatever sits behind it is what you see. In normal flow that is nothing — the bar has
+   * its own 6rem row, and the only thing painting there is the body, which is why a cream strip
+   * appeared above every page.
+   *
+   * So the page is pulled up by exactly the height of the bar, and the first band gives that space
+   * back as a transparent top BORDER. Three things follow, and all three are the point:
+   *
+   *  · The strip behind the header is the first band's own background — white on a service page,
+   *    cream elsewhere — rather than a colour of its own. There is no seam to match.
+   *  · Content lands exactly where it did before. The border replaces the row the header used to
+   *    occupy, so no page needed its spacing changed.
+   *  · Scrolled content passes UNDER the bar, which is what makes the blur worth having.
+   *
+   * A border rather than padding because padding-top is a Tailwind utility on every `Section`, and
+   * a utility beats anything written here whatever its specificity — the layers decide. Nothing
+   * sets a border on a section, and a transparent border still has the element's background painted
+   * under it (`background-clip: border-box`), so the band's colour fills the strip.
+   *
+   * `first-of-type` and not `first-child`: every page opens with a `<script>` of structured data.
+   */
+  main {
+    margin-top: calc(-1 * var(--header-height));
+  }
+
+  main > section:first-of-type {
+    border-top: var(--header-height) solid transparent;
   }
 
   body {
@@ -207,10 +238,16 @@
   }
 
   /**
-   * ── The header's scroll shadow ──────────────────────────────────────────────
-   * At the top of the page the header wears nothing at all — no border, no shadow — so it reads
-   * as part of the first band rather than as a bar sitting on top of it. Once the page moves
-   * underneath, a soft shadow fades in to separate the two.
+   * ── The header's scroll state ───────────────────────────────────────────────
+   * At the top of the page the header wears NOTHING: no border, no shadow, and no background at
+   * all. The first band runs up underneath it (see the `main` rules above), so what you see behind
+   * the logo and the links is that band's own colour. Once the page moves, the bar fades to solid
+   * white and lifts a soft shadow — one animation, both properties, so the background arriving and
+   * the shadow arriving are the same event rather than two effects that can drift apart.
+   *
+   * White rather than the cream it used to be: it is the one surface that reads as a bar sitting
+   * over the page rather than as another band of it, and it is the surface the cards and the
+   * dropdown panels already use.
    *
    * Driven by a SCROLL TIMELINE, not a scroll listener. `animation-timeline: scroll(root block)`
    * ties the animation's progress to the document's scroll offset, so the whole effect is a few
@@ -219,9 +256,19 @@
    *
    * `animation-range` is the fade distance: fully off at the top, fully on 4rem down.
    *
+   * KNOWN TRADE while the bar is still transparent — the first 4rem of scroll, and the top of every
+   * page: the links are ink on whatever band is behind them. That is fine on all of them today
+   * (cream, off-white, white). It would not be fine over a dark photograph, so a hero image is not
+   * something to put directly under the bar without checking it.
+   *
    * Wrapped in @supports because the degradation is worth stating: a browser without scroll-driven
-   * animations gets NO shadow, ever — which is the at-rest design, not a broken one.
+   * animations gets the white bar at every scroll position and no shadow, ever. That is the legible
+   * version of this, not a broken one — which is why the white also sits on the plain rule below.
    */
+  .header-lift {
+    background-color: var(--color-surface-raised);
+  }
+
   @supports (animation-timeline: scroll()) {
     .header-lift {
       animation: header-lift linear both;
@@ -232,9 +279,11 @@
 
     @keyframes header-lift {
       from {
+        background-color: transparent;
         box-shadow: 0 0 0 0 rgb(11 78 112 / 0);
       }
       to {
+        background-color: var(--color-surface-raised);
         box-shadow: var(--shadow-sm);
       }
     }

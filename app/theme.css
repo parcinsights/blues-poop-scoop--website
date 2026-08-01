@@ -199,6 +199,18 @@
   --ease-out: cubic-bezier(0.2, 0.8, 0.3, 1);
 
   /* ── Layout ───────────────────────────────────────────────────────────── */
+
+  /**
+   * The header bar's height, and it is a MEASUREMENT rather than a preference: the logo mark is
+   * `h-16` (4rem) inside `py-4` (1rem top and bottom), which is 6rem, at every width — the bar does
+   * not shrink on a phone. Change either of those in Header.tsx and change this in the same commit.
+   *
+   * It is a token because the page has to know it: the header has no background of its own, so the
+   * first band of every page is pulled up UNDER the bar and gives back exactly this much space at
+   * the top. See the `main` rules in base.css.
+   */
+  --header-height: 6rem;
+
   --container-page: 75rem;
   --container-prose: 42rem;
 

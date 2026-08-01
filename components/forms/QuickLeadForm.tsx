@@ -3,7 +3,7 @@
 import { useState } from "react";
 
 import { Button } from "@/components/ui/Button";
-import { Field, Honeypot, Input, Select } from "@/components/ui/Field";
+import { Field, Honeypot, Input, Select, type FieldVariant } from "@/components/ui/Field";
 import { Callout } from "@/components/ui/surfaces";
 import { Stack } from "@/components/ui/layout";
 import { Text } from "@/components/ui/typography";
@@ -20,9 +20,37 @@ import { quickLeadSchema } from "@/lib/validation";
  *
  * This is the only client component on the site apart from nothing else — the rest is static.
  */
-export function QuickLeadForm({ compact = false }: { compact?: boolean }) {
+
+/**
+ * Every label, once. They are the labels AND — in the `pill` variant — the placeholders, and the
+ * two must match word for word: a hidden label that says something different from the placeholder
+ * above it is worse than either alone, because a screen reader and a sighted reader are then being
+ * given different forms.
+ */
+const labels = {
+  name: "Your name",
+  email: "Email",
+  phone: "Phone",
+  zip: "Zip code",
+  dogs: "How many dogs?",
+  frequency: "How often?",
+} as const;
+
+export function QuickLeadForm({
+  compact = false,
+  variant = "boxed",
+}: {
+  /** Drops the frequency select — for the form dropped inside another page. */
+  compact?: boolean;
+  /** See the note on `FieldVariant`. `pill` hides the labels and carries them as placeholders. */
+  variant?: FieldVariant;
+}) {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [state, setState] = useState<"idle" | "sending" | "sent" | "error">("idle");
+
+  const pill = variant === "pill";
+  /** In `pill` the label lives in the placeholder, so every field has to carry one. */
+  const placeholder = (label: string) => (pill ? label : undefined);
 
   async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -66,43 +94,82 @@ export function QuickLeadForm({ compact = false }: { compact?: boolean }) {
   return (
     <form onSubmit={onSubmit} noValidate className="relative">
       <Stack gap={4}>
-        <Field label="Your name" htmlFor="name" required error={errors.name}>
-          <Input id="name" autoComplete="name" invalid={Boolean(errors.name)} />
+        <Field label={labels.name} htmlFor="name" required error={errors.name} hideLabel={pill}>
+          <Input
+            id="name"
+            autoComplete="name"
+            placeholder={placeholder(labels.name)}
+            variant={variant}
+            invalid={Boolean(errors.name)}
+          />
         </Field>
 
-        <Field label="Email" htmlFor="email" required error={errors.email}>
-          <Input id="email" type="email" autoComplete="email" invalid={Boolean(errors.email)} />
+        <Field label={labels.email} htmlFor="email" required error={errors.email} hideLabel={pill}>
+          <Input
+            id="email"
+            type="email"
+            autoComplete="email"
+            placeholder={placeholder(labels.email)}
+            variant={variant}
+            invalid={Boolean(errors.email)}
+          />
         </Field>
 
-        <Field label="Phone" htmlFor="phone" required error={errors.phone}>
-          <Input id="phone" type="tel" autoComplete="tel" invalid={Boolean(errors.phone)} />
+        <Field label={labels.phone} htmlFor="phone" required error={errors.phone} hideLabel={pill}>
+          <Input
+            id="phone"
+            type="tel"
+            autoComplete="tel"
+            placeholder={placeholder(labels.phone)}
+            variant={variant}
+            invalid={Boolean(errors.phone)}
+          />
         </Field>
 
         <Field
-          label="Zip code"
+          label={labels.zip}
           htmlFor="zip"
           required
-          hint="So we can confirm we reach you."
+          // The hint is what the visible label cannot say in two words. It is dropped in `pill`
+          // along with the label — a line of explanation under a placeholder-only field puts the
+          // words back that the shape exists to remove.
+          hint={pill ? undefined : "So we can confirm we reach you."}
           error={errors.zip}
+          hideLabel={pill}
         >
           <Input
             id="zip"
             inputMode="numeric"
             autoComplete="postal-code"
             maxLength={5}
+            placeholder={placeholder(labels.zip)}
+            variant={variant}
             invalid={Boolean(errors.zip)}
           />
         </Field>
 
-        <Field label="How many dogs?" htmlFor="dogs" required error={errors.dogs}>
-          <Input id="dogs" type="number" min={1} max={20} defaultValue={1} invalid={Boolean(errors.dogs)} />
+        <Field label={labels.dogs} htmlFor="dogs" required error={errors.dogs} hideLabel={pill}>
+          {/* No default in `pill`: a pre-filled "1" with the label hidden is a box containing a
+              number and no clue what it counts. The boxed form keeps it — there the label is
+              visible, and one fewer field to fill is one fewer reason to abandon. */}
+          <Input
+            id="dogs"
+            type="number"
+            min={1}
+            max={20}
+            defaultValue={pill ? undefined : 1}
+            placeholder={placeholder(labels.dogs)}
+            variant={variant}
+            invalid={Boolean(errors.dogs)}
+          />
         </Field>
 
         {!compact && (
-          <Field label="How often?" htmlFor="frequency">
+          <Field label={labels.frequency} htmlFor="frequency" hideLabel={pill}>
             <Select
               id="frequency"
               defaultValue="not-sure"
+              variant={variant}
               options={[
                 { value: "weekly", label: "Weekly" },
                 { value: "biweekly", label: "Every other week" },

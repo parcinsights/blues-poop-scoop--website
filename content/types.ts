@@ -54,37 +54,54 @@ export type Service = {
   summary: string;
   seo: Seo;
   /**
-   * The hero photograph, as a key into the image registry. Absent until the client supplies a photo
-   * of THIS work: the hero falls back to the plain centred treatment, which is a smaller page but
-   * an honest one. A stock lawn, or the same owners-and-dog shot on all four services, is worth
-   * less than no picture — the photo is only doing a job if it shows the thing being sold.
+   * The hero photograph, as a key into the image registry. Absent and the hero drops to a single
+   * column of words, which is a plainer page but an honest one: the same owners-and-dog shot on
+   * every service is worth less than no picture, because a photo is only doing a job if it shows
+   * the thing being sold.
+   *
+   * Unlike the homepage's, this picture stops at the container edge rather than bleeding off the
+   * screen — the full-bleed treatment belongs to the front door alone. See `ServiceHero`.
    */
   image?: AssetKey;
   /**
-   * The reassurance strip under the hero buttons — "No contracts", "Cancel anytime". Per service
-   * because the objections differ: a recurring plan has to answer "am I locked in", and a one-off
-   * clean does not.
+   * The outlined chips above the h1 — two to four words each: "Weekly or bi-weekly", "No
+   * contracts", "Pet-safe". They are read before the heading is, so they are qualities of the work
+   * rather than a second summary, and every one has to be something the business will stand behind.
    */
-  assurances?: readonly string[];
+  tags?: readonly string[];
   /**
-   * The "what's included" band, directly under the hero. This is the band that does the selling —
-   * a visitor who clicked a service wants to know what actually happens, and everything below it
-   * (why us, how it works, prices) is the same on every page.
+   * The INCLUDES tab: what actually happens when we turn up. One string per PARAGRAPH — these are
+   * sentences, not bullets.
    *
-   * Items are single sentences, and each one has to be a FACT the business will stand behind.
+   * It was a ticked list until the tabs arrived, and the list was the wrong shape: five fragments
+   * that each answered half a question. Every fact in here still has to be a fact, and the prose
+   * makes that harder to fudge rather than easier — a bullet can imply a promise, a sentence has
+   * to make one.
    */
-  includes?: {
-    heading: string;
-    intro?: string;
-    items: readonly string[];
-    image?: AssetKey;
-  };
+  includes?: readonly string[];
   /**
-   * Questions specific to THIS service. Absent falls back to the site-wide set, because a service
-   * page with no FAQ band reads as less answered than the homepage — which is backwards.
+   * The BENEFITS tab: what the customer gets out of it, as opposed to what we do. One string per
+   * paragraph, as above.
+   *
+   * The one place on a service page where the copy talks about the yard rather than the work —
+   * which is exactly why it is the easiest field on this type to fill with invented sentiment.
+   * Wrap anything the client has not actually said in `todo()`.
+   */
+  benefits?: readonly string[];
+  /**
+   * Questions specific to THIS service.
+   *
+   * NOT RENDERED by the current template, which ends at the details section — this is real copy
+   * kept against the FAQ band coming back, and it is deliberately not fed to `servicePageGraph` in
+   * the meantime: FAQPage markup for questions a visitor cannot see is exactly what Google's
+   * structured-data guidelines call out.
    */
   faq?: readonly FaqItem[];
-  /** Ordered body content for the service page. Also the publish gate — see lib/content.ts. */
+  /**
+   * The ABOUT tab — the long-form answer to "what is this". Also the publish gate: a service with
+   * an empty body renders (so it can be reviewed and linked) but carries `noindex` and stays out of
+   * the sitemap. See lib/content.ts.
+   */
   body: ContentBlock[];
   /** Whether this service gets city×service pages generated for it. */
   hasCityPages: boolean;
