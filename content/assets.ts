@@ -14,12 +14,22 @@
 import type { Asset } from "./types";
 
 export const assets = {
+  /**
+   * THE logo — the header lockup's picture half, cropped tight to the artwork's own edges so the
+   * space around it in the header comes from layout rather than from transparent pixels baked
+   * into the file. The wordmark beside it is live text, not part of this image.
+   *
+   * Note the dimensions: 483×405 is not square. Declaring it square is what makes the header jump
+   * as the image loads, so the registry carries the real numbers and assets.test.ts checks them
+   * against the file on every run.
+   */
   logoMark: {
-    src: "/brand/mark.png",
+    src: "/brand/blues-poop-scoop--logo-cropped.png",
     alt: "Blue's Poop Scoop",
-    width: 240,
-    height: 240,
+    width: 483,
+    height: 405,
   },
+  /** The full lockup, artwork and wordmark together. For social cards and print, not the header. */
   logoFull: {
     src: "/brand/blues-poop-scoop--logo--full.png",
     alt: "Blue's Poop Scoop — pet waste removal",

@@ -26,7 +26,7 @@ export function Hero({
   showPhone?: boolean;
 }) {
   return (
-    <Section spacing="lg">
+    <Section tone="canvas" spacing="lg">
       <Container>
         <Stack gap={6}>
           <Heading level={1}>{heading}</Heading>

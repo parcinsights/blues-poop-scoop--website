@@ -25,7 +25,10 @@ export function PageShell({
   children?: ReactNode;
 }) {
   return (
-    <Section spacing="md">
+    // `canvas`, matching the homepage hero and the header above it. Every page's first band is the
+    // same off-white, which is what lets the header carry no border at the top of the page without
+    // a colour seam appearing under it on ten of the eleven routes.
+    <Section tone="canvas" spacing="md">
       <Container>
         <Stack gap={5}>
           <Breadcrumbs crumbs={crumbs} />

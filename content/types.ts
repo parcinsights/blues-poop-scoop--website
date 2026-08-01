@@ -128,3 +128,20 @@ export type NavLink = {
   href: string;
   children?: NavLink[];
 };
+
+/**
+ * One TOP-LEVEL header item. Unlike `NavLink`, `href` is optional — a grouping label such as
+ * "Residential" opens a dropdown and has no page of its own, and inventing a URL for it just so
+ * the type is satisfied is how a nav ends up linking to a thin placeholder page.
+ *
+ * The three shapes, all valid:
+ *   · href, no children      — a plain link.
+ *   · href and children      — a link that also opens a menu ("About").
+ *   · children, no href      — a menu trigger only ("Residential").
+ * `routes.test.ts` fails the build on an item with neither.
+ */
+export type NavGroup = {
+  label: string;
+  href?: string;
+  children?: NavLink[];
+};

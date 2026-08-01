@@ -3,7 +3,7 @@ import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 
 import { cities } from "@/content/cities";
-import { headerNav, footerNav, primaryCta } from "@/content/nav";
+import { headerCta, headerNav, footerNav, primaryCta } from "@/content/nav";
 import { services } from "@/content/services";
 import { redirects } from "./redirects.mjs";
 import { SITE_URL, absoluteUrl, allRoutes, publishedRoutes, routes } from "./routes";
@@ -70,8 +70,26 @@ describe("route registry", () => {
 describe("navigation", () => {
   const known = new Set(allRoutes().map((entry) => entry.path));
 
+  /** Every href in the header, top-level items and dropdown children alike. */
+  const headerHrefs = headerNav.flatMap((item) => [
+    ...(item.href ? [item.href] : []),
+    ...(item.children ?? []).map((child) => child.href),
+  ]);
+
   it("points every header link at a route in the registry", () => {
-    for (const link of headerNav) expect(known.has(link.href), `${link.href}`).toBe(true);
+    for (const href of headerHrefs) expect(known.has(href), href).toBe(true);
+  });
+
+  /**
+   * A top-level item with neither a page nor a menu is a dead word in the nav bar — it renders,
+   * it looks clickable, and it does nothing. The types allow either one to be missing; this
+   * forbids both being missing.
+   */
+  it("gives every header item either a destination or a dropdown", () => {
+    const dead = headerNav
+      .filter((item) => !item.href && !item.children?.length)
+      .map((item) => item.label);
+    expect(dead).toEqual([]);
   });
 
   it("points every footer link at a route in the registry", () => {
@@ -82,6 +100,10 @@ describe("navigation", () => {
 
   it("points the primary CTA at a route in the registry", () => {
     expect(known.has(primaryCta.href)).toBe(true);
+  });
+
+  it("points the header CTA at a route in the registry", () => {
+    expect(known.has(headerCta.href)).toBe(true);
   });
 });
 

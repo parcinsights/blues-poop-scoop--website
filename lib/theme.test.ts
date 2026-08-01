@@ -86,10 +86,16 @@ describe("palette meets WCAG AA", () => {
   const brand = token("color-brand");
   const inkInverse = token("color-ink-inverse");
 
+  /**
+   * `canvas` is in here despite nothing rendering on it yet. It is the house page background kept
+   * ready for the swap described in theme.css, and a background nobody has contrast-checked is
+   * exactly the kind of thing that gets switched on during a redesign and ships illegible.
+   */
   const READABLE_SURFACES: [string, string][] = [
     ["surface", surface],
     ["surface-alt", surfaceAlt],
     ["surface-raised", surfaceRaised],
+    ["canvas", token("color-canvas")],
   ];
 
   const textPairs: [string, string, string][] = [

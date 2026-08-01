@@ -20,15 +20,35 @@ import { cx } from "@/lib/cx";
  * a column of twelve navigation items is just noise.
  */
 
-export type LinkVariant = "inline" | "nav" | "quiet";
+export type LinkVariant = "inline" | "nav" | "quiet" | "menu";
 
 const variants: Record<LinkVariant, string> = {
   // Underlined and brand-coloured — the base.css default, so it needs no classes of its own.
   inline: "",
   // Navigation: no underline, ink-coloured, weighted so it reads as a control.
-  nav: "no-underline text-ink font-semibold",
+  // The hover colour is set here rather than left to base.css, because `text-ink` is a utility and
+  // would win over the base-layer `a:hover` rule — a nav link with no hover feedback at all.
+  // The size is baked in, not left to the `size` prop — a nav item is 18px/800 everywhere it
+  // appears, and passing `size="small"` alongside this would produce two competing text sizes.
+  nav:
+    "no-underline text-ink text-control font-extrabold " +
+    "transition-colors duration-150 ease-out hover:text-brand",
   // Footer and other lists: no underline, inherits the surrounding colour.
   quiet: "no-underline text-inherit",
+  /**
+   * A row inside a dropdown panel. Same weight as the top-level `nav` items — a menu that drops
+   * to a lighter weight the moment it opens reads as a different, lesser kind of link.
+   *
+   * The padding lives on the anchor, not the `<li>`, so the whole row — not just the words — is
+   * the click target, and the hover wash lines up with it.
+   *
+   * Full-bleed and square: the panel clips the corners, so a radius here would only show as white
+   * slivers where the wash meets the card edge. `py-3` is what separates one option from the next —
+   * a gap between the rows would do it as stripes of white through the open menu instead.
+   */
+  menu:
+    "no-underline text-ink text-control font-extrabold block px-4 py-3 " +
+    "transition-colors duration-150 ease-out hover:bg-brand-tint hover:text-brand-dark",
 };
 
 /** `true` for anything that leaves the app router: another origin, a phone number, an email. */

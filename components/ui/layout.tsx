@@ -48,7 +48,7 @@ export function Section({
   id,
 }: {
   children: ReactNode;
-  tone?: "default" | "alt" | "brand" | "dark";
+  tone?: "default" | "alt" | "brand" | "canvas" | "dark";
   spacing?: "sm" | "md" | "lg";
   as?: ElementType;
   id?: string;
@@ -57,6 +57,8 @@ export function Section({
     default: "bg-surface text-ink",
     alt: "bg-surface-alt text-ink",
     brand: "bg-brand-tint text-ink",
+    // The house off-white. See --color-canvas in theme.css.
+    canvas: "bg-canvas text-ink",
     dark: "bg-surface-dark text-ink-inverse",
   } as const;
 
