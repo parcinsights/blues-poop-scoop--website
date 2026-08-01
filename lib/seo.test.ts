@@ -54,8 +54,8 @@ describe("indexability is decided by the deployment", () => {
 describe("canonical and social tags", () => {
   it("self-references the canonical on our own origin", async () => {
     const { buildMetadata } = await loadSeo("production");
-    const meta = buildMetadata({ ...page, path: "/services/weekly-scooping/" });
-    expect(meta.alternates?.canonical).toBe("https://bluespoopscoop.com/services/weekly-scooping/");
+    const meta = buildMetadata({ ...page, path: "/services/poop-scoop/" });
+    expect(meta.alternates?.canonical).toBe("https://bluespoopscoop.com/services/poop-scoop/");
   });
 
   it("keeps og:url in agreement with the canonical", async () => {

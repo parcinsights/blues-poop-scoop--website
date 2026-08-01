@@ -14,10 +14,10 @@ import type { NavGroup, NavLink } from "./types";
  * earlier "Residential" menu that listed the two frequencies (weekly, bi-weekly) alongside a
  * separate "Services" link — two menus covering the same ground, with One-Time appearing in both.
  *
- * The frequency pages did not go away; they are the ones carrying the city money-pages and the
- * "weekly dog poop removal" intent. They are now reached from the Poop Scoop page and the footer
- * instead of the bar, because a visitor who has not read anything yet does not know whether they
- * want weekly or fortnightly — that is a decision the page makes for them, not the nav.
+ * The frequency pages are gone entirely as of 2026-08-01 (see the note in content/services.ts).
+ * Weekly and every-other-week are two prices for one job, and the Poop Scoop page carries both —
+ * a visitor who has not read anything yet does not know which they want, and a nav is the wrong
+ * place to make them choose.
  *
  * Every item here has a page behind it, so there is no menu-label-only group at present. The
  * `href`-less shape is still supported — see `NavGroup` in ./types.
@@ -56,24 +56,26 @@ export const headerNav: NavGroup[] = [
 
 export const footerNav: { heading: string; links: NavLink[] }[] = [
   {
-    // The footer is where the frequency pages live now that the bar leads with "Poop Scoop" —
-    // someone who already knows they want every-other-week can get there in one click from
-    // anywhere, without the header having to ask the question.
+    // The whole menu, in the order it is sold: the plan, then the three things bought alongside
+    // it. Same four items as the header dropdown — the footer is the fallback for someone who has
+    // scrolled past the bar, not a second, different menu.
     heading: "Services",
     links: [
       { label: "Poop Scoop", href: routes.service("poop-scoop") },
-      { label: "Weekly Scooping", href: routes.service("weekly-scooping") },
-      { label: "Bi-Weekly Scooping", href: routes.service("biweekly-scooping") },
-      { label: "Commercial", href: routes.commercial() },
-    ],
-  },
-  {
-    heading: "Add-ons",
-    links: [
       { label: "Deodorizer", href: routes.service("deodorizer") },
       { label: "Haul Away", href: routes.service("haul-away") },
       { label: "One-Time Cleans", href: routes.service("one-time-cleanup") },
+    ],
+  },
+  {
+    // Commercial sits here rather than under "Services": it is a different buyer on a different
+    // page, and putting it in the residential list invites a homeowner to click it.
+    heading: "Get a quote",
+    links: [
       { label: "Pricing", href: routes.pricing() },
+      { label: "Get a free quote", href: routes.getStarted() },
+      { label: "Commercial", href: routes.commercial() },
+      { label: "Areas We Serve", href: routes.locations() },
     ],
   },
   {

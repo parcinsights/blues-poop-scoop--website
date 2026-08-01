@@ -6,6 +6,10 @@
  * forgetting. The compiler asks for the fact.
  */
 
+// Type-only, and circular by design: assets.ts imports `Asset` from here. Erased at compile, so it
+// costs nothing — and it is what lets a content record name a picture by key instead of by path.
+import type { AssetKey } from "./assets";
+
 export type Weekday =
   | "Monday"
   | "Tuesday"
@@ -31,17 +35,56 @@ export type Seo = {
   description: string;
 };
 
-/** One service the business sells. Drives /services/[service]/ and the city×service pages. */
+/**
+ * One service the business sells. Drives /services/[service]/ and the city×service pages.
+ *
+ * Every service page is the SAME template — same bands, same order, same styling. So the fields
+ * below are not "some copy for the page", they are the page: each one fills a specific band, and
+ * the optional ones simply drop their band when absent. Anything that would need a NEW band on one
+ * service and not another belongs here as another optional field, never as a second layout.
+ * See app/services/[service]/page.tsx.
+ */
 export type Service = {
   slug: string;
   /** The client's own name for this work. */
   name: string;
   /** The <h1>. May differ from `name` — the h1 targets a query, the name is a label. */
   heading: string;
-  /** One sentence, used in grids and link previews. */
+  /** One sentence, used in grids and link previews — and as the hero standfirst on its own page. */
   summary: string;
   seo: Seo;
-  /** Ordered body content for the service page. */
+  /**
+   * The hero photograph, as a key into the image registry. Absent until the client supplies a photo
+   * of THIS work: the hero falls back to the plain centred treatment, which is a smaller page but
+   * an honest one. A stock lawn, or the same owners-and-dog shot on all four services, is worth
+   * less than no picture — the photo is only doing a job if it shows the thing being sold.
+   */
+  image?: AssetKey;
+  /**
+   * The reassurance strip under the hero buttons — "No contracts", "Cancel anytime". Per service
+   * because the objections differ: a recurring plan has to answer "am I locked in", and a one-off
+   * clean does not.
+   */
+  assurances?: readonly string[];
+  /**
+   * The "what's included" band, directly under the hero. This is the band that does the selling —
+   * a visitor who clicked a service wants to know what actually happens, and everything below it
+   * (why us, how it works, prices) is the same on every page.
+   *
+   * Items are single sentences, and each one has to be a FACT the business will stand behind.
+   */
+  includes?: {
+    heading: string;
+    intro?: string;
+    items: readonly string[];
+    image?: AssetKey;
+  };
+  /**
+   * Questions specific to THIS service. Absent falls back to the site-wide set, because a service
+   * page with no FAQ band reads as less answered than the homepage — which is backwards.
+   */
+  faq?: readonly FaqItem[];
+  /** Ordered body content for the service page. Also the publish gate — see lib/content.ts. */
   body: ContentBlock[];
   /** Whether this service gets city×service pages generated for it. */
   hasCityPages: boolean;

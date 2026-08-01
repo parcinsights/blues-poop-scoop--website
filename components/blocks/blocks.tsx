@@ -1,5 +1,6 @@
-import { ArrowRight, BadgeCheck, Dog, MapPin, MessageCircleHeart, PawPrint } from "lucide-react";
+import { ArrowRight, BadgeCheck, Check, Dog, MapPin, MessageCircleHeart, PawPrint } from "lucide-react";
 
+import { Breadcrumbs } from "@/components/seo/Breadcrumbs";
 import { Button } from "@/components/ui/Button";
 import { Image } from "@/components/ui/Image";
 import { Cluster, Container, Grid, Section, Split, Stack } from "@/components/ui/layout";
@@ -15,6 +16,7 @@ import type { ContentBlock, FaqItem, WhyUsPoint } from "@/content/types";
 import { cx } from "@/lib/cx";
 import { serviceAreaMapIsConfigured, serviceAreaMapUrl } from "@/lib/maps";
 import { routes } from "@/lib/routes";
+import type { Crumb } from "@/lib/schema";
 
 /**
  * The composed sections. Each takes content and renders it — none of them contains an English
@@ -27,11 +29,15 @@ import { routes } from "@/lib/routes";
  * Pass `image` and the hero becomes the split treatment: words on the page gutter, photograph
  * bleeding off the right edge of the screen. Without it, the plain centred-column hero every
  * other page uses.
+ *
+ * Pass `crumbs` and the trail sits above the h1, which is what lets an inner page use this hero
+ * instead of `PageShell` — the homepage passes none, because a one-item trail is noise.
  */
 export function Hero({
   heading,
   subheading,
   image,
+  crumbs,
   rating,
   assurances,
   showPhone = true,
@@ -40,6 +46,8 @@ export function Hero({
   subheading?: string;
   /** A key into the image registry. See content/assets.ts. */
   image?: AssetKey;
+  /** The breadcrumb trail, when this hero is standing in for `PageShell` on an inner page. */
+  crumbs?: Crumb[];
   rating?: { stars: number; label: string };
   /** The reassurance strip under the buttons — "No contracts", "Cancel anytime". */
   assurances?: readonly string[];
@@ -47,6 +55,9 @@ export function Hero({
 }) {
   const body = (
     <Stack gap={6}>
+      {/* Above the rating and the h1 both: the trail is where you ARE, and it is the first thing
+          on the page for the same reason it is the first thing in the structured data. */}
+      {crumbs && <Breadcrumbs crumbs={crumbs} />}
       {rating && <Rating stars={rating.stars} label={rating.label} />}
       {/* `display` is the oversized treatment, and this is the one h1 on the site that gets it. */}
       <Heading level={1} size={image ? "display" : "h1"}>
@@ -88,7 +99,7 @@ export function Hero({
           media={
             <Image
               asset={image}
-              // The LCP element of the homepage. Exactly one image per page gets this.
+              // The page's LCP element. Exactly one image per page gets this.
               priority
               sizes="(min-width: 64rem) 50vw, 100vw"
               className="h-96 w-full object-cover sm:h-120 lg:h-full lg:rounded-l-lg"
@@ -293,6 +304,94 @@ export function HowItWorks({
             ))}
           </ol>
         </Stack>
+      </Container>
+    </Section>
+  );
+}
+
+// ── What's included ──────────────────────────────────────────────────────────
+
+/**
+ * The band directly under a service page's hero: what actually happens when we turn up.
+ *
+ * It is the ONE band on a service page that is genuinely about that service — everything below it
+ * (why us, how it works, prices, coverage) is the same on all four. So it gets the position
+ * immediately after the h1 and the only per-service photograph on the page.
+ *
+ * Ticks rather than the "why us" band's glyph medallions, and every tick identical: those are four
+ * different claims and each earns its own symbol, while these are one promise repeated — a
+ * checklist. Cycling the four medallion colours through a checklist would imply a grouping that is
+ * not there, so every tick takes the first of them and the list reads as one thing.
+ *
+ * `image` is optional and usually absent for now. Without it the list simply takes the full column
+ * width, which is a plainer band rather than a broken one — see the note on `Service.image`.
+ */
+export function ServiceIncludes({
+  heading,
+  intro,
+  items,
+  image,
+}: {
+  heading: string;
+  intro?: string;
+  items: readonly string[];
+  image?: AssetKey;
+}) {
+  if (items.length === 0) return null;
+
+  const body = (
+    <Stack gap={6}>
+      <Stack gap={4}>
+        <Heading level={2} align="center-mobile">
+          {heading}
+        </Heading>
+        {intro && <Text tone="muted">{intro}</Text>}
+      </Stack>
+
+      {/* A real list: parallel promises are a list, and a screen reader announcing the count up
+          front is the summary a sighted reader gets from the column of ticks. */}
+      <ul className="list-none pl-0 flex flex-col gap-4">
+        {items.map((item) => (
+          <li key={item} className="flex items-start gap-4">
+            <span
+              aria-hidden="true"
+              // `shrink-0` or the circle squashes into an oval as the sentence wraps. `mt-0.5`
+              // sits it on the text's cap height rather than its line box, so the tick lines up
+              // with the first letter instead of floating above it.
+              className="mt-0.5 flex size-7 shrink-0 items-center justify-center rounded-pill bg-accent-mint text-accent-mint-ink"
+            >
+              <Check size={16} strokeWidth={3} />
+            </span>
+            <Text tone="muted">{item}</Text>
+          </li>
+        ))}
+      </ul>
+    </Stack>
+  );
+
+  return (
+    // `alt` against the canvas hero above and the canvas "why us" below — this band is the page's
+    // one piece of service-specific argument, and the tone change is what separates it from the
+    // standing bands on either side.
+    <Section tone="alt">
+      <Container>
+        {image ? (
+          /* Words LEFT, picture right — the reverse of the "why us" band directly below it. Two
+             adjacent bands with the photograph on the same side read as one long column of images
+             with text stuck beside them. Source order is words-then-picture, so on a phone the
+             promise arrives first and the photo is the evidence under it — the opposite of the
+             "why us" band, where the faces are what earn the claims. */
+          <div className="grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
+            {body}
+            <Image
+              asset={image}
+              sizes="(min-width: 64rem) 50vw, 100vw"
+              className="h-80 w-full rounded-lg object-cover sm:h-112 lg:h-140"
+            />
+          </div>
+        ) : (
+          body
+        )}
       </Container>
     </Section>
   );
