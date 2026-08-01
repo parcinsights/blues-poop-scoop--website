@@ -18,7 +18,7 @@
 
 import { cities, areaServedNames } from "@/content/cities";
 import { sameAs, site } from "@/content/site";
-import type { FaqItem, OpeningHours, Service } from "@/content/types";
+import type { BlogPost, FaqItem, OpeningHours, Service } from "@/content/types";
 import { SITE_URL, absoluteUrl, routes } from "./routes";
 
 type JsonLdNode = Record<string, unknown>;
@@ -195,6 +195,50 @@ export function servicePageGraph(args: {
   ];
   if (args.faqs && args.faqs.length > 0) nodes.push(faqNode(args.path, args.faqs));
   return graph(nodes);
+}
+
+/**
+ * A blog post. `BlogPosting` rather than `Article`, which is the specific type for this and costs
+ * nothing to be accurate about.
+ *
+ * `author` is a `Person` and `publisher` points at the business. Both are required for the post to
+ * be eligible as an article result, and the author being a named human rather than the company is
+ * the honest description of who wrote it — which is also what E-E-A-T is asking for.
+ *
+ * `dateModified` is set equal to `datePublished` because nothing here tracks edits. That is
+ * truthful for a post that has not been revised, and it is deliberately NOT wired to a build
+ * timestamp: a `dateModified` that advances on every deploy claims an update that never happened,
+ * and it is the single most common way a small site's article markup becomes a lie.
+ */
+export function blogPostGraph(args: {
+  path: string;
+  post: BlogPost;
+  crumbs: Crumb[];
+}): JsonLdNode {
+  const url = absoluteUrl(args.path);
+  return graph([
+    businessNode(),
+    websiteNode(),
+    webPageNode({
+      path: args.path,
+      name: args.post.title,
+      description: args.post.seo.description,
+      hasBreadcrumb: true,
+    }),
+    breadcrumbNode(args.path, args.crumbs),
+    {
+      "@type": "BlogPosting",
+      "@id": `${url}#post`,
+      headline: args.post.title,
+      description: args.post.excerpt,
+      datePublished: args.post.date,
+      dateModified: args.post.date,
+      author: { "@type": "Person", name: args.post.author },
+      publisher: { "@id": BUSINESS_ID },
+      mainEntityOfPage: { "@id": `${url}#webpage` },
+      inLanguage: "en-US",
+    },
+  ]);
 }
 
 export function faqPageGraph(args: {

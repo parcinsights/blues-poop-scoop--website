@@ -23,7 +23,11 @@ export function Footer() {
   return (
     <footer className="bg-surface-dark text-ink-inverse">
       <Container>
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-10 py-14">
+        {/* Five columns: the brand block, the three `footerNav` groups, and the coverage list.
+            Two-up on a tablet rather than four, because four 160px columns of small links is a
+            wall. The count is pinned to `footerNav.length + 2` in the class below — adding a
+            fourth nav group means changing it here too. */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-10 py-14">
           <div className="flex flex-col gap-3">
             <span className="font-display font-bold text-h5">{site.name}</span>
             <Text size="small">{site.tagline}</Text>

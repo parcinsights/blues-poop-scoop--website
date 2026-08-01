@@ -13,8 +13,10 @@
  * next.config.mjs and must never change after launch — it is a full URL migration if it does.
  */
 
+import { posts } from "@/content/blog";
 import { cities } from "@/content/cities";
 import { moneyPage } from "@/content/money-pages";
+import { opportunities } from "@/content/pages/standing";
 import { cityPageServices, services } from "@/content/services";
 import { isPublishable } from "./content";
 
@@ -47,6 +49,10 @@ export const routes = {
   about: () => "/about/",
   contact: () => "/contact/",
   faq: () => "/faq/",
+  reviews: () => "/reviews/",
+  opportunities: () => "/opportunities/",
+  blog: () => "/blog/",
+  blogPost: (slug: string) => `/blog/${slug}/`,
   getStarted: () => "/get-started/",
 } as const;
 
@@ -85,11 +91,43 @@ export function allRoutes(): RouteEntry[] {
     { path: routes.about(), priority: 0.5, changeFrequency: "yearly", implemented: true },
     { path: routes.contact(), priority: 0.7, changeFrequency: "yearly", implemented: true },
     { path: routes.getStarted(), priority: 0.9, changeFrequency: "monthly", implemented: true },
+    // Real content from day one — the quotes already exist. Priority sits above /about/ because a
+    // review page is a page people look for by name.
+    { path: routes.reviews(), priority: 0.6, changeFrequency: "monthly", implemented: true },
+    // Hiring. Low priority and yearly: it matters to the handful of people looking for it and to
+    // nobody else, and treating it as a ranking target is how a careers page ends up outranking
+    // the service pages for the business's own name. Unpublished until the role is written up —
+    // the page carries `noindex` while its body is empty, and a sitemap entry for a noindexed URL
+    // is the contradiction this flag exists to prevent.
+    {
+      path: routes.opportunities(),
+      priority: 0.4,
+      changeFrequency: "yearly",
+      implemented: isPublishable(opportunities.body),
+    },
     // Commercial stays unpublished until the client confirms they actually sell it — their
     // current site says "Coming Soon", and a page offering a service nobody performs is worse
     // than no page.
     { path: routes.commercial(), priority: 0.7, changeFrequency: "monthly", implemented: false },
+    // The blog index is only worth submitting once it indexes something. An empty archive page in
+    // the sitemap is a soft-404 invitation, and it stays that way for as long as nobody writes a
+    // post — which, on a site this size, can be a long time. See content/blog.ts.
+    {
+      path: routes.blog(),
+      priority: 0.5,
+      changeFrequency: "weekly",
+      implemented: posts.length > 0,
+    },
   ];
+
+  for (const post of posts) {
+    entries.push({
+      path: routes.blogPost(post.slug),
+      priority: 0.5,
+      changeFrequency: "yearly",
+      implemented: isPublishable(post.body),
+    });
+  }
 
   /**
    * From here down, CONTENT decides publication, not a developer's memory. A page whose body has

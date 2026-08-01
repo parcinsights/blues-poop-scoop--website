@@ -24,6 +24,7 @@ const DYNAMIC_FAMILIES: { test: (path: string) => boolean; file: string }[] = [
     test: (p) => /^\/locations\/[^/]+\/[^/]+\/$/.test(p),
     file: "app/locations/[city]/[service]/page.tsx",
   },
+  { test: (p) => /^\/blog\/[^/]+\/$/.test(p), file: "app/blog/[slug]/page.tsx" },
 ];
 
 function isServable(path: string): boolean {

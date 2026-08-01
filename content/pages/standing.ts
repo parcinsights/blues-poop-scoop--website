@@ -58,6 +58,65 @@ export const commercial = {
   body: [] as ContentBlock[],
 };
 
+/**
+ * /reviews/ — the whole wall, rather than the trimmed set the homepage carries.
+ *
+ * The page is real content the day it ships, because the quotes already exist. Note what it must
+ * NOT do: emit `review` or `aggregateRating` markup. Self-collected reviews on your own domain are
+ * against Google's guidelines and are a manual-action risk — the reason is written out at the top
+ * of content/reviews.ts, and the temptation is strongest on exactly this page.
+ */
+export const reviewsPage = {
+  seo: {
+    title: "Reviews | Blue's Poop Scoop",
+    description:
+      "What our customers say about us, in their own words. Pet waste removal across Philadelphia and the Main Line.",
+  } satisfies Seo,
+  heading: "What our customers say",
+  intro:
+    "Every quote below is a real review left by a real customer. We have not edited them beyond fixing an obvious typo.",
+  body: [] as ContentBlock[],
+};
+
+/**
+ * /opportunities/ — hiring.
+ *
+ * A hiring page on a small trade site is read by two people: someone deciding whether to apply,
+ * and a customer checking whether the business is real. Both are served by the same thing —
+ * specifics. Pay, hours, the vehicle situation, whether it is seasonal.
+ *
+ * OUTSTANDING, and none of it can be guessed: George has to supply the pay rate, the hours, what
+ * a route day looks like, whether a driver uses their own vehicle, and where an application goes.
+ * Inventing a wage on a real business's careers page is the worst possible placeholder.
+ */
+export const opportunities = {
+  seo: {
+    title: todo("Now Hiring | Work With Blue's Poop Scoop"),
+    description: todo(
+      "We're hiring in Philadelphia and the Main Line. Outdoor work, your own route, and dogs all day.",
+    ),
+  } satisfies Seo,
+  heading: todo("Come work with us"),
+  intro: todo(
+    "We're a small local crew, and we're growing. If you like dogs, working outside, and being trusted to run your own day, we'd like to hear from you.",
+  ),
+  body: [] as ContentBlock[],
+};
+
+/**
+ * /blog/ — the index. Posts live in content/blog.ts and there are none yet, deliberately; the note
+ * there explains what is worth publishing and why an empty blog beats a padded one.
+ */
+export const blogIndex = {
+  seo: {
+    title: "Blog | Blue's Poop Scoop",
+    description:
+      "Notes on yard care, pet waste, and dog ownership around Philadelphia and the Main Line.",
+  } satisfies Seo,
+  heading: "From the blog",
+  intro: "Notes from the route — seasonal yard care, and the questions our customers actually ask.",
+};
+
 export const getStarted = {
   seo: {
     title: "Get a free quote | Blue's Poop Scoop",

@@ -8,51 +8,82 @@ import { routes } from "@/lib/routes";
 import type { NavGroup, NavLink } from "./types";
 
 /**
- * The header, split the way a customer decides rather than the way the site is filed: a homeowner
- * and a property manager want different things, so those are the first two items, and everything
- * else sits under a group instead of stretching the bar into eight links nobody reads.
+ * The header, split the way a customer decides rather than the way the site is filed.
  *
- * "Residential" has no page of its own — it is a menu label. See `NavGroup` in ./types.
+ * "Services" is ONE dropdown: the core service first, then the three extras. It replaced an
+ * earlier "Residential" menu that listed the two frequencies (weekly, bi-weekly) alongside a
+ * separate "Services" link — two menus covering the same ground, with One-Time appearing in both.
+ *
+ * The frequency pages did not go away; they are the ones carrying the city money-pages and the
+ * "weekly dog poop removal" intent. They are now reached from the Poop Scoop page and the footer
+ * instead of the bar, because a visitor who has not read anything yet does not know whether they
+ * want weekly or fortnightly — that is a decision the page makes for them, not the nav.
+ *
+ * Every item here has a page behind it, so there is no menu-label-only group at present. The
+ * `href`-less shape is still supported — see `NavGroup` in ./types.
  */
 export const headerNav: NavGroup[] = [
   {
-    label: "Residential",
+    label: "Services",
+    href: routes.services(),
     children: [
-      { label: "Weekly Scooping", href: routes.service("weekly-scooping") },
-      { label: "Bi-Weekly Scooping", href: routes.service("biweekly-scooping") },
-      { label: "One-Time Cleanup", href: routes.service("one-time-cleanup") },
-      { label: "Pricing", href: routes.pricing() },
+      { label: "Poop Scoop", href: routes.service("poop-scoop") },
+      // The three add-ons, in the order they get sold: the extra everyone asks about first, then
+      // the one that changes what happens to the waste, then the one-off.
+      { label: "Deodorizer", href: routes.service("deodorizer") },
+      { label: "Haul Away", href: routes.service("haul-away") },
+      { label: "One-Time Cleans", href: routes.service("one-time-cleanup") },
     ],
   },
+  { label: "Pricing", href: routes.pricing() },
   { label: "Commercial", href: routes.commercial() },
+  { label: "Reviews", href: routes.reviews() },
   {
     label: "About",
     href: routes.about(),
     children: [
       { label: "About Us", href: routes.about() },
+      { label: "Blog", href: routes.blog() },
       { label: "Areas We Serve", href: routes.locations() },
       { label: "FAQ", href: routes.faq() },
+      // Hiring sits under About rather than in the bar: it is a page for one visitor in a
+      // hundred, and a top-level "Opportunities" spends bar width on them at the cost of everyone
+      // else. It is still one hop from every page.
+      { label: "Opportunities", href: routes.opportunities() },
     ],
   },
-  { label: "Services", href: routes.services() },
 ];
 
 export const footerNav: { heading: string; links: NavLink[] }[] = [
   {
+    // The footer is where the frequency pages live now that the bar leads with "Poop Scoop" —
+    // someone who already knows they want every-other-week can get there in one click from
+    // anywhere, without the header having to ask the question.
     heading: "Services",
     links: [
+      { label: "Poop Scoop", href: routes.service("poop-scoop") },
       { label: "Weekly Scooping", href: routes.service("weekly-scooping") },
       { label: "Bi-Weekly Scooping", href: routes.service("biweekly-scooping") },
-      { label: "One-Time Cleanup", href: routes.service("one-time-cleanup") },
       { label: "Commercial", href: routes.commercial() },
+    ],
+  },
+  {
+    heading: "Add-ons",
+    links: [
+      { label: "Deodorizer", href: routes.service("deodorizer") },
+      { label: "Haul Away", href: routes.service("haul-away") },
+      { label: "One-Time Cleans", href: routes.service("one-time-cleanup") },
+      { label: "Pricing", href: routes.pricing() },
     ],
   },
   {
     heading: "Company",
     links: [
       { label: "About", href: routes.about() },
-      { label: "Pricing", href: routes.pricing() },
+      { label: "Reviews", href: routes.reviews() },
+      { label: "Blog", href: routes.blog() },
       { label: "FAQ", href: routes.faq() },
+      { label: "Opportunities", href: routes.opportunities() },
       { label: "Contact", href: routes.contact() },
     ],
   },
