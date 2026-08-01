@@ -179,4 +179,12 @@
   /* ── Layout ───────────────────────────────────────────────────────────── */
   --container-page: 75rem;
   --container-prose: 42rem;
+
+  /**
+   * Exactly half of `--container-page`. It is what lets `Split` put a column of text on the page
+   * gutter while the picture beside it runs off the screen: a box capped at half the page width
+   * and pushed to the right of a half-viewport column lands on the same line the Container does.
+   * Keep the two in step — this is not a free number.
+   */
+  --container-page-half: 37.5rem;
 }

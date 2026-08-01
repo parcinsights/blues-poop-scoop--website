@@ -15,7 +15,7 @@ import { Card } from "@/components/ui/surfaces";
 import { Heading, Text } from "@/components/ui/typography";
 import { cities } from "@/content/cities";
 import { home } from "@/content/pages/home";
-import { reviews } from "@/content/reviews";
+import { ratingSummary, reviews } from "@/content/reviews";
 import { residentialServices } from "@/content/services";
 import { routes } from "@/lib/routes";
 import { homeGraph } from "@/lib/schema";
@@ -34,7 +34,13 @@ export default function HomePage() {
     <>
       <JsonLd graph={homeGraph(home.seo.description)} />
 
-      <Hero heading={home.hero.heading} subheading={home.hero.subheading} />
+      <Hero
+        heading={home.hero.heading}
+        subheading={home.hero.subheading}
+        image="landingHero"
+        rating={ratingSummary}
+        assurances={home.hero.assurances}
+      />
 
       <FeatureGrid heading="More than just a poop scoop service" features={home.valueProps} />
 

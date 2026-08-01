@@ -13,6 +13,19 @@
  * Ask the client for 3-6, ideally pulled from their Google Business Profile so they are verifiable.
  */
 
+import { todo } from "./todo";
 import type { Review } from "./types";
 
 export const reviews: Review[] = [];
+
+/**
+ * The star row in the hero. Same rule as above — it is visible trust, not structured data.
+ *
+ * OUTSTANDING — the label is a placeholder. It needs the real number and the place a visitor can
+ * go and check it ("5.0 from 38 reviews on Google"), because an unsourced star row is the exact
+ * thing every competitor's template also says, and a count that can be verified is not.
+ */
+export const ratingSummary = {
+  stars: 5,
+  label: todo("5-star rated"),
+} as const;

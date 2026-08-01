@@ -1,4 +1,4 @@
-import type { ElementType, ReactNode } from "react";
+import { Fragment, type ElementType, type ReactNode } from "react";
 
 import { cx } from "@/lib/cx";
 
@@ -169,6 +169,38 @@ export function List({
         <li key={index}>{item}</li>
       ))}
     </Tag>
+  );
+}
+
+// ── InlineList ───────────────────────────────────────────────────────────────
+
+/**
+ * A short run of phrases on one line, separated by a dot — the reassurance strip under a CTA.
+ *
+ * Not a `<List>`: these are not items of anything, they are one sentence's worth of objections
+ * answered, and marking them up as a list makes a screen reader announce "list, three items"
+ * before reading three fragments. The dots are decorative and hidden for the same reason.
+ */
+export function InlineList({
+  items,
+  tone = "muted",
+}: {
+  items: readonly string[];
+  tone?: Tone;
+}) {
+  return (
+    <div className={cx("flex flex-wrap items-center gap-x-3 gap-y-1 text-small", tones[tone])}>
+      {items.map((item, index) => (
+        <Fragment key={item}>
+          {index > 0 && (
+            <span aria-hidden="true" className="text-line-strong">
+              •
+            </span>
+          )}
+          <span>{item}</span>
+        </Fragment>
+      ))}
+    </div>
   );
 }
 

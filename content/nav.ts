@@ -60,9 +60,16 @@ export const footerNav: { heading: string; links: NavLink[] }[] = [
 
 /** The one primary conversion action, referenced by every CTA on the site. */
 export const primaryCta = {
-  label: "Get a free quote",
+  label: "Get my free quote",
   href: routes.getStarted(),
 } as const;
+
+/**
+ * The phone CTA's words where the number itself is not what sells the click — the hero, which
+ * already carries the number in the header above it. The dark CTA band still spells the number
+ * out, because by then the visitor has read the page and is dialling rather than deciding.
+ */
+export const phoneCtaLabel = "Call us now";
 
 /**
  * The header's own button, deliberately NOT `primaryCta`.

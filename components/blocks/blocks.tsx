@@ -1,10 +1,13 @@
 import { Button } from "@/components/ui/Button";
-import { Cluster, Container, Grid, Section, Stack } from "@/components/ui/layout";
+import { Image } from "@/components/ui/Image";
+import { Cluster, Container, Grid, Section, Split, Stack } from "@/components/ui/layout";
 import { Link } from "@/components/ui/Link";
+import { Rating } from "@/components/ui/Rating";
 import { Card, Callout } from "@/components/ui/surfaces";
-import { Heading, List, Quote, Text } from "@/components/ui/typography";
+import { Heading, InlineList, List, Quote, Text } from "@/components/ui/typography";
+import type { AssetKey } from "@/content/assets";
 import { priceTiers, pricing } from "@/content/pricing";
-import { primaryCta } from "@/content/nav";
+import { phoneCtaLabel, primaryCta } from "@/content/nav";
 import { site } from "@/content/site";
 import type { ContentBlock, FaqItem } from "@/content/types";
 import { routes } from "@/lib/routes";
@@ -16,37 +19,83 @@ import { routes } from "@/lib/routes";
 
 // ── Hero ─────────────────────────────────────────────────────────────────────
 
+/**
+ * Pass `image` and the hero becomes the split treatment: words on the page gutter, photograph
+ * bleeding off the right edge of the screen. Without it, the plain centred-column hero every
+ * other page uses.
+ */
 export function Hero({
   heading,
   subheading,
+  image,
+  rating,
+  assurances,
   showPhone = true,
 }: {
   heading: string;
   subheading?: string;
+  /** A key into the image registry. See content/assets.ts. */
+  image?: AssetKey;
+  rating?: { stars: number; label: string };
+  /** The reassurance strip under the buttons — "No contracts", "Cancel anytime". */
+  assurances?: readonly string[];
   showPhone?: boolean;
 }) {
-  return (
-    <Section tone="canvas" spacing="lg">
-      <Container>
-        <Stack gap={6}>
-          <Heading level={1}>{heading}</Heading>
-          {subheading && (
-            <Text size="lead" tone="muted" measure>
-              {subheading}
-            </Text>
-          )}
-          <Cluster gap={4}>
-            <Button href={primaryCta.href} size="lg">
-              {primaryCta.label}
+  const body = (
+    <Stack gap={6}>
+      {rating && <Rating stars={rating.stars} label={rating.label} />}
+      {/* `display` is the oversized treatment, and this is the one h1 on the site that gets it. */}
+      <Heading level={1} size={image ? "display" : "h1"}>
+        {heading}
+      </Heading>
+      {subheading && (
+        <Text size="lead" tone="muted" measure>
+          {subheading}
+        </Text>
+      )}
+      {/* The strip sits tighter to the buttons than the Stack's own rhythm — it is a footnote on
+          them, not the next thing down the page. */}
+      <Stack gap={4}>
+        <Cluster gap={4}>
+          <Button href={primaryCta.href} size="lg">
+            {primaryCta.label}
+          </Button>
+          {showPhone && (
+            <Button
+              href={`tel:${site.phone.e164}`}
+              variant="secondary"
+              size="lg"
+              // The visible words are not the whole story — a screen reader gets the number.
+              ariaLabel={`Call ${site.phone.display}`}
+            >
+              {phoneCtaLabel}
             </Button>
-            {showPhone && (
-              <Button href={`tel:${site.phone.e164}`} variant="ghost" size="lg">
-                Call {site.phone.display}
-              </Button>
-            )}
-          </Cluster>
-        </Stack>
-      </Container>
+          )}
+        </Cluster>
+        {assurances && <InlineList items={assurances} />}
+      </Stack>
+    </Stack>
+  );
+
+  return (
+    <Section tone="canvas" spacing="hero">
+      {image ? (
+        <Split
+          media={
+            <Image
+              asset={image}
+              // The LCP element of the homepage. Exactly one image per page gets this.
+              priority
+              sizes="(min-width: 64rem) 50vw, 100vw"
+              className="h-96 w-full object-cover sm:h-120 lg:h-full lg:rounded-l-lg"
+            />
+          }
+        >
+          {body}
+        </Split>
+      ) : (
+        <Container>{body}</Container>
+      )}
     </Section>
   );
 }

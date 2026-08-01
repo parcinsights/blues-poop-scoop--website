@@ -34,6 +34,35 @@ export function Container({
   );
 }
 
+// ── Split ────────────────────────────────────────────────────────────────────
+
+/**
+ * Text on the left, a picture that runs off the right edge of the screen on the right.
+ *
+ * It replaces `Container` rather than sitting inside one — a Container would stop the picture at
+ * the page width, and stopping it there is the whole thing this exists to avoid.
+ *
+ * The alignment is not approximate. The text box is capped at `max-w-page-half` and pushed to the
+ * right of a half-viewport column, which puts its left edge at `(100vw - page) / 2` — the same
+ * line `Container` sits on, so the h1 here and the h2 of the section below it stack flush. Under
+ * `lg` the two collapse to one column and the box behaves exactly like a Container.
+ *
+ * `media` is a separate prop rather than a second child so the stacking order on a phone is fixed
+ * here — words first, picture second — and cannot be got wrong at a call site.
+ */
+export function Split({ children, media }: { children: ReactNode; media: ReactNode }) {
+  return (
+    <div className="grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
+      <div className="mx-auto w-full max-w-page px-5 sm:px-6 lg:mr-0 lg:max-w-page-half lg:px-8">
+        {children}
+      </div>
+      {/* `self-stretch` hands the picture the row's height; the floor keeps it from going letterbox
+          when the text beside it is short. */}
+      <div className="lg:min-h-160 lg:self-stretch">{media}</div>
+    </div>
+  );
+}
+
 // ── Section ──────────────────────────────────────────────────────────────────
 
 /**
@@ -49,7 +78,7 @@ export function Section({
 }: {
   children: ReactNode;
   tone?: "default" | "alt" | "brand" | "canvas" | "dark";
-  spacing?: "sm" | "md" | "lg";
+  spacing?: "sm" | "md" | "lg" | "hero";
   as?: ElementType;
   id?: string;
 }) {
@@ -66,6 +95,13 @@ export function Section({
     sm: "py-10 md:py-14",
     md: "py-14 md:py-20",
     lg: "py-20 md:py-28",
+    /**
+     * The FIRST band of a page, sitting directly under the header. Asymmetric on purpose: the
+     * header already supplies the air above, so a symmetric `lg` reads as a gap rather than as
+     * breathing room and pushes the h1 below the fold on a laptop. Bottom stays full-size,
+     * because the band below it has nothing overlapping to borrow from.
+     */
+    hero: "pt-6 pb-20 md:pt-10 md:pb-28",
   } as const;
 
   return (

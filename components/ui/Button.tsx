@@ -43,9 +43,9 @@ const lift = "hover:scale-105 disabled:hover:scale-100 motion-reduce:hover:scale
 const variants: Record<ButtonVariant, string> = {
   primary: "bg-brand text-ink-inverse hover:bg-brand-dark hover:text-ink-inverse",
   secondary:
-    "bg-transparent text-brand border border-brand hover:bg-brand-tint hover:text-brand-dark",
+    "bg-transparent text-brand border-2 border-brand hover:bg-brand-tint hover:text-brand-dark",
   ghost:
-    "bg-transparent text-brand border border-line-strong hover:bg-brand-tint hover:text-brand-dark",
+    "bg-transparent text-brand border-2 border-line-strong hover:bg-brand-tint hover:text-brand-dark",
   link: "bg-transparent text-brand underline hover:text-brand-dark",
 };
 

@@ -21,8 +21,23 @@ export const home = {
   } satisfies Seo,
 
   hero: {
-    heading: "More than just a poop scoop service",
-    subheading: `Weekly and every-other-week dog waste removal across Philadelphia and the Main Line. Plans from $${startingPrice} a month.`,
+    heading: "We scoop, so you don't have to",
+    /**
+     * Not a price and not a service list — both of those are a click away, and neither is the
+     * reason someone hires this. The problem is the chore and the low-grade guilt around it, so
+     * the copy names that, then answers it with the one operating policy that is actually theirs:
+     * they never enter while the dog is outside. See `valueProps` below — it is the same promise,
+     * and it is repeated here on purpose.
+     */
+    subheading:
+      "Your yard should be somewhere you and your dog actually want to be. We keep it that way — on schedule, every week, and never while your pup is outside.",
+
+    /**
+     * The objections a homeowner has in the two seconds before clicking, answered in three
+     * fragments. Client-supplied — these are commitments the business is making, so they belong
+     * here rather than being invented as copy.
+     */
+    assurances: ["No contracts", "Cancel anytime", "We reply by text"],
   },
 
   /** Verbatim from the client. Do not smooth these out — the specificity is the value. */

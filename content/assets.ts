@@ -29,6 +29,17 @@ export const assets = {
     width: 483,
     height: 405,
   },
+  /**
+   * The homepage hero photograph — the owners and the dog the business is named after. A real
+   * photo of the actual people is the single hardest thing for a franchise competitor to match,
+   * which is why it sits above the fold rather than a stock lawn.
+   */
+  landingHero: {
+    src: "/landing--hero.jpg",
+    alt: "The owners of Blue's Poop Scoop in branded sweatshirts, holding their small white dog outdoors",
+    width: 3000,
+    height: 2000,
+  },
   /** The full lockup, artwork and wordmark together. For social cards and print, not the header. */
   logoFull: {
     src: "/brand/blues-poop-scoop--logo--full.png",
