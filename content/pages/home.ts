@@ -156,6 +156,24 @@ export const home = {
   },
 
   /**
+   * The coverage band, sitting between "how it works" and the prices.
+   *
+   * The intro names Philadelphia's four neighbourhoods rather than saying "Philadelphia", for the
+   * same reason the FAQ answer does: a Chestnut Hill resident does not scan a map for the word
+   * Philadelphia, they scan it for Chestnut Hill. It is derived from cities.ts, so adding a town
+   * there rewrites this too.
+   *
+   * The link out is worded as a question because it is the escape hatch for the one visitor this
+   * band is bad news for — somebody who has just failed to find their street. "See every town we
+   * cover" is no use to them; being told to ask is.
+   */
+  serviceArea: {
+    heading: "Where we scoop",
+    intro: `We cover Northwest Philadelphia — ${sentenceList(philadelphia?.neighborhoods ?? [])} — and the Main Line. If you're close by but not on this list, ask us; we'll tell you honestly whether we can reach you.`,
+    cta: "Not sure if we reach you?",
+  },
+
+  /**
    * The pricing band. The prices themselves live in content/pricing.ts and are never retyped here —
    * this is only the words wrapped around them.
    *

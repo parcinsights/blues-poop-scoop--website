@@ -43,6 +43,10 @@ export default function LocationsIndexPage() {
         intro="We cover Northwest Philadelphia and the Main Line. If you're nearby but not listed, ask — we'll tell you honestly whether we can reach you."
       />
 
+      {/* PARKED — `ServiceAreaMapFrame` belongs above these cards: this is where somebody lands
+          from "pooper scooper near me", and the shape of the territory answers that faster than
+          ten town names do. Out for the same reason as the homepage band — see app/page.tsx. */}
+
       <Section tone="alt">
         <Container>
           <Grid columns={3}>

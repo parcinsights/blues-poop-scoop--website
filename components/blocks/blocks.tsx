@@ -13,6 +13,7 @@ import { phoneCtaLabel, primaryCta } from "@/content/nav";
 import { site } from "@/content/site";
 import type { ContentBlock, FaqItem, WhyUsPoint } from "@/content/types";
 import { cx } from "@/lib/cx";
+import { serviceAreaMapIsConfigured, serviceAreaMapUrl } from "@/lib/maps";
 import { routes } from "@/lib/routes";
 
 /**
@@ -554,6 +555,113 @@ export function ServiceAreaList({
               </Button>
             ))}
           </Cluster>
+        </Stack>
+      </Container>
+    </Section>
+  );
+}
+
+// ── Service area map ─────────────────────────────────────────────────────────
+
+/**
+ * The coverage band: a map to orient, a list of towns to answer.
+ *
+ * It sits between "how it works" and the prices on purpose. "Do you even come to my street?" is
+ * disqualifying — someone outside the territory should find that out before they read a number,
+ * and someone inside it should have the doubt cleared while they still have it.
+ *
+ * The map is decoration and the town list is the content, not the other way round. That ordering
+ * is why the whole thing still works with the map gone: no key configured (see lib/maps.ts), no
+ * iframe, and the band reads as a slightly plainer version of itself rather than as a hole.
+ * It is also why the towns are `Button`s and not pins — a pin is not a link to a page that ranks.
+ */
+/**
+ * The map itself, framed. Renders nothing at all when no key is configured — see lib/maps.ts.
+ *
+ * Separate from the band below so /locations/ can show the map without the town chips, which on
+ * that page would be the same ten links as the cards directly under it.
+ */
+export function ServiceAreaMapFrame() {
+  if (!serviceAreaMapIsConfigured()) return null;
+
+  /**
+   * Two crops of the same map, not one image squeezed. A 16/9 strip on a 390px screen is about
+   * 220px of map — not enough of the territory to orient anyone — so the phone gets a squarer
+   * frame. A `<picture>` fetches only the crop that matches, so this is two URLs and still one
+   * request.
+   *
+   * 640 is Google's ceiling on a free static map in either direction; `scale=2` inside the URL is
+   * what makes it sharp, so the numbers here are the CSS size and the file is twice that.
+   */
+  const wide = serviceAreaMapUrl({ width: 640, height: 360 });
+  const tall = serviceAreaMapUrl({ width: 480, height: 440 });
+  if (!wide || !tall) return null;
+
+  return (
+    /* The frame owns the corners so the image needs no rounding of its own to disagree about. */
+    <div className="w-full overflow-hidden rounded-lg border border-line shadow-sm">
+      <picture>
+        <source media="(min-width: 640px)" srcSet={wide} />
+        {/* eslint-disable-next-line @next/next/no-img-element -- Not a local asset. It must be
+            fetched by the BROWSER so the request carries a Referer and the key's referrer
+            restriction applies; next/image would fetch it from our server and strip that. */}
+        <img
+          src={tall}
+          alt={`Map of the area ${site.name} covers: Northwest Philadelphia and the Main Line, with a marker on each town served.`}
+          loading="lazy"
+          decoding="async"
+          width={640}
+          height={360}
+          className="block aspect-4/3 w-full object-cover sm:aspect-video"
+        />
+      </picture>
+    </div>
+  );
+}
+
+export function ServiceAreaMap({
+  heading,
+  intro,
+  cities,
+  cta,
+}: {
+  heading: string;
+  intro: string;
+  cities: readonly { slug: string; name: string }[];
+  /** Omit on /locations/ itself, where the link would point at the page you are already on. */
+  cta?: string;
+}) {
+  return (
+    <Section tone="alt">
+      <Container>
+        <Stack gap={8} align="center">
+          <Stack gap={3} align="center">
+            <Heading level={2} align="center">
+              {heading}
+            </Heading>
+            <Text tone="muted" measure>
+              {intro}
+            </Text>
+          </Stack>
+
+          <ServiceAreaMapFrame />
+
+          {/* The chips are the actual answer, so they stay above the CTA: someone who finds their
+              town here is done reading and wants the button, and someone who does not is the one
+              the CTA's wording is written for. */}
+          <Cluster gap={3} justify="center">
+            {cities.map((city) => (
+              <Button key={city.slug} href={routes.city(city.slug)} variant="ghost" size="sm">
+                {city.name}
+              </Button>
+            ))}
+          </Cluster>
+
+          {cta ? (
+            <Button href={routes.locations()} variant="link">
+              {cta}
+            </Button>
+          ) : null}
         </Stack>
       </Container>
     </Section>

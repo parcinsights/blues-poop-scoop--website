@@ -53,6 +53,15 @@ export default function HomePage() {
 
       <HowItWorks heading={home.howItWorks.heading} steps={home.howItWorks.steps} />
 
+      {/* PARKED — the service-area band belongs HERE, between the steps and the prices: "do you
+          come to my street?" is the disqualifying question, and a visitor outside the territory
+          should find that out before reading a number they were never going to be quoted.
+
+          It is built and tested (`ServiceAreaMap` in components/blocks/blocks.tsx, content in
+          content/pages/home.ts) and left out only because the Maps Static API is not yet activated
+          on the Cloud project that owns the key — without it the band ships a broken image. Put
+          the block back once the map loads. See PLAN.md §10. */}
+
       <PricingBand
         heading={home.pricing.heading}
         assurances={home.pricing.assurances}

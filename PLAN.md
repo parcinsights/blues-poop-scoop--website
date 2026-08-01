@@ -265,6 +265,23 @@ names for each, and what the owner says makes them different from the franchises
 **Blocks the forms:** GHL sub-account webhook URL, Sweep&Go API token, and confirmation of the exact
 cleanup-frequency values their account uses.
 
+**Blocks the service-area map (built, parked):** the **Maps Static API** activated on the Google
+Cloud project that owns the key in `NEXT_PUBLIC_GOOGLE_MAPS_KEY`. The key is valid — the Maps Embed
+API answers `200` with it — but every static request comes back `403 "This API is not activated on
+your API project"`, including a bare one with no polygon or markers. That wording is project-level
+activation, not a key restriction (a restricted key reports "not authorized to use this service"
+instead), so the likely cause is that the API was enabled in a different project than the one the
+key belongs to: check the project picker while the key is on screen under Credentials, then enable
+it there. Also confirm the referrer restriction lists the production domain.
+
+Everything else is done and tested: `lib/maps.ts` (convex hull of the town centres → a filled
+polygon, plus a pin per town, auto-framed so adding a town re-fits the map), `coords` on every entry
+in `content/cities.ts`, `ServiceAreaMap` and `ServiceAreaMapFrame` in `components/blocks/blocks.tsx`,
+and the copy in `content/pages/home.ts`. Two call sites are commented out rather than deleted —
+`app/page.tsx` between the steps and the prices, and `app/locations/page.tsx` above the town cards.
+Uncomment both once a static map actually loads; until then the band would ship a broken image,
+because nothing on the server can tell a working key from one Google will refuse.
+
 **Blocks launch:** domain registrar login, Vercel account, Cloudflare account, GA4 property, Search
 Console access, Google Business Profile access.
 

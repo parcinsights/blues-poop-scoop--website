@@ -21,6 +21,7 @@ export const cities: City[] = [
     region: "PA",
     county: "Philadelphia County",
     zips: ["19118", "19119", "19128", "19129"],
+    coords: { lat: 40.045, lng: -75.2 },
     neighborhoods: ["Chestnut Hill", "Mount Airy", "Roxborough", "East Falls"],
     seo: {
       title: todo("Dog Poop Removal in Philadelphia, PA | Blue's Poop Scoop"),
@@ -36,6 +37,7 @@ export const cities: City[] = [
     region: "PA",
     county: "Montgomery County",
     zips: ["19003"],
+    coords: { lat: 40.0068, lng: -75.2899 },
     seo: {
       title: todo("Dog Poop Removal in Ardmore, PA | Blue's Poop Scoop"),
       description: todo("Weekly pet waste removal in Ardmore. Local, insured, and reliable."),
@@ -48,6 +50,7 @@ export const cities: City[] = [
     region: "PA",
     county: "Montgomery County",
     zips: ["19004"],
+    coords: { lat: 40.009, lng: -75.2338 },
     seo: {
       title: todo("Dog Poop Removal in Bala Cynwyd, PA | Blue's Poop Scoop"),
       description: todo("Weekly pet waste removal in Bala Cynwyd. Local, insured, and reliable."),
@@ -60,6 +63,7 @@ export const cities: City[] = [
     region: "PA",
     county: "Montgomery County",
     zips: ["19010"],
+    coords: { lat: 40.0232, lng: -75.3157 },
     seo: {
       title: todo("Dog Poop Removal in Bryn Mawr, PA | Blue's Poop Scoop"),
       description: todo("Weekly pet waste removal in Bryn Mawr. Local, insured, and reliable."),
@@ -72,6 +76,7 @@ export const cities: City[] = [
     region: "PA",
     county: "Montgomery County",
     zips: ["19035"],
+    coords: { lat: 40.0437, lng: -75.2779 },
     seo: {
       title: todo("Dog Poop Removal in Gladwyne, PA | Blue's Poop Scoop"),
       description: todo("Weekly pet waste removal in Gladwyne. Local, insured, and reliable."),
@@ -84,6 +89,7 @@ export const cities: City[] = [
     region: "PA",
     county: "Montgomery County",
     zips: ["19038"],
+    coords: { lat: 40.1023, lng: -75.1524 },
     seo: {
       title: todo("Dog Poop Removal in Glenside, PA | Blue's Poop Scoop"),
       description: todo("Weekly pet waste removal in Glenside. Local, insured, and reliable."),
@@ -96,6 +102,7 @@ export const cities: City[] = [
     region: "PA",
     county: "Delaware County",
     zips: ["19041"],
+    coords: { lat: 40.0104, lng: -75.3063 },
     seo: {
       title: todo("Dog Poop Removal in Haverford, PA | Blue's Poop Scoop"),
       description: todo("Weekly pet waste removal in Haverford. Local, insured, and reliable."),
@@ -108,6 +115,7 @@ export const cities: City[] = [
     region: "PA",
     county: "Montgomery County",
     zips: ["19072"],
+    coords: { lat: 40.009, lng: -75.261 },
     seo: {
       title: todo("Dog Poop Removal in Narberth, PA | Blue's Poop Scoop"),
       description: todo("Weekly pet waste removal in Narberth. Local, insured, and reliable."),
@@ -120,6 +128,7 @@ export const cities: City[] = [
     region: "PA",
     county: "Delaware County",
     zips: ["19085"],
+    coords: { lat: 40.0373, lng: -75.3438 },
     seo: {
       title: todo("Dog Poop Removal in Villanova, PA | Blue's Poop Scoop"),
       description: todo("Weekly pet waste removal in Villanova. Local, insured, and reliable."),
@@ -132,6 +141,7 @@ export const cities: City[] = [
     region: "PA",
     county: "Montgomery County",
     zips: ["19096"],
+    coords: { lat: 40.0079, lng: -75.2732 },
     seo: {
       title: todo("Dog Poop Removal in Wynnewood, PA | Blue's Poop Scoop"),
       description: todo("Weekly pet waste removal in Wynnewood. Local, insured, and reliable."),

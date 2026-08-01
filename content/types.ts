@@ -57,6 +57,13 @@ export type City = {
   county: string;
   zips: string[];
   /**
+   * Roughly the middle of the town — a pin on the service-area map, and one vertex of the shape
+   * drawn around all of them. Four decimal places is about 10 metres, which is far more precision
+   * than a map at this zoom can show; it is written that way only because that is the form you get
+   * back when you look a place up.
+   */
+  coords: { lat: number; lng: number };
+  /**
    * Neighbourhoods covered by this page. Deliberately NOT separate URLs — a set of
    * near-identical neighbourhood pages is the doorway-page pattern and gets sites discounted.
    * A neighbourhood earns its own URL when it has real distinct content behind it.
