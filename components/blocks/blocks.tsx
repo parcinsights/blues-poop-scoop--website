@@ -5,7 +5,7 @@ import { Image } from "@/components/ui/Image";
 import { Cluster, Container, Grid, Section, Split, Stack } from "@/components/ui/layout";
 import { Link } from "@/components/ui/Link";
 import { Rating } from "@/components/ui/Rating";
-import { Card, Callout } from "@/components/ui/surfaces";
+import { Badge, Card, Callout } from "@/components/ui/surfaces";
 import { Heading, InlineList, List, Quote, Text } from "@/components/ui/typography";
 import type { AssetKey } from "@/content/assets";
 import { priceTiers, pricing } from "@/content/pricing";
@@ -387,6 +387,152 @@ export function PriceTable({ heading }: { heading: string }) {
   );
 }
 
+// ── Pricing band ─────────────────────────────────────────────────────────────
+
+/**
+ * The homepage pricing band. Three cards side by side, one per dog count, each carrying BOTH
+ * frequencies — not one card per frequency. The choice a visitor cannot change is how many dogs
+ * they own, so that is what picks the card; how often we come is the thing they are still weighing,
+ * and it belongs inside the card as a comparison of two numbers.
+ *
+ * Deliberately not `PriceTable`. That is the real grid on /pricing, marked up as a table because a
+ * buyer scrutinising it needs rows and scoped headers. This is the landing-page version of the same
+ * three facts: a list of plans, read one card at a time.
+ *
+ * Inside a card the two frequencies are NOT equals. Weekly is the plan being sold — big navy
+ * numeral, the only thing on the card you can read from across the room — and every other week is a
+ * quiet line under a hairline: there if you want it, not an invitation to shop down.
+ *
+ * Centred throughout, at every width — so this band is `align="center"` rather than the house
+ * `center-mobile`, the same exception `HowItWorks` takes. A left-hung title over a centred row of
+ * cards is the only thing in the band not on the midline, which reads as a mistake.
+ *
+ * One column, then three at `md` — never two, for the reason `HowItWorks` gives. The step is `md`
+ * rather than `sm` because the featured card wears both a chip and a paw across its top edge, and
+ * three columns at 40rem leaves the two too close to sit side by side.
+ *
+ * Every price comes from content/pricing.ts. Nothing in this file knows what a plan costs.
+ */
+export function PricingBand({
+  heading,
+  assurances,
+  promise,
+  cta,
+}: {
+  heading: string;
+  /** The dotted reassurance strip under the title — the same treatment the hero uses. */
+  assurances: readonly string[];
+  /** The guarantee, restated in money terms, under the cards. */
+  promise: string;
+  cta: string;
+}) {
+  return (
+    <Section tone="canvas">
+      <Container>
+        <Stack gap={10} align="center">
+          <Stack gap={4} align="center">
+            <Heading level={2} align="center">
+              {heading}
+            </Heading>
+            <InlineList items={assurances} />
+          </Stack>
+
+          {/* `mt-2` gives back the featured card's chip overhang, so it does not crowd the strip
+              above it. A real list — three parallel offers is a list, and a screen reader saying
+              "three items" is the summary a sighted reader gets from the row of cards.
+
+              `w-full` because the Stack above centres its children by shrinking them. */}
+          <ul className="mt-2 grid w-full list-none grid-cols-1 gap-6 pl-0 md:grid-cols-3">
+            {priceTiers.map((tier) => (
+              <li key={tier.id}>
+                <Card tone={tier.featured ? "featured" : "default"}>
+                  {tier.featured && (
+                    <>
+                      {/* Straddles the top rim — `-top-3.5` is half the chip's height, so the
+                          border cuts it in two and the opaque fill runs the rim behind it. */}
+                      <span className="absolute -top-3.5 left-1/2 -translate-x-1/2">
+                        <Badge tone="featured">Most popular</Badge>
+                      </span>
+                      {/* The house paw, stuck on the corner like a sticker. It hangs OUTSIDE the
+                          card on purpose: inside, a centred plan name on a narrow card runs under
+                          it. Decoration — hidden from assistive tech, untouchable by the pointer. */}
+                      <PawPrint
+                        size={44}
+                        aria-hidden="true"
+                        className="pointer-events-none absolute -right-3 -top-3 rotate-12 text-amber"
+                      />
+                    </>
+                  )}
+
+                  {/* No alignment of its own — the band's centring is inherited. */}
+                  <Stack gap={5}>
+                    <div>
+                      <Heading level={3} size="h4">
+                        {tier.name}
+                      </Heading>
+                      <Text size="small" tone="muted">
+                        {tier.dogs}
+                      </Text>
+                    </div>
+
+                    {/* A description list: each frequency is a term, its price is the value. The
+                        unit rides both prices — these are monthly totals, not per visit, and that
+                        is the one misread this band exists to prevent. */}
+                    <dl className="flex flex-col gap-5">
+                      <div>
+                        <Text as="dt" size="small" tone="muted">
+                          Weekly
+                        </Text>
+                        {/* The focal point of the whole band. `leading-none` because the numeral
+                            has no descenders and h2's line box would otherwise leave a gap under
+                            it wider than the one above the unit. */}
+                        <dd className="font-display text-h2 font-bold leading-none text-brand">
+                          {`$${tier.weekly}`}
+                        </dd>
+                        <Text size="small" tone="muted">
+                          {pricing.unit}
+                        </Text>
+                      </div>
+
+                      {/* The quieter option, under a hairline and at body weight — available, not
+                          advertised. */}
+                      <div className="border-t border-line pt-4">
+                        <Text as="dt" size="small" tone="muted">
+                          Every other week
+                        </Text>
+                        <Text as="dd" size="small" tone="muted">
+                          <Text as="span" weight="semibold" tone="default">
+                            {`$${tier.biweekly}`}
+                          </Text>
+                          {` ${pricing.unit}`}
+                        </Text>
+                      </div>
+                    </dl>
+                  </Stack>
+                </Card>
+              </li>
+            ))}
+          </ul>
+
+          <Stack gap={5} align="center">
+            <Text tone="muted" measure>
+              {promise}
+            </Text>
+            {/* Points at /contact/, not the quote form: someone who has just read three prices is
+                choosing between them, and the next thing they want is a person, not a second form
+                asking the questions the prices already answered. */}
+            <Cluster gap={4} justify="center">
+              <Button href={routes.contact()} size="lg">
+                {cta}
+              </Button>
+            </Cluster>
+          </Stack>
+        </Stack>
+      </Container>
+    </Section>
+  );
+}
+
 // ── Service area list ────────────────────────────────────────────────────────
 
 export function ServiceAreaList({
@@ -417,10 +563,36 @@ export function ServiceAreaList({
 // ── FAQ ──────────────────────────────────────────────────────────────────────
 
 /**
+ * The rows themselves, shared by every band that asks questions.
+ *
  * `<details>` rather than React state: the answers are in the DOM and readable before any
  * JavaScript runs, which is what makes them indexable and what makes the page work on a slow
- * connection. It is also keyboard-operable for free.
+ * connection. It is also keyboard-operable for free. The open/close animation and the plus that
+ * turns into a minus are pure CSS — see the `.faq-*` rules in app/base.css.
+ *
+ * The sign is a `<span>` with no content: it is drawn entirely from the summary's state, and a
+ * screen reader is already told "expanded" or "collapsed" by the `<details>` itself. Reading a
+ * plus out loud would say the same thing twice, wrong.
  */
+function FaqRows({ items }: { items: readonly FaqItem[] }) {
+  return (
+    <div className="flex w-full flex-col gap-3">
+      {items.map((item) => (
+        <details key={item.question} className="faq-item">
+          <summary className="faq-summary">
+            {item.question}
+            <span aria-hidden="true" className="faq-sign" />
+          </summary>
+          <div className="faq-answer">
+            <Text tone="muted">{item.answer}</Text>
+          </div>
+        </details>
+      ))}
+    </div>
+  );
+}
+
+/** The inner-page treatment: a left-hung title over the rows. Used on /faq/ and /pricing/. */
 export function FaqAccordion({ heading, items }: { heading: string; items: FaqItem[] }) {
   if (items.length === 0) return null;
   return (
@@ -428,20 +600,87 @@ export function FaqAccordion({ heading, items }: { heading: string; items: FaqIt
       <Container width="prose">
         <Stack gap={6}>
           <Heading level={2} align="center-mobile">{heading}</Heading>
-          <div className="flex flex-col">
-            {items.map((item) => (
-              <details key={item.question} className="border-b border-line py-4">
-                <summary className="cursor-pointer font-display font-semibold text-h5 text-ink">
-                  {item.question}
-                </summary>
-                <div className="pt-3">
-                  <Text tone="muted">{item.answer}</Text>
-                </div>
-              </details>
-            ))}
-          </div>
+          <FaqRows items={items} />
         </Stack>
       </Container>
+    </Section>
+  );
+}
+
+/**
+ * Paw prints tracking up the margins of the FAQ band, outside the reading column and untouchable
+ * by the pointer. Decoration, and hidden from assistive tech: nothing here is information.
+ *
+ * They live in the gutters `Container width="prose"` leaves behind, which only exist once the
+ * viewport is wider than the reading measure — so below `lg` there is nowhere to put them and they
+ * are simply not drawn, rather than being crowded in beside the text or pushed off-screen where
+ * they would drag a horizontal scrollbar onto the page.
+ *
+ * Sizes and angles are deliberately uneven. Four identical paws at four identical angles reads as
+ * a border pattern; a set that wanders reads as a dog walked through.
+ */
+function FaqPaws() {
+  return (
+    <div
+      aria-hidden="true"
+      className="pointer-events-none absolute inset-0 hidden overflow-hidden lg:block"
+    >
+      <PawPrint size={72} className="absolute left-6 top-12 -rotate-12 text-brand opacity-10" />
+      <PawPrint size={44} className="absolute left-28 top-52 rotate-12 text-amber opacity-60" />
+      <PawPrint size={56} className="absolute bottom-16 left-10 rotate-6 text-brand opacity-10" />
+      <PawPrint size={52} className="absolute right-24 top-24 rotate-12 text-brand opacity-10" />
+      <PawPrint size={76} className="absolute bottom-24 right-8 -rotate-6 text-amber opacity-50" />
+      <PawPrint size={40} className="absolute bottom-56 right-32 rotate-45 text-brand opacity-10" />
+    </div>
+  );
+}
+
+/**
+ * The homepage FAQ band. White, centred, and narrower than the bands above it — after three bands
+ * of cards and prices this one is a single column of questions, and the change of shape is what
+ * says the page is winding down rather than starting another pitch.
+ *
+ * Centred at every width, not the house `center-mobile`: the whole band sits on the midline, and a
+ * title that snapped left at `md` would be the only thing in it that did. Same exception
+ * `HowItWorks` and `PricingBand` take.
+ *
+ * The link out is the point of only asking four questions here. The other five are real questions
+ * with real answers, and this is the one place on the homepage that has earned the click to them.
+ */
+export function FaqBand({
+  heading,
+  items,
+  cta,
+}: {
+  heading: string;
+  items: readonly FaqItem[];
+  /** The label on the link through to /faq/. */
+  cta: string;
+}) {
+  if (items.length === 0) return null;
+  return (
+    <Section tone="raised">
+      {/* Full-bleed, so the paws can sit in the margins the prose Container leaves. It is the
+          positioning parent for them and nothing else. */}
+      <div className="relative">
+        <FaqPaws />
+        <Container width="prose">
+          {/* No `align="center"` on the Stack: that would hand `text-center` down to the answers
+              as well, and a centred paragraph is a paragraph nobody finishes. The two things that
+              are centred say so themselves. */}
+          <Stack gap={8}>
+            <Heading level={2} align="center">
+              {heading}
+            </Heading>
+            <FaqRows items={items} />
+            <Cluster gap={4} justify="center">
+              <Button href={routes.faq()} variant="secondary" size="md">
+                {cta}
+              </Button>
+            </Cluster>
+          </Stack>
+        </Container>
+      </div>
     </Section>
   );
 }

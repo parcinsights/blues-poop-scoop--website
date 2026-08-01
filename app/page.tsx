@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-import { Hero, HowItWorks, ReviewWall, WhyUs } from "@/components/blocks/blocks";
+import { FaqBand, Hero, HowItWorks, PricingBand, ReviewWall, WhyUs } from "@/components/blocks/blocks";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { home } from "@/content/pages/home";
 import { ratingSummary, reviews } from "@/content/reviews";
@@ -40,6 +40,15 @@ export default function HomePage() {
       />
 
       <HowItWorks heading={home.howItWorks.heading} steps={home.howItWorks.steps} />
+
+      <PricingBand
+        heading={home.pricing.heading}
+        assurances={home.pricing.assurances}
+        promise={home.pricing.promise}
+        cta={home.pricing.cta}
+      />
+
+      <FaqBand heading={home.faq.heading} items={home.faq.items} cta={home.faq.cta} />
 
       {/* REBUILD IN PROGRESS — the rest of the homepage is being redesigned one band at a time.
           The blocks that used to sit here (value props, services grid, pricing, service area, CTA)

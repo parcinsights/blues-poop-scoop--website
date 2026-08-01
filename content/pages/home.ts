@@ -1,6 +1,23 @@
+import { cities } from "../cities";
 import { startingPrice } from "../pricing";
 import { todo } from "../todo";
-import type { Seo, WhyUsPoint } from "../types";
+import type { FaqItem, Seo, WhyUsPoint } from "../types";
+
+/** "A, B and C". Used once, below — the coverage sentence is never typed out by hand. */
+function sentenceList(names: readonly string[]): string {
+  if (names.length < 2) return names.join("");
+  return `${names.slice(0, -1).join(", ")} and ${names[names.length - 1]}`;
+}
+
+/**
+ * The service-area answer, DERIVED from content/cities.ts. Adding a town there rewrites this
+ * sentence; nobody has to remember that the homepage also names the list.
+ *
+ * Philadelphia is pulled out because it is one page covering four neighbourhoods — naming the
+ * neighbourhoods is what a Chestnut Hill resident is actually scanning for. See cities.ts.
+ */
+const philadelphia = cities.find((city) => city.slug === "philadelphia");
+const elsewhere = cities.filter((city) => city.slug !== "philadelphia").map((city) => city.name);
 
 /**
  * The homepage.
@@ -120,6 +137,56 @@ export const home = {
           "After the first visit, no need to be home — we scoop, double-bag, and text you when done.",
       },
     ],
+  },
+
+  /**
+   * The pricing band. The prices themselves live in content/pricing.ts and are never retyped here —
+   * this is only the words wrapped around them.
+   *
+   * The promise line is the guarantee restated at the moment of most doubt: a visitor reading a
+   * price is deciding, and "you only pay for visits we actually complete" answers the fear the
+   * number creates. It is the same 30-day guarantee as the "why us" band, said in money terms.
+   */
+  pricing: {
+    heading: "Simple, flat-rate pricing",
+    /** The three objections a price raises, answered before they are asked. */
+    assurances: ["No hidden fees", "No contracts", "Pause anytime"],
+    promise:
+      "Every plan backed by our 30-day promise. Full refund, no questions asked — and you only pay for visits we actually complete.",
+    cta: "Get my free quote",
+  },
+
+  /**
+   * The homepage FAQ. Four questions, not the site's nine: this band exists to clear the last
+   * doubts standing between "that price is fine" and booking, so it takes the ones a buyer asks in
+   * that moment — do I have to be there, is my dog safe, where does it go, do you even come here.
+   * The rest live on /faq/, which the band links out to.
+   *
+   * The wording is shorter than the same questions on /faq/ on purpose. This is the landing-page
+   * version: a visitor here is skimming, and a visitor on /faq/ is reading.
+   */
+  faq: {
+    heading: "Questions we get a lot",
+    items: [
+      {
+        question: "Do I need to be home?",
+        answer:
+          "For your first visit, yes — we'll need you home to walk us through the yard and get gate access set up. After that, you're free to come and go. We text before and after every visit.",
+      },
+      {
+        question: "What if my dog is outside?",
+        answer: "We coordinate around your dog's schedule and never enter when pets are out.",
+      },
+      {
+        question: "What do you do with the waste?",
+        answer: "All waste is collected and double-bagged for sanitation and odor control.",
+      },
+      {
+        question: "Where do you service?",
+        answer: `${sentenceList(philadelphia?.neighborhoods ?? [])} in Philadelphia, plus ${sentenceList(elsewhere)}. If you're nearby but not on that list, ask us — we'll tell you honestly whether we can reach you.`,
+      },
+    ] satisfies FaqItem[],
+    cta: "See all questions",
   },
 
   /** OUTSTANDING — the owner interview. See the note above. */

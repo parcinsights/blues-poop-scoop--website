@@ -114,6 +114,11 @@ export type Review = {
  */
 export type PriceTier = {
   id: string;
+  /**
+   * The plan's cute name — "The Sidekick". It is a label for the card, never the fact: the row on
+   * /pricing is titled by `dogs`, because a buyer comparing prices needs the dog count, not a joke.
+   */
+  name: string;
   /** Human label for the row, e.g. "1–2 dogs". */
   dogs: string;
   /** Whole dollars per month, weekly visits. */

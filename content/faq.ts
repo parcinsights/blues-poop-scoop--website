@@ -34,15 +34,18 @@ export const faqs: FaqItem[] = [
       "Chestnut Hill, Mt. Airy, Roxborough and East Falls in Philadelphia, plus Ardmore, Bryn Mawr, Haverford, Narberth, Gladwyne and Glenside on the Main Line. If you are nearby but not on the list, get in touch and we will tell you honestly whether we can reach you.",
   },
 
-  // ── Outstanding. Every one of these is a question real customers ask. ──────
   {
     question: "Do I need to be home?",
-    answer: todo(""),
+    answer:
+      "For your first visit, yes — we'll need you home to walk us through the yard and get gate access set up. After that, you're free to come and go. We text before and after every visit.",
   },
   {
     question: "Where does the waste go?",
-    answer: todo(""),
+    answer:
+      "All waste is collected and double-bagged for sanitation and odor control, then hauled off your property.",
   },
+
+  // ── Outstanding. Every one of these is a question real customers ask. ──────
   {
     question: "Is there a contract?",
     answer: todo(""),

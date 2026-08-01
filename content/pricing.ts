@@ -13,9 +13,9 @@ import { todo } from "./todo";
 import type { PriceTier } from "./types";
 
 export const priceTiers: PriceTier[] = [
-  { id: "1-2-dogs", dogs: "1–2 dogs", weekly: 100, biweekly: 70, featured: true },
-  { id: "3-4-dogs", dogs: "3–4 dogs", weekly: 160, biweekly: 100 },
-  { id: "5-6-dogs", dogs: "5–6 dogs", weekly: 220, biweekly: 130 },
+  { id: "1-2-dogs", name: "The Sidekick", dogs: "1–2 dogs", weekly: 100, biweekly: 70, featured: true },
+  { id: "3-4-dogs", name: "The Squad", dogs: "3–4 dogs", weekly: 160, biweekly: 100 },
+  { id: "5-6-dogs", name: "The Full House", dogs: "5–6 dogs", weekly: 220, biweekly: 130 },
 ];
 
 export const pricing = {

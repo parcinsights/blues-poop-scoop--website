@@ -37,12 +37,18 @@ export function Badge({
   tone = "brand",
 }: {
   children: ReactNode;
-  tone?: "brand" | "accent" | "neutral";
+  tone?: "brand" | "accent" | "neutral" | "featured";
 }) {
   const tones = {
     brand: "bg-brand-tint text-brand",
     accent: "bg-amber-tint text-ink",
     neutral: "bg-surface-alt text-ink-muted",
+    /**
+     * The solid amber, for the chip on a `Card tone="featured"` — same hue as that card's rim, so
+     * the badge reads as part of the card rather than as a sticker from somewhere else. Ink text
+     * only: white on amber is 1.64:1. See the palette note at the top of theme.css.
+     */
+    featured: "bg-amber text-ink",
   } as const;
 
   return (

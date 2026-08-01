@@ -334,6 +334,147 @@
     overscroll-behavior: contain;
   }
 
+  /**
+   * ── FAQ accordion ───────────────────────────────────────────────────────────
+   * A native `<details>` with no JavaScript anywhere near it. The answers are in the DOM before
+   * hydration — which is what makes them indexable and what makes the band work on a dying phone —
+   * and the keyboard behaviour is the browser's, not a re-implementation of it.
+   *
+   * The open/close is animated in CSS, which a `<details>` could not do until recently: a closed
+   * element's content box has no height to animate FROM, and `auto` was never an animatable value
+   * to go TO. Two newer features fix exactly that, and both are needed:
+   *   · `interpolate-size: allow-keywords` makes `height: auto` interpolable.
+   *   · `::details-content` is the box wrapping everything after the `<summary>`, so there is
+   *     something to put a height on without inventing a wrapper div.
+   * `content-visibility` has to transition too, with `allow-discrete` — it flips to `hidden` on
+   * close, and without delaying that flip to the end of the transition the panel vanishes on frame
+   * one and the height animates against an empty box.
+   *
+   * Wrapped in @supports because the degradation is worth stating: a browser without these opens
+   * and closes instantly, which is the plain `<details>` behaviour and not a broken one. Nothing
+   * about the content, the layout, or the plus/minus depends on the query.
+   */
+  .faq-item {
+    background-color: var(--color-canvas);
+    border: 1px solid var(--color-line);
+    border-radius: var(--radius-lg);
+    transition:
+      border-color 200ms var(--ease-out),
+      box-shadow 200ms var(--ease-out);
+  }
+
+  .faq-item:hover {
+    border-color: var(--color-line-strong);
+  }
+
+  /* Open: the row lifts off the band and takes the brand edge, so which question you are reading
+     is obvious from the shape of the list rather than only from the sign at the end of it. */
+  .faq-item[open] {
+    border-color: var(--color-brand);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .faq-summary {
+    /* Both are needed to kill the disclosure triangle — the second is Safari's. */
+    list-style: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: calc(var(--spacing) * 4);
+    padding: calc(var(--spacing) * 5);
+    font-family: var(--font-display);
+    font-size: var(--text-h5);
+    line-height: var(--text-h5--line-height);
+    font-weight: 600;
+    color: var(--color-ink);
+    /* The band is centred; the questions inside it are not. A centred question over a left-hung
+       answer reads as two unrelated things. */
+    text-align: left;
+  }
+
+  .faq-summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .faq-answer {
+    padding: 0 calc(var(--spacing) * 5) calc(var(--spacing) * 5);
+    text-align: left;
+  }
+
+  /**
+   * The plus. Two bars in a medallion — the same circle the "why us" points wear, so the control
+   * belongs to the same family as the rest of the page.
+   *
+   * On open the whole medallion turns a half-circle while the upright bar turns a quarter-circle
+   * back to flat: the two land on top of each other and the plus has become a minus. Because the
+   * bars are pseudo-elements of one rotating box, the two motions are a single gesture rather than
+   * a swap of one icon for another.
+   */
+  .faq-sign {
+    position: relative;
+    /* `flex: none` or the circle squashes into an oval as a long question wraps beside it. */
+    flex: none;
+    width: calc(var(--spacing) * 8);
+    height: calc(var(--spacing) * 8);
+    border-radius: var(--radius-pill);
+    background-color: var(--color-brand-tint);
+    color: var(--color-brand);
+    transition:
+      transform 320ms var(--ease-out),
+      background-color 200ms var(--ease-out);
+  }
+
+  .faq-sign::before,
+  .faq-sign::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: calc(var(--spacing) * 3.5);
+    height: 2px;
+    border-radius: var(--radius-pill);
+    background-color: currentColor;
+    transform: translate(-50%, -50%);
+    transition: transform 320ms var(--ease-out);
+  }
+
+  /* The upright half of the plus. */
+  .faq-sign::after {
+    transform: translate(-50%, -50%) rotate(90deg);
+  }
+
+  .faq-item[open] .faq-sign {
+    /* Ink on amber is 7.71:1, and the bars are ink-weight brand — see the palette in theme.css. */
+    background-color: var(--color-amber);
+    transform: rotate(180deg);
+  }
+
+  .faq-item[open] .faq-sign::after {
+    transform: translate(-50%, -50%) rotate(0deg);
+  }
+
+  @supports (interpolate-size: allow-keywords) {
+    html {
+      interpolate-size: allow-keywords;
+    }
+
+    .faq-item::details-content {
+      block-size: 0;
+      overflow: hidden;
+      opacity: 0;
+      transition:
+        block-size 320ms var(--ease-out),
+        content-visibility 320ms var(--ease-out) allow-discrete,
+        opacity 220ms var(--ease-out);
+    }
+
+    .faq-item[open]::details-content {
+      block-size: auto;
+      opacity: 1;
+    }
+  }
+
   /** Skip link — visible only when focused. */
   .skip-link {
     position: absolute;
