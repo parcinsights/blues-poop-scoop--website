@@ -723,6 +723,36 @@ export const blogIndex = {
   heading: "From the blog",
   intro:
     "Notes from the route — seasonal yard care, and the questions our customers actually ask.",
+
+  /**
+   * THE EMPTY STATE — what /blog/ shows until the first post lands, which is most of its life.
+   *
+   * It is written as a page, not as an apology. An empty archive that says "no posts found" tells
+   * a visitor the site is unfinished; this one tells them why there is nothing here, which is a
+   * position rather than an oversight, and then does the only useful thing an empty page can do:
+   * hand them somewhere else to go.
+   *
+   * The topics are the subjects, not headlines and not dates. They say what this blog will be
+   * about without promising a post that has to exist by Friday — and every one of them is a
+   * question the route already answers out loud, so none of them is a commitment George would
+   * have to invent something to keep.
+   */
+  empty: {
+    badge: "First post on the way",
+    heading: "Nothing here yet",
+    detail:
+      "We would rather write something worth reading than fill this page up. When we've got something useful to say, it lands here.",
+    topicsHeading: "What we'll be writing about",
+    topics: [
+      "Seasonal yard care",
+      "New puppy, new yard",
+      "Why spring costs more",
+      "Keeping a yard usable in winter",
+    ],
+    /** The two exits. The FAQ answers today what the blog would have; pricing is the next step. */
+    faqLabel: "Read the FAQ",
+    pricingLabel: "See our pricing",
+  },
 };
 
 /**
