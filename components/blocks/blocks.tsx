@@ -17,7 +17,15 @@ import { QuickLeadForm } from "@/components/forms/QuickLeadForm";
 import { Breadcrumbs } from "@/components/seo/Breadcrumbs";
 import { Button } from "@/components/ui/Button";
 import { Image } from "@/components/ui/Image";
-import { Cluster, Container, Grid, Section, Split, Stack } from "@/components/ui/layout";
+import {
+  Cluster,
+  Container,
+  Grid,
+  Section,
+  type SectionTone,
+  Split,
+  Stack,
+} from "@/components/ui/layout";
 import { Link } from "@/components/ui/Link";
 import { Rating } from "@/components/ui/Rating";
 import { Badge, Card, Callout, Chip } from "@/components/ui/surfaces";
@@ -1742,11 +1750,24 @@ function FaqRows({ items }: { items: readonly FaqItem[] }) {
   );
 }
 
-/** The inner-page treatment: a left-hung title over the rows. Used on /faq/ and /pricing/. */
-export function FaqAccordion({ heading, items }: { heading: string; items: FaqItem[] }) {
+/**
+ * The inner-page treatment: a left-hung title over the rows. Used on /faq/ and /pricing/.
+ *
+ * `tone` exists because /faq/ stacks two of these. Two bands of the same surface in a row need a
+ * `SectionDivider` between them, not a colour change — see the note on that component.
+ */
+export function FaqAccordion({
+  heading,
+  items,
+  tone,
+}: {
+  heading: string;
+  items: FaqItem[];
+  tone?: SectionTone;
+}) {
   if (items.length === 0) return null;
   return (
-    <Section>
+    <Section tone={tone}>
       <Container width="prose">
         <Stack gap={6}>
           <Heading level={2} align="center-mobile">{heading}</Heading>

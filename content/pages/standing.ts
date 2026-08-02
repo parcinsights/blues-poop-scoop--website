@@ -444,7 +444,10 @@ export const commercial = {
           "That depends on the size of your property and where residents actually walk their dogs. During our free walkthrough we'll recommend the right number and placement.",
       },
       {
-        question: "What areas do you serve?",
+        // Deliberately not "What areas do you serve?" — the residential set already asks that and
+        // answers it with a list of towns, and /faq/ renders both sets on one page. Two entries
+        // with the same question and different answers is the worst version of this.
+        question: "Which areas do you cover for commercial properties?",
         answer:
           "We serve commercial properties throughout the greater Philadelphia area. Call us to confirm availability for your property.",
       },

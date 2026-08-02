@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 
 import { Breadcrumbs } from "@/components/seo/Breadcrumbs";
-import { Container, Section, Stack } from "@/components/ui/layout";
+import { Container, Section, type SectionTone, Stack } from "@/components/ui/layout";
 import { Heading, Text } from "@/components/ui/typography";
 import type { Crumb } from "@/lib/schema";
 
@@ -17,18 +17,28 @@ export function PageShell({
   crumbs,
   heading,
   intro,
+  tone = "canvas",
   children,
 }: {
   crumbs: Crumb[];
   heading: string;
   intro?: string;
+  /**
+   * The surface behind the header block. `canvas` by default — see below. Override it only where
+   * the whole page runs on a different surface, as /faq/ does: a cream header over an otherwise
+   * white page reads as a stray band rather than as the top of the page.
+   *
+   * The header is transparent until the page scrolls, so whatever this is becomes the strip behind
+   * it. That is by design and already true of the service pages; see the note in base.css.
+   */
+  tone?: SectionTone;
   children?: ReactNode;
 }) {
   return (
     // `canvas`, matching the homepage hero and the header above it. Every page's first band is the
     // same off-white, which is what lets the header carry no border at the top of the page without
     // a colour seam appearing under it on ten of the eleven routes.
-    <Section tone="canvas" spacing="md">
+    <Section tone={tone} spacing="md">
       <Container>
         <Stack gap={5}>
           <Breadcrumbs crumbs={crumbs} />
