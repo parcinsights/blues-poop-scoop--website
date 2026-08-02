@@ -1,6 +1,6 @@
 import { site } from "../site";
 import { todo } from "../todo";
-import type { ContentBlock, Seo } from "../types";
+import type { ContentBlock, Feature, Seo } from "../types";
 
 /**
  * The standing pages — /about/, /contact/, /pricing/, /commercial/, /get-started/.
@@ -34,15 +34,84 @@ export const contact = {
   body: [] as ContentBlock[],
 };
 
+/**
+ * /pricing/.
+ *
+ * The page answers the question in the order a buyer actually asks it: what does it cost, why
+ * should I trust you with the money, do you even come to my street, has anyone else done this, and
+ * what happens after I click. The plans, the reviews and the three steps are the SAME blocks the
+ * homepage runs — a visitor who arrives here from search gets the landing page's argument without
+ * having to go and find the landing page.
+ */
 export const pricingPage = {
   seo: {
     title: "Pricing | Blue's Poop Scoop",
     description:
       "Straightforward monthly pricing by number of dogs. Weekly from $100 a month, every other week from $70.",
   } satisfies Seo,
-  heading: "Simple, honest pricing",
-  intro:
-    "Priced by how many dogs you have and how often you want us out. No hidden fees, no per-visit surprises.",
+  /**
+   * NO `heading` AND NO `intro`. The page opens on the photograph, directly under the header, and
+   * the first words on it are the pricing band's own title — which is therefore the h1, and comes
+   * from `home.pricing.heading` so that the homepage band and this page cannot end up calling the
+   * same three plans two different things. See app/pricing/page.tsx.
+   */
+
+  /**
+   * The guarantees, directly under the prices. That placement is the point: a number is the moment
+   * doubt arrives, and these are the three things that cost the business money if they turn out to
+   * be false — a re-clean, a reply, an insurance certificate. Claims with a price attached are the
+   * only kind worth printing next to one.
+   *
+   * Three, not four. The 30-day refund on the homepage is a stronger promise than any of these and
+   * is already said twice above — once in the plans' own promise line, once in the intro here.
+   */
+  guarantee: {
+    heading: "The Blue's Poop Scoop Guarantee",
+    intro:
+      "We'd rather fix it than argue about it. Every plan comes with the same three promises, and none of them has fine print.",
+    points: [
+      {
+        icon: "guarantee",
+        title: "100% Satisfaction",
+        detail: "Not happy? We'll come back and re-clean for free.",
+      },
+      {
+        icon: "reachable",
+        title: "Always Reachable",
+        detail: "Text or call us anytime. We respond within the hour.",
+      },
+      {
+        icon: "insured",
+        title: "Insured",
+        detail: "Fully insured for your peace of mind.",
+      },
+    ] satisfies Feature[],
+  },
+
+  /**
+   * The coverage band. Zips rather than town names — see the note on `ServiceZips` for why this
+   * page uses a different currency from the homepage's band.
+   *
+   * The list itself is NOT written here. It comes from `servicedZips` in content/cities.ts, which
+   * is the same list the lead form is validated against, so the page cannot advertise a zip the
+   * form would then reject.
+   */
+  serviceArea: {
+    heading: "Where we scoop",
+    intro:
+      "We cover most of Philadelphia and the Main Line. Find your zip below and you're in our route.",
+    note: {
+      before: "Don't see your zip?",
+      link: "Contact us",
+      after: " — we may still be able to help!",
+    },
+  },
+
+  /** The wall, trimmed to the homepage's set. Proof sits under coverage: it is worth most to someone who has just found their own zip. */
+  reviews: {
+    heading: "See what our friends are saying about us",
+  },
+
   body: [] as ContentBlock[],
 };
 

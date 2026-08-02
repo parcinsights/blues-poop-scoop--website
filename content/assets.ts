@@ -52,6 +52,22 @@ export const assets = {
     height: 3000,
   },
   /**
+   * The full-bleed band at the top of /pricing/ — the van, the two owners, the real scooper and
+   * the phone number painted on the door. It runs edge to edge under the h1 and is the only
+   * picture on the page: someone about to read three numbers is deciding whether these are real
+   * people, and a signwritten van answers that faster than any sentence.
+   *
+   * Cropped hard by `object-cover` in a fixed-height band, so the van sits in the middle third of
+   * the frame and survives the crop at every width. Downsized from the camera's 6000×4000 — the
+   * band never renders wider than ~1600 CSS pixels and the original was 2.6MB.
+   */
+  pricingBanner: {
+    src: "/pricing.jpg",
+    alt: "The two owners of Blue's Poop Scoop standing beside their branded green and white van",
+    width: 2400,
+    height: 1600,
+  },
+  /**
    * ── THE SERVICE CARDS ──────────────────────────────────────────────────────
    * One per service, for the 2×2 grid on /services/. All four are cropped square-ish by
    * `object-cover` in a fixed-height box, so what matters in each is that the subject sits near

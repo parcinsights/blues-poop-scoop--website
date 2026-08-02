@@ -177,15 +177,37 @@ export type FaqItem = {
 };
 
 /**
- * One reason to hire this business, for the "why us" band.
+ * The glyph on a selling point. A KEY, not a component: content files describe what a point is
+ * about and the block decides what that looks like, which is what keeps a lucide import out of the
+ * content layer.
  *
- * `icon` is a KEY, not a component: content files describe what a point is about and the block
- * decides what that looks like, which is what keeps a lucide import out of the content layer.
+ * Add a key here and it must be given a picture in `pointIcons` — that map is typed against this
+ * union, so a key with no glyph is a compile error rather than a hole in a band.
  */
+export type PointIcon =
+  | "guarantee"
+  | "safety"
+  | "local"
+  | "flexible"
+  | "reachable"
+  | "insured";
+
+/** One reason to hire this business — the "why us" band, and the guarantees on /pricing/. */
 export type WhyUsPoint = {
-  icon: "guarantee" | "safety" | "local" | "flexible";
+  icon: PointIcon;
   title: string;
   detail: string;
+};
+
+/**
+ * One cell of a `FeatureGrid`. The icon is optional, and that is the difference between the two
+ * bands built on it: /about/ runs the three value props as plain cards, /pricing/ runs the
+ * guarantees as the same cards with a medallion on each.
+ */
+export type Feature = {
+  title: string;
+  detail: string;
+  icon?: PointIcon;
 };
 
 /** A real customer quote. Rendered as content — never as review structured data (see lib/schema.ts). */

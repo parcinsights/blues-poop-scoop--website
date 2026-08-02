@@ -1,4 +1,12 @@
-import { ArrowRight, BadgeCheck, Dog, MapPin, MessageCircleHeart, PawPrint } from "lucide-react";
+import {
+  ArrowRight,
+  BadgeCheck,
+  Dog,
+  MapPin,
+  MessageCircleHeart,
+  PawPrint,
+  ShieldCheck,
+} from "lucide-react";
 
 import { ServiceTabs, type ServiceTab } from "@/components/blocks/ServiceTabs";
 import { QuickLeadForm } from "@/components/forms/QuickLeadForm";
@@ -14,7 +22,7 @@ import type { AssetKey } from "@/content/assets";
 import { priceTiers, pricing } from "@/content/pricing";
 import { phoneCtaLabel, primaryCta } from "@/content/nav";
 import { site } from "@/content/site";
-import type { ContentBlock, FaqItem, WhyUsPoint } from "@/content/types";
+import type { ContentBlock, FaqItem, Feature, PointIcon, WhyUsPoint } from "@/content/types";
 import { cx } from "@/lib/cx";
 import { serviceAreaMapIsConfigured, serviceAreaMapUrl } from "@/lib/maps";
 import { routes } from "@/lib/routes";
@@ -236,13 +244,46 @@ function medallion(index: number) {
   return medallionAccents[index % medallionAccents.length] ?? medallionAccents[0];
 }
 
-/** Content names an icon by key; this is the only place that turns one into a picture. */
-const whyUsIcons = {
+/**
+ * Content names an icon by key; this is the only place that turns one into a picture. Typed
+ * against `PointIcon`, so adding a key to that union without a glyph here fails the build.
+ *
+ * `flexible` and `reachable` are the same drawing on purpose — "no contracts, reach a person by
+ * text" and "text or call us anytime" are the same promise told from two sides, and they never
+ * appear in the same band.
+ */
+const pointIcons: Record<PointIcon, typeof BadgeCheck> = {
   guarantee: BadgeCheck,
   safety: Dog,
   local: MapPin,
   flexible: MessageCircleHeart,
-} as const;
+  reachable: MessageCircleHeart,
+  insured: ShieldCheck,
+};
+
+/**
+ * A glyph in its pastel medallion — the circle that appears in "why us", "how it works" and the
+ * guarantee grid. `index` picks the hue off the cycle above, so the colour is a property of where
+ * the item sits rather than of what it says.
+ *
+ * Always decoration: the title beside it carries the meaning, and reading the icon out loud would
+ * say the same thing twice, worse.
+ */
+function Medallion({ icon, index }: { icon: PointIcon; index: number }) {
+  const Icon = pointIcons[icon];
+  return (
+    <span
+      aria-hidden="true"
+      className={cx(
+        // `shrink-0` or the circle squashes into an oval as the text beside it wraps.
+        "flex size-11 shrink-0 items-center justify-center rounded-pill",
+        medallion(index).fill,
+      )}
+    >
+      <Icon size={22} />
+    </span>
+  );
+}
 
 export function WhyUs({
   heading,
@@ -286,31 +327,19 @@ export function WhyUs({
             {/* A real list: four parallel claims are a list, and a screen reader saying "four
                 items" up front is the summary a sighted reader gets from the medallions. */}
             <ul className="list-none pl-0 flex flex-col gap-5">
-              {points.map((point, index) => {
-                const Icon = whyUsIcons[point.icon];
-                return (
-                  <li key={point.title} className="flex items-start gap-4">
-                    <span
-                      aria-hidden="true"
-                      className={cx(
-                        // `shrink-0` or the circle squashes into an oval as the text wraps.
-                        "flex size-11 shrink-0 items-center justify-center rounded-pill",
-                        medallion(index).fill,
-                      )}
-                    >
-                      <Icon size={22} />
-                    </span>
-                    <div>
-                      <Heading level={3} size="h5">
-                        {point.title}
-                      </Heading>
-                      <Text tone="muted" size="small">
-                        {point.detail}
-                      </Text>
-                    </div>
-                  </li>
-                );
-              })}
+              {points.map((point, index) => (
+                <li key={point.title} className="flex items-start gap-4">
+                  <Medallion icon={point.icon} index={index} />
+                  <div>
+                    <Heading level={3} size="h5">
+                      {point.title}
+                    </Heading>
+                    <Text tone="muted" size="small">
+                      {point.detail}
+                    </Text>
+                  </div>
+                </li>
+              ))}
             </ul>
 
             <Cluster gap={4}>
@@ -542,28 +571,92 @@ export function ServiceDetails({
 
 // ── Feature grid ─────────────────────────────────────────────────────────────
 
+/**
+ * A row of short parallel claims on cards. Two bands are built on it, and the only difference
+ * between them is data: /about/ runs the three value props bare, /pricing/ runs the three
+ * guarantees with a medallion on each. Never fork this for a third look.
+ *
+ * `intro` is the line under the title — a band whose heading names a promise ("The Blue's Poop
+ * Scoop Guarantee") needs one sentence saying what the promise is before the three cards break it
+ * into parts. Omit it and the title sits straight on the grid, as it does on /about/.
+ *
+ * The cards are a real `<ul>`: three parallel claims are a list, and a screen reader saying "three
+ * items" up front is the summary a sighted reader gets from the row itself.
+ */
 export function FeatureGrid({
   heading,
+  intro,
   features,
+  tone = "alt",
+  align = "start",
 }: {
   heading: string;
-  features: readonly { title: string; detail: string }[];
+  intro?: string;
+  features: readonly Feature[];
+  /**
+   * The band's surface. `raised` is plain white, and it flips the cards to cream — a white card on
+   * a white band is an invisible card. See `Card`.
+   */
+  tone?: "alt" | "raised";
+  /**
+   * `center` puts the whole band on the midline, cards included. Use it where the band is a set of
+   * equals with a medallion each; `start` is the plain left-hung treatment /about/ takes.
+   */
+  align?: "start" | "center";
 }) {
+  const centred = align === "center";
+
   return (
-    <Section tone="alt">
+    <Section tone={tone}>
       <Container>
-        <Stack gap={8}>
-          <Heading level={2} align="center-mobile">{heading}</Heading>
-          <Grid columns={3}>
-            {features.map((feature) => (
-              <Card key={feature.title}>
-                <Stack gap={2}>
-                  <Heading level={3}>{feature.title}</Heading>
-                  <Text tone="muted">{feature.detail}</Text>
-                </Stack>
-              </Card>
+        <Stack gap={8} align={centred ? "center" : undefined}>
+          <Stack gap={4} align={centred ? "center" : undefined}>
+            {/* Centred at every width when the band is, not the house `center-mobile`: a title
+                that snapped left at `md` would be the only thing here off the midline. */}
+            <Heading level={2} align={centred ? "center" : "center-mobile"}>
+              {heading}
+            </Heading>
+            {intro ? (
+              centred ? (
+                <Text tone="muted" measure>
+                  {intro}
+                </Text>
+              ) : (
+                /* Centred with the title on a phone and left-hung from `md`, matching it. */
+                <div className="text-center md:text-left">
+                  <Text tone="muted" measure>
+                    {intro}
+                  </Text>
+                </div>
+              )
+            ) : null}
+          </Stack>
+          {/* The grid classes are on the `<ul>` itself rather than on a `Grid` inside it: an
+              `<li>` has to be a direct child of its list, and wrapping the items in Grid's div
+              would break that. Same reason `PricingBand` and `HowItWorks` hand-roll theirs.
+
+              `w-full` because the Stack above centres its children by shrinking them. */}
+          <ul className="grid w-full list-none grid-cols-1 gap-6 pl-0 sm:grid-cols-2 lg:grid-cols-3">
+            {features.map((feature, index) => (
+              <li key={feature.title}>
+                {/* On white the card carries the cream the page's other bands use; on the deeper
+                    cream band it is the usual white. Either way the card is the lighter of the
+                    two surfaces, which is how everything on this site lifts. */}
+                <Card tone={tone === "raised" ? "canvas" : "default"}>
+                  {/* The medallion gets its own step of the rhythm — at `gap-2` the icon reads as
+                      part of the title's line rather than as the card's mark. Centred, the circle
+                      sits on the midline above the words rather than beside them. */}
+                  <Stack gap={4} align={centred ? "center" : undefined}>
+                    {feature.icon && <Medallion icon={feature.icon} index={index} />}
+                    <Stack gap={2}>
+                      <Heading level={3}>{feature.title}</Heading>
+                      <Text tone="muted">{feature.detail}</Text>
+                    </Stack>
+                  </Stack>
+                </Card>
+              </li>
             ))}
-          </Grid>
+          </ul>
         </Stack>
       </Container>
     </Section>
@@ -661,6 +754,9 @@ export function PricingBand({
   assurances,
   promise,
   cta,
+  level = 2,
+  crumbs,
+  spacing = "md",
 }: {
   heading: string;
   /** The dotted reassurance strip under the title — the same treatment the hero uses. */
@@ -668,108 +764,262 @@ export function PricingBand({
   /** The guarantee, restated in money terms, under the cards. */
   promise: string;
   cta: string;
+  /**
+   * `1` on /pricing/, where this band is the top of the page and its title IS the page's title.
+   * Everywhere else it is a section inside a page that already has an h1, and must stay `2`.
+   */
+  level?: 1 | 2;
+  /**
+   * The trail, when this band is standing in for `PageShell` at the top of a page. Same reason
+   * `Hero` takes one: a page whose first words are a section title still has to say where it is.
+   */
+  crumbs?: Crumb[];
+  /**
+   * `sm` where the band follows a photograph that has already opened the page — the picture is the
+   * air above the title, and a full `md` on top of it reads as a gap. `md` everywhere else.
+   */
+  spacing?: "sm" | "md";
 }) {
   return (
+    <Section tone="canvas" spacing={spacing}>
+      <Container>
+        {/* The trail hangs LEFT while the band it introduces is centred, and the two are separate
+            stacks for exactly that reason. A centred breadcrumb reads as part of the title block —
+            it is not; it is where you are, and it belongs on the page's own left edge, the same
+            line it sits on for every other route. */}
+        <Stack gap={6}>
+          {crumbs && <Breadcrumbs crumbs={crumbs} />}
+
+          <Stack gap={10} align="center">
+            <Stack gap={4} align="center">
+              <Heading level={level} align="center">
+                {heading}
+              </Heading>
+              <InlineList items={assurances} />
+            </Stack>
+
+            {/* `mt-2` gives back the featured card's chip overhang, so it does not crowd the strip
+                above it. A real list — three parallel offers is a list, and a screen reader saying
+                "three items" is the summary a sighted reader gets from the row of cards.
+
+                `w-full` because the Stack above centres its children by shrinking them. */}
+            <ul className="mt-2 grid w-full list-none grid-cols-1 gap-6 pl-0 md:grid-cols-3">
+              {priceTiers.map((tier) => (
+                <li key={tier.id}>
+                  <Card tone={tier.featured ? "featured" : "default"}>
+                    {tier.featured && (
+                      <>
+                        {/* Straddles the top rim — `-top-3.5` is half the chip's height, so the
+                            border cuts it in two and the opaque fill runs the rim behind it. */}
+                        <span className="absolute -top-3.5 left-1/2 -translate-x-1/2">
+                          <Badge tone="featured">Most popular</Badge>
+                        </span>
+                        {/* The house paw, stuck on the corner like a sticker. It hangs OUTSIDE the
+                            card on purpose: inside, a centred plan name on a narrow card runs
+                            under it. Decoration — hidden from assistive tech, untouchable. */}
+                        <PawPrint
+                          size={44}
+                          aria-hidden="true"
+                          className="pointer-events-none absolute -right-3 -top-3 rotate-12 text-amber"
+                        />
+                      </>
+                    )}
+
+                    {/* No alignment of its own — the band's centring is inherited. */}
+                    <Stack gap={5}>
+                      <div>
+                        <Heading level={3} size="h4">
+                          {tier.name}
+                        </Heading>
+                        <Text size="small" tone="muted">
+                          {tier.dogs}
+                        </Text>
+                      </div>
+
+                      {/* A description list: each frequency is a term, its price is the value. The
+                          unit rides both prices — these are monthly totals, not per visit, and
+                          that is the one misread this band exists to prevent. */}
+                      <dl className="flex flex-col gap-5">
+                        <div>
+                          <Text as="dt" size="small" tone="muted">
+                            Weekly
+                          </Text>
+                          {/* The focal point of the whole band. `leading-none` because the numeral
+                              has no descenders and h2's line box would otherwise leave a gap under
+                              it wider than the one above the unit. */}
+                          <dd className="font-display text-h2 font-bold leading-none text-brand">
+                            {`$${tier.weekly}`}
+                          </dd>
+                          <Text size="small" tone="muted">
+                            {pricing.unit}
+                          </Text>
+                        </div>
+
+                        {/* The quieter option, under a hairline and at body weight — available,
+                            not advertised. */}
+                        <div className="border-t border-line pt-4">
+                          <Text as="dt" size="small" tone="muted">
+                            Every other week
+                          </Text>
+                          <Text as="dd" size="small" tone="muted">
+                            <Text as="span" weight="semibold" tone="default">
+                              {`$${tier.biweekly}`}
+                            </Text>
+                            {` ${pricing.unit}`}
+                          </Text>
+                        </div>
+                      </dl>
+                    </Stack>
+                  </Card>
+                </li>
+              ))}
+            </ul>
+
+            <Stack gap={5} align="center">
+              <Text tone="muted" measure>
+                {promise}
+              </Text>
+              {/* Points at /contact/, not the quote form: someone who has just read three prices
+                  is choosing between them, and the next thing they want is a person, not a second
+                  form asking the questions the prices already answered. */}
+              <Cluster gap={4} justify="center">
+                <Button href={routes.contact()} size="lg">
+                  {cta}
+                </Button>
+              </Cluster>
+            </Stack>
+          </Stack>
+        </Stack>
+      </Container>
+    </Section>
+  );
+}
+
+// ── Photo band ───────────────────────────────────────────────────────────────
+
+/**
+ * One photograph, on the container line, with nothing on it. No overlaid heading, no gradient
+ * scrim, no button — those turn a picture into a hero, and a page only gets one hero.
+ *
+ * On /pricing/ it is the first thing on the page: the van, the two owners and the phone number
+ * painted on the door, before a single word. That is the "are these real people" question answered
+ * without a sentence being spent on it, and it is why the page needs no introduction above it.
+ *
+ * IT IS CONTAINED, not full-bleed. Edge to edge, a photograph at the top of a page is a hero, and
+ * this page's hero is the price. Inside `Container` with the same rounding a card takes, it reads
+ * as the first item ON the page rather than as the page's own lid — it lines up with the h2 under
+ * it and with every band below.
+ *
+ * `spacing="none"`, and it must stay a `<section>` for it: `main` is pulled up by the height of the
+ * header and the first section gives that row back as a transparent border, so a bare `<img>` here
+ * would slide under the nav bar. See base.css. The air below the picture belongs to the band that
+ * follows.
+ *
+ * Fixed heights rather than the file's own 3:2 — at the page width a 3:2 is 500px tall and pushes
+ * everything that matters off the screen. The crop is what keeps it a band. Whoever calls this
+ * decides `priority`, since whether it is the page's LCP element depends on what sits above it.
+ */
+export function PhotoBand({
+  image,
+  priority = false,
+}: {
+  image: AssetKey;
+  /** Set only when this is the largest thing above the fold. Exactly one image per page. */
+  priority?: boolean;
+}) {
+  return (
+    <Section tone="canvas" spacing="none">
+      <Container>
+        <Image
+          asset={image}
+          priority={priority}
+          // Capped at the container, which is 75rem minus its own gutters.
+          sizes="(min-width: 75rem) 71rem, 100vw"
+          // `block` or the img keeps its inline descender space and leaves a hairline of the band
+          // showing under the picture.
+          className="block h-56 w-full rounded-lg object-cover sm:h-72 lg:h-96"
+        />
+      </Container>
+    </Section>
+  );
+}
+
+// ── Serviced zip codes ───────────────────────────────────────────────────────
+
+/**
+ * The coverage answer as zip codes rather than town names.
+ *
+ * WHY ZIPS HERE, when the homepage band lists towns. A town name is what someone recognises, and
+ * that is the right currency on a landing page. But this business's footprint is most of
+ * Philadelphia — fifty-odd zips against ten town pages — so a list of towns on the pricing page
+ * would understate the coverage badly, and a visitor in South Philly would read "Chestnut Hill,
+ * Ardmore, Bryn Mawr…" and correctly conclude we do not come to them. The zip is also the exact
+ * thing the quote form asks for two clicks later, so someone who finds theirs here already has
+ * their answer typed.
+ *
+ * Chips, not links: a zip is not a page, and making these look clickable would promise fifty
+ * routes that do not exist. The town names are still links, on the homepage band, where they point
+ * at real pages.
+ *
+ * The note at the bottom is the whole reason this band is safe to publish. A list of fifty numbers
+ * reads as a boundary, and the one visitor it fails is the one who scans it and does not find
+ * their street — the line tells them to ask anyway, which is true and is the only thing worth
+ * saying to them.
+ */
+export function ServiceZips({
+  heading,
+  intro,
+  zips,
+  note,
+}: {
+  heading: string;
+  intro?: string;
+  /** Every serviced zip, from content/cities.ts. Never typed out at a call site. */
+  zips: readonly string[];
+  /**
+   * The "don't see yours?" escape hatch, split around the link rather than handed over as one
+   * string with markup in it — no English is authored in this file, and no content file is allowed
+   * to write a tag.
+   */
+  note: { before: string; link: string; after: string };
+}) {
+  return (
+    // `canvas`, the pale cream — this band sits between two darker ones on /pricing/, and fifty
+    // outlined chips need the quietest surface on the site behind them or the page reads as noise.
     <Section tone="canvas">
       <Container>
-        <Stack gap={10} align="center">
-          <Stack gap={4} align="center">
+        <Stack gap={8} align="center">
+          <Stack gap={3} align="center">
             <Heading level={2} align="center">
               {heading}
             </Heading>
-            <InlineList items={assurances} />
+            {intro && (
+              <Text tone="muted" measure>
+                {intro}
+              </Text>
+            )}
           </Stack>
 
-          {/* `mt-2` gives back the featured card's chip overhang, so it does not crowd the strip
-              above it. A real list — three parallel offers is a list, and a screen reader saying
-              "three items" is the summary a sighted reader gets from the row of cards.
-
-              `w-full` because the Stack above centres its children by shrinking them. */}
-          <ul className="mt-2 grid w-full list-none grid-cols-1 gap-6 pl-0 md:grid-cols-3">
-            {priceTiers.map((tier) => (
-              <li key={tier.id}>
-                <Card tone={tier.featured ? "featured" : "default"}>
-                  {tier.featured && (
-                    <>
-                      {/* Straddles the top rim — `-top-3.5` is half the chip's height, so the
-                          border cuts it in two and the opaque fill runs the rim behind it. */}
-                      <span className="absolute -top-3.5 left-1/2 -translate-x-1/2">
-                        <Badge tone="featured">Most popular</Badge>
-                      </span>
-                      {/* The house paw, stuck on the corner like a sticker. It hangs OUTSIDE the
-                          card on purpose: inside, a centred plan name on a narrow card runs under
-                          it. Decoration — hidden from assistive tech, untouchable by the pointer. */}
-                      <PawPrint
-                        size={44}
-                        aria-hidden="true"
-                        className="pointer-events-none absolute -right-3 -top-3 rotate-12 text-amber"
-                      />
-                    </>
-                  )}
-
-                  {/* No alignment of its own — the band's centring is inherited. */}
-                  <Stack gap={5}>
-                    <div>
-                      <Heading level={3} size="h4">
-                        {tier.name}
-                      </Heading>
-                      <Text size="small" tone="muted">
-                        {tier.dogs}
-                      </Text>
-                    </div>
-
-                    {/* A description list: each frequency is a term, its price is the value. The
-                        unit rides both prices — these are monthly totals, not per visit, and that
-                        is the one misread this band exists to prevent. */}
-                    <dl className="flex flex-col gap-5">
-                      <div>
-                        <Text as="dt" size="small" tone="muted">
-                          Weekly
-                        </Text>
-                        {/* The focal point of the whole band. `leading-none` because the numeral
-                            has no descenders and h2's line box would otherwise leave a gap under
-                            it wider than the one above the unit. */}
-                        <dd className="font-display text-h2 font-bold leading-none text-brand">
-                          {`$${tier.weekly}`}
-                        </dd>
-                        <Text size="small" tone="muted">
-                          {pricing.unit}
-                        </Text>
-                      </div>
-
-                      {/* The quieter option, under a hairline and at body weight — available, not
-                          advertised. */}
-                      <div className="border-t border-line pt-4">
-                        <Text as="dt" size="small" tone="muted">
-                          Every other week
-                        </Text>
-                        <Text as="dd" size="small" tone="muted">
-                          <Text as="span" weight="semibold" tone="default">
-                            {`$${tier.biweekly}`}
-                          </Text>
-                          {` ${pricing.unit}`}
-                        </Text>
-                      </div>
-                    </dl>
-                  </Stack>
-                </Card>
+          {/* A real list — fifty parallel facts are a list, and a screen reader announcing the
+              count is the summary a sighted reader gets from the size of the block. `gap-2`, one
+              step tighter than a chip row elsewhere: at this many items the air between them is
+              what decides whether the band reads as a set or as confetti. */}
+          <ul className="flex list-none flex-wrap justify-center gap-2 pl-0">
+            {zips.map((zip) => (
+              <li key={zip}>
+                <Chip>{zip}</Chip>
               </li>
             ))}
           </ul>
 
-          <Stack gap={5} align="center">
-            <Text tone="muted" measure>
-              {promise}
-            </Text>
-            {/* Points at /contact/, not the quote form: someone who has just read three prices is
-                choosing between them, and the next thing they want is a person, not a second form
-                asking the questions the prices already answered. */}
-            <Cluster gap={4} justify="center">
-              <Button href={routes.contact()} size="lg">
-                {cta}
-              </Button>
-            </Cluster>
-          </Stack>
+          {/* The link is inside the sentence rather than being a button under it: this is a
+              footnote for the minority the list just turned away, and a button would give it the
+              weight of the band's main action. */}
+          <Text tone="muted">
+            {`${note.before} `}
+            <Link href={routes.contact()}>{note.link}</Link>
+            {note.after}
+          </Text>
         </Stack>
       </Container>
     </Section>

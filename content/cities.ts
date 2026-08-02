@@ -152,8 +152,39 @@ export const cities: City[] = [
 
 export const cityBySlug = new Map(cities.map((city) => [city.slug, city]));
 
-/** Every zip the business serves, derived — never maintained as a second list. */
-export const servicedZips: string[] = cities.flatMap((city) => city.zips).sort();
+/**
+ * Every zip inside the Philadelphia city line that the truck reaches — client-supplied, and much
+ * wider than the four `philadelphia` carries above.
+ *
+ * The two lists are not the same fact and must not be merged into one. A `City.zips` array is what
+ * that CITY PAGE is about: /locations/philadelphia/ covers Chestnut Hill, Mount Airy, Roxborough
+ * and East Falls, and putting South Philly's 19148 in it would claim the page speaks for a
+ * neighbourhood it never mentions. This is the SERVICE FOOTPRINT: where a van will actually drive,
+ * whether or not a page exists for the street. Coverage is the bigger set, and the difference is
+ * why /pricing/ lists zips rather than town names.
+ *
+ * There is no Main Line zip here — those live on their own city entries and arrive via the union
+ * below.
+ */
+export const philadelphiaZips: string[] = [
+  "19102", "19103", "19104", "19106", "19107", "19109", "19111", "19114",
+  "19115", "19116", "19118", "19119", "19120", "19121", "19122", "19123",
+  "19124", "19125", "19126", "19127", "19128", "19129", "19130", "19131",
+  "19132", "19133", "19134", "19135", "19136", "19137", "19138", "19139",
+  "19140", "19141", "19142", "19143", "19144", "19145", "19146", "19147",
+  "19148", "19149", "19150", "19151", "19152", "19153", "19154",
+];
+
+/**
+ * Every zip the business serves: the city pages' own zips UNIONED with the Philadelphia footprint,
+ * de-duplicated and sorted. Derived — never maintained as a third list.
+ *
+ * This is what the lead form is checked against (see lib/validation.ts), so an entry missing here
+ * is a real customer being told we do not come to their street.
+ */
+export const servicedZips: string[] = [
+  ...new Set([...cities.flatMap((city) => city.zips), ...philadelphiaZips]),
+].sort();
 
 /** Plain-language coverage summary, for schema `areaServed` and the footer. */
 export const areaServedNames: string[] = cities.map((city) => `${city.name}, ${city.region}`);

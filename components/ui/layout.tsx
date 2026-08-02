@@ -105,13 +105,23 @@ export function Section({
 }: {
   children: ReactNode;
   tone?: SectionTone;
-  spacing?: "sm" | "md" | "lg" | "lg-tight-top" | "hero" | "hero-media";
+  spacing?: "none" | "sm" | "md" | "lg" | "lg-tight-top" | "hero" | "hero-media";
   as?: ElementType;
   id?: string;
 }) {
   const tones = sectionTones;
 
   const spacings = {
+    /**
+     * No padding at all. For a band that IS one object — a photograph, a rule — where the air
+     * around it belongs to whatever sits above and below rather than to the object itself.
+     *
+     * It still has to be a `<section>`, and that is the reason this exists rather than the block
+     * simply rendering a bare element: `main` is pulled up by the height of the header and the
+     * FIRST SECTION gives that row back as a transparent top border (see base.css). Anything else
+     * at the top of a page slides under the bar.
+     */
+    none: "",
     sm: "py-10 md:py-14",
     md: "py-14 md:py-20",
     lg: "py-20 md:py-28",
