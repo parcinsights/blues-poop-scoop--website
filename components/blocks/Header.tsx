@@ -108,7 +108,19 @@ export function Header() {
               at any size and remains selectable, translatable, and readable to a screen reader. */}
           <Link href={routes.home()} variant="quiet">
             <span className="flex items-center gap-3">
-              <Image asset="logoMark" priority className="h-16 w-auto" />
+              {/* NO `priority`, and the reason is worth keeping: this component is on every page,
+                  so a `priority` here preloaded the logo AHEAD of each page's real LCP element —
+                  two `<link rel="preload" as="image">` tags racing, with the 76px logo winning the
+                  start. The mark is above the fold but it is not the largest thing there, and
+                  `priority` is for exactly one image per page. See the note in ui/Image.
+
+                  `sizes` because without it Next emits a 1x/2x srcset off the asset's intrinsic
+                  483px width and the browser takes the 1080w file for a 76×64 slot — 27KB to draw
+                  a thumbnail. The other two logoMark call sites already pass this.
+
+                  `decorative` because the company name is live text immediately to the right; a
+                  screen reader that reads the alt as well says the brand twice. */}
+              <Image asset="logoMark" decorative sizes="80px" className="h-16 w-auto" />
               {/* 18px/600, the same as the nav items beside it — the lockup and the navigation are
                   one row of type, and the mark to its left is what gives the brand its size.
                   Fredoka is variable across 300–700, so 600 is a real design, not an interpolation

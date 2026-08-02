@@ -155,8 +155,13 @@ export function Hero({
               href={`tel:${site.phone.e164}`}
               variant="secondary"
               size="lg"
-              // The visible words are not the whole story — a screen reader gets the number.
-              ariaLabel={`Call ${site.phone.display}`}
+              /* The visible words are not the whole story — a screen reader gets the number too.
+                 It must START with the visible label: WCAG 2.5.3 (Label in Name) requires the
+                 accessible name to CONTAIN the visible text, so that someone driving the page by
+                 voice can say "click call us now" and be understood. A bare
+                 `Call (610) 410-0506` replaced the visible words instead of extending them, and
+                 broke exactly that. */
+              ariaLabel={`${phoneCtaLabel} — ${site.phone.display}`}
             >
               {phoneCtaLabel}
             </Button>
@@ -435,9 +440,14 @@ export function WhyUs({
               shown whole: `object-cover` with the default centre anchor, which is where the two
               faces and the dog are. The top of this frame is tree, so `object-top` would crop to
               foliage — if the picture is ever swapped for a landscape one, revisit this line. */}
+          {/* `sizes` is capped at 34rem rather than left at 50vw: this column is half of a
+              CONTAINER, not half of the viewport. The container tops out at 75rem and the columns
+              are 4rem apart, so the picture never renders wider than ~34rem however wide the
+              screen gets. Claiming 50vw made the browser fetch the 828w file for a 536px slot and
+              discard two thirds of the bytes. */}
           <Image
             asset={image}
-            sizes="(min-width: 64rem) 50vw, 100vw"
+            sizes="(min-width: 75rem) 34rem, (min-width: 64rem) 46vw, 100vw"
             className="h-96 w-full rounded-lg object-cover sm:h-120 lg:h-160"
           />
 
@@ -553,9 +563,14 @@ export function StoryBand({
           {/* Cropped to a band and never shown whole, exactly as `WhyUs` is: a 2:3 frame at full
               height is most of a phone screen before a word of the story appears. The default
               centre anchor is where the faces and the dog are. */}
+          {/* `sizes` is capped at 34rem rather than left at 50vw: this column is half of a
+              CONTAINER, not half of the viewport. The container tops out at 75rem and the columns
+              are 4rem apart, so the picture never renders wider than ~34rem however wide the
+              screen gets. Claiming 50vw made the browser fetch the 828w file for a 536px slot and
+              discard two thirds of the bytes. */}
           <Image
             asset={image}
-            sizes="(min-width: 64rem) 50vw, 100vw"
+            sizes="(min-width: 75rem) 34rem, (min-width: 64rem) 46vw, 100vw"
             className="h-96 w-full rounded-lg object-cover sm:h-120 lg:h-160"
           />
         </div>
@@ -1450,7 +1465,12 @@ export function PricingBand({
                     {/* No alignment of its own — the band's centring is inherited. */}
                     <Stack gap={5}>
                       <div>
-                        <Heading level={3} size="h4">
+                        {/* DERIVED from the band's own level, never hardcoded. On /pricing/ this
+                            band opens the page, so its title is the h1 and a fixed h3 here skipped
+                            h2 entirely — the `heading-order` failure. Everywhere else the band is
+                            an h2 section and these stay h3. `size` is unchanged either way: the
+                            level is the outline, the size is the look, and only the outline moves. */}
+                        <Heading level={level === 1 ? 2 : 3} size="h4">
                           {tier.name}
                         </Heading>
                         <Text size="small" tone="muted">
@@ -1469,12 +1489,21 @@ export function PricingBand({
                           {/* The focal point of the whole band. `leading-none` because the numeral
                               has no descenders and h2's line box would otherwise leave a gap under
                               it wider than the one above the unit. */}
-                          <dd className="font-display text-h2 font-bold leading-none text-brand">
-                            {`$${tier.weekly}`}
+                          {/* The unit lives INSIDE the dd, exactly as the biweekly row below
+                              already has it. A div inside a dl may only hold dt and dd elements —
+                              a stray paragraph beside them makes the whole list invalid, and that
+                              is what axe's `definition-list` rule fires on. Wrapping it keeps the
+                              price and its unit as ONE value, which is what a screen reader
+                              should read for the term: "$100 per month", not "$100" and then an
+                              orphaned "per month". */}
+                          <dd className="text-brand">
+                            <span className="font-display text-h2 font-bold leading-none">
+                              {`$${tier.weekly}`}
+                            </span>
+                            <Text size="small" tone="muted">
+                              {pricing.unit}
+                            </Text>
                           </dd>
-                          <Text size="small" tone="muted">
-                            {pricing.unit}
-                          </Text>
                         </div>
 
                         {/* The quieter option, under a hairline and at body weight — available,
