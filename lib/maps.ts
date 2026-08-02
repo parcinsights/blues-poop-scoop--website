@@ -1,5 +1,5 @@
 /**
- * The service-area map: a shape drawn around the towns we serve, with a pin on each one.
+ * The service-area map: the real outline of every zip code we serve, drawn as one shape.
  *
  * Google's **Maps Static API** — a PNG requested by the browser as a plain `<img>`. The two
  * alternatives were both worse here:
@@ -9,102 +9,40 @@
  *   - The **Maps JavaScript API** can draw anything, and costs ~200KB of client JavaScript plus a
  *     billed map load per view, for a picture nobody on this page will pan or zoom. This site
  *     renders its FAQ with `<details>` rather than React state; a quarter-megabyte of Google on
- *     the landing page for a decorative map would be the single heaviest thing on it.
+ *     a page for a map that answers one yes-or-no question would be the heaviest thing on it.
  *
  * The static image is requested BY THE BROWSER, not by us on the server, and that is deliberate:
  * a browser sends a `Referer` header, so the same HTTP-referrer restriction that protects the key
  * on the Embed API protects it here. Fetching it server-side and proxying the bytes would strip
  * that header and force an unrestricted key — a strictly worse trade for a saved request.
  *
+ * ── Where the shape comes from ───────────────────────────────────────────────
+ * No Maps API knows what a zip code looks like; they all take coordinates. So the boundary is
+ * built ahead of time from US Census ZCTA data by scripts/build-service-area.mjs, dissolved into
+ * a single region, and checked in as one encoded string. Nothing is computed here at request time
+ * and nothing is fetched from the Census at runtime — see content/service-area.ts.
+ *
+ * This replaced a convex hull drawn around the ten town centres. The hull was a guess with a
+ * fudge factor in it that claimed ground we do not cover and cut corners off ground we do; this is
+ * the actual footprint, to about fifty metres.
+ *
  * ── DEFERRED: the key ────────────────────────────────────────────────────────
  * Needs: NEXT_PUBLIC_GOOGLE_MAPS_KEY, with **Maps Static API** enabled and listed in the key's
  * API restrictions, and an HTTP-referrer restriction locking it to the production domain. It is
  * public by design (it ships in the page source), so that restriction is the only thing protecting
  * it and is not optional.
- * On arrival: set the env var. No code change — the band renders its map instead of skipping it.
+ *
+ * As of writing the key exists but the API is NOT enabled on its Cloud project — a request comes
+ * back 403 with "This API is not activated". An unauthorised static map is not a blank space: it
+ * is a grey tile with Google's error text baked into the PNG, which looks like a broken site. That
+ * is what `NEXT_PUBLIC_GOOGLE_MAPS_STATIC_ENABLED` below is for.
  */
 
-import { cities } from "@/content/cities";
+import { serviceAreaOutline } from "@/content/service-area";
 import { BRAND_HEX } from "@/lib/tokens";
-
-type Point = { lat: number; lng: number };
 
 /** The brand navy, restated in the `0xRRGGBB` form Google's colour parameters want. */
 const brand = BRAND_HEX.replace("#", "0x");
-
-/**
- * How far the drawn shape is pushed out past the towns themselves, as a multiple of each town's
- * distance from the middle of the territory.
- *
- * It is not decoration. A polygon whose corners sit exactly on ten town centres claims we stop at
- * the town hall, which is both wrong and unhelpful — the shape is meant to read as "this area",
- * and an area has to contain the towns rather than touch them. The value is judged by eye: enough
- * that no pin sits on the boundary, little enough that the shape does not swallow Center City.
- */
-const OUTWARD_PAD = 1.3;
-
-/**
- * The corners of the territory, in order, as a convex hull of the town centres.
- *
- * Andrew's monotone chain. Ten points, so the sort dominates and the algorithm is irrelevant to
- * performance; it is here because it is the one that is short enough to read.
- *
- * Convex is a real simplification: a genuine route map has dents in it, and this shape will always
- * include ground between the towns that we may not actually cover. That is why the map is never
- * the answer on its own — the band under it lists the towns by name, and the copy tells anyone in
- * between to ask. A shape that is honestly approximate beats a shape that is precisely wrong.
- */
-function convexHull(points: readonly Point[]): Point[] {
-  // x = longitude, y = latitude. Sorted west to east, then south to north.
-  const sorted = [...points].sort((a, b) => a.lng - b.lng || a.lat - b.lat);
-  if (sorted.length < 3) return sorted;
-
-  /** > 0 when the turn from a to b to c is counter-clockwise. */
-  const cross = (a: Point, b: Point, c: Point) =>
-    (b.lng - a.lng) * (c.lat - a.lat) - (b.lat - a.lat) * (c.lng - a.lng);
-
-  const half = (input: readonly Point[]) => {
-    const chain: Point[] = [];
-    for (const point of input) {
-      // Drop the last corner for as long as it is a right turn — i.e. a dent, not a corner.
-      for (;;) {
-        const last = chain[chain.length - 1];
-        const previous = chain[chain.length - 2];
-        if (!previous || !last || cross(previous, last, point) > 0) break;
-        chain.pop();
-      }
-      chain.push(point);
-    }
-    // The last point of each half is the first point of the other. Dropping it here is what keeps
-    // the joined ring from naming both corners twice.
-    chain.pop();
-    return chain;
-  };
-
-  return [...half(sorted), ...half([...sorted].reverse())];
-}
-
-/**
- * Push every corner away from the middle of the territory.
- *
- * A degree of longitude at this latitude is about 77% of a degree of latitude on the ground, so
- * scaling both axes by the same number pads east-west slightly less than north-south. That is
- * left alone: the correction is smaller than the guesswork in `OUTWARD_PAD` itself, and this is a
- * soft blob around ten suburbs, not a survey.
- */
-function padOutward(hull: readonly Point[]): Point[] {
-  const middle = {
-    lat: hull.reduce((sum, p) => sum + p.lat, 0) / hull.length,
-    lng: hull.reduce((sum, p) => sum + p.lng, 0) / hull.length,
-  };
-  return hull.map((point) => ({
-    lat: middle.lat + (point.lat - middle.lat) * OUTWARD_PAD,
-    lng: middle.lng + (point.lng - middle.lng) * OUTWARD_PAD,
-  }));
-}
-
-/** `40.0068,-75.2899`. Five decimals is about a metre — past that the URL grows for nothing. */
-const asPair = (point: Point) => `${point.lat.toFixed(5)},${point.lng.toFixed(5)}`;
 
 export type MapSize = {
   /** CSS pixels. Google caps a free static map at 640 in either direction before `scale`. */
@@ -113,19 +51,14 @@ export type MapSize = {
 };
 
 /**
- * The image URL for one size, or `null` when no key is configured.
+ * The image URL for one size, or `null` when the map is switched off.
  *
- * Null rather than a broken image: an unauthorised static map comes back as a grey tile with
- * Google's own error text baked into the PNG, which looks like the site is broken rather than like
- * a feature that has not been switched on. The caller drops the map and keeps the town list, which
- * is the half that was doing the real work anyway.
+ * Null rather than a broken image: the caller drops the map and keeps the town list, which is the
+ * half that was doing the real work anyway.
  */
 export function serviceAreaMapUrl({ width, height }: MapSize): string | null {
   const key = process.env.NEXT_PUBLIC_GOOGLE_MAPS_KEY;
-  if (!key) return null;
-
-  const towns = cities.map((city) => city.coords);
-  const outline = padOutward(convexHull(towns));
+  if (!key || !serviceAreaMapIsConfigured()) return null;
 
   const params = new URLSearchParams({
     size: `${width}x${height}`,
@@ -139,32 +72,40 @@ export function serviceAreaMapUrl({ width, height }: MapSize): string | null {
   });
 
   /**
-   * The shape. `fillcolor` carries an alpha byte — `33` is 20%, dark enough to read as a region
-   * and light enough that the road names and town labels underneath still show through, which is
-   * the entire point of drawing it on a map rather than on a blank rectangle.
+   * The territory. `enc:` is the encoded-polyline form — the same 300 points spelled out as
+   * `lat,lng` pairs would be an 8KB URL, and this is 1.3KB.
    *
-   * No `center` and no `zoom`: given features and no viewport, Google fits the frame to the
-   * features. That means the map re-frames itself when a town is added to content/cities.ts, and
-   * nobody has to remember that a number in this file also decides what you can see.
+   * `fillcolor` carries an alpha byte: `33` is 20%, dark enough to read as a region and light
+   * enough that the road names and town labels underneath still show through, which is the entire
+   * point of drawing it on a map rather than on a blank rectangle. `weight:2` keeps the edge
+   * legible where the fill against cream is not.
+   *
+   * No `center` and no `zoom`: given a path and no viewport, Google fits the frame to it. The map
+   * therefore re-frames itself when the boundary changes, and no number in this file secretly
+   * decides what you can see.
    */
   params.append(
     "path",
-    [`color:${brand}ff`, "weight:2", `fillcolor:${brand}33`, ...outline.map(asPair)].join("|"),
+    [`color:${brand}ff`, "weight:2", `fillcolor:${brand}33`, `enc:${serviceAreaOutline}`].join("|"),
   );
-
-  /**
-   * A pin per town, appended after the shape so the pins draw on top of the fill.
-   *
-   * `size:small` is the dot without the teardrop: eleven full-size markers on a 640px map is a
-   * pile of overlapping pins around Ardmore, and the label they would carry is unreadable at that
-   * size anyway. The names are in the list under the map, where they are also links.
-   */
-  params.append("markers", [`size:small`, `color:${brand}`, ...towns.map(asPair)].join("|"));
 
   return `https://maps.googleapis.com/maps/api/staticmap?${params}`;
 }
 
-/** Whether a map can be drawn at all. Lets a caller skip the frame without building a URL. */
+/**
+ * Whether a map can be drawn at all.
+ *
+ * Two gates, not one, because a key being present does not mean the API behind it answers. The
+ * Static API is enabled per Cloud project and billing has to be attached; until someone has done
+ * that in the console, the key in .env.local produces a 403 image rather than no image. There is
+ * no way to find that out from here without making the request, and the request is the browser's.
+ *
+ * So switching the map on is deliberate: set NEXT_PUBLIC_GOOGLE_MAPS_STATIC_ENABLED=true once the
+ * API is actually activated. The default is off, which is the state that fails safe.
+ */
 export function serviceAreaMapIsConfigured(): boolean {
-  return Boolean(process.env.NEXT_PUBLIC_GOOGLE_MAPS_KEY);
+  return (
+    Boolean(process.env.NEXT_PUBLIC_GOOGLE_MAPS_KEY) &&
+    process.env.NEXT_PUBLIC_GOOGLE_MAPS_STATIC_ENABLED === "true"
+  );
 }

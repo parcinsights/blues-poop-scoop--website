@@ -210,6 +210,26 @@ export const home = {
     cta: "See all questions",
   },
 
+  /**
+   * The second CTA ribbon, between the questions and the coverage map.
+   *
+   * A different seam from `ctaBanner` and a different job. That one interrupts someone who has
+   * just been persuaded; this one catches someone who has finished OBJECTING — the FAQ is the last
+   * place doubt gets to speak, and the moment after the last answer is the moment there is nothing
+   * left to look up.
+   *
+   * The wording deliberately shares no line with `ctaBanner`. Two identical ribbons on one page do
+   * not read as two chances to click, they read as a page that lost its place.
+   *
+   * It also has to survive being followed by the map, which is the one band that can still turn a
+   * visitor away. So it promises a quote rather than a booking: nobody is being asked to commit
+   * before they have seen whether we come to their street.
+   */
+  ctaAfterFaq: {
+    heading: "Question answered? Let's get your yard on the route.",
+    detail: "The quote is free and takes about a minute.",
+  },
+
   /** OUTSTANDING — the owner interview. See the note above. */
   story: todo(""),
 } as const;

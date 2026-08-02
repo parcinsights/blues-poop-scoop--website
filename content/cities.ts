@@ -188,3 +188,29 @@ export const servicedZips: string[] = [
 
 /** Plain-language coverage summary, for schema `areaServed` and the footer. */
 export const areaServedNames: string[] = cities.map((city) => `${city.name}, ${city.region}`);
+
+/**
+ * Every place we serve, by NAME, each pointing at the page that covers it.
+ *
+ * This is the zip list said in English, and it exists because a zip code is a terrible thing to
+ * ask somebody to recognise. "Do you come to Narberth?" is the question people actually have;
+ * "is 19072 on the list?" is a lookup they have to perform.
+ *
+ * ── Why this is not just `cities.map(c => c.name)` ───────────────────────────
+ * Every one of the fifty-six serviced zips resolves, at USPS city level, to one of the ten towns
+ * in `cities` — checked, not assumed: the forty-seven Philadelphia zips all carry the preferred
+ * city name "Philadelphia". So a list of town names is COMPLETE and also nearly useless, because
+ * "Philadelphia" standing alone tells a Roxborough resident nothing about whether we cross the
+ * Schuylkill. Philadelphia is therefore expanded into the neighbourhoods its page actually names.
+ *
+ * ── What this list still understates ────────────────────────────────────────
+ * The footprint is the whole city; the four neighbourhoods here are the four `philadelphia` has
+ * written copy for. Someone in Fishtown is inside `servicedZips` and will not find their name
+ * below. That gap is why the band that renders this carries a "don't see yours, ask us" line, and
+ * it closes properly only when the client tells us which neighbourhoods they actually want named.
+ * Guessing at forty more from a zip map would be inventing coverage claims on their behalf.
+ */
+export const servicedPlaces: { name: string; slug: string }[] = cities.flatMap((city) => [
+  { name: city.name, slug: city.slug },
+  ...(city.neighborhoods ?? []).map((name) => ({ name, slug: city.slug })),
+]);

@@ -92,95 +92,112 @@ export function QuickLeadForm({
   }
 
   return (
+    /**
+     * Two stacks, not one, and the nesting is the spacing.
+     *
+     * The fields are a group with `gap-4` between them; the button is a separate thing at `gap-8`
+     * below that group. A single flat stack gave the submit button the same air as the gap between
+     * two inputs, which made it read as a sixth field — the thing you tab into next rather than the
+     * thing you press when you are finished. The step up is what ends the form.
+     *
+     * Both callers get this for free: the hero/footer boxed form and the `pill` card on the service
+     * and coverage pages are the same component.
+     */
     <form onSubmit={onSubmit} noValidate className="relative">
-      <Stack gap={4}>
-        <Field label={labels.name} htmlFor="name" required error={errors.name} hideLabel={pill}>
-          <Input
-            id="name"
-            autoComplete="name"
-            placeholder={placeholder(labels.name)}
-            variant={variant}
-            invalid={Boolean(errors.name)}
-          />
-        </Field>
-
-        <Field label={labels.email} htmlFor="email" required error={errors.email} hideLabel={pill}>
-          <Input
-            id="email"
-            type="email"
-            autoComplete="email"
-            placeholder={placeholder(labels.email)}
-            variant={variant}
-            invalid={Boolean(errors.email)}
-          />
-        </Field>
-
-        <Field label={labels.phone} htmlFor="phone" required error={errors.phone} hideLabel={pill}>
-          <Input
-            id="phone"
-            type="tel"
-            autoComplete="tel"
-            placeholder={placeholder(labels.phone)}
-            variant={variant}
-            invalid={Boolean(errors.phone)}
-          />
-        </Field>
-
-        <Field
-          label={labels.zip}
-          htmlFor="zip"
-          required
-          // The hint is what the visible label cannot say in two words. It is dropped in `pill`
-          // along with the label — a line of explanation under a placeholder-only field puts the
-          // words back that the shape exists to remove.
-          hint={pill ? undefined : "So we can confirm we reach you."}
-          error={errors.zip}
-          hideLabel={pill}
-        >
-          <Input
-            id="zip"
-            inputMode="numeric"
-            autoComplete="postal-code"
-            maxLength={5}
-            placeholder={placeholder(labels.zip)}
-            variant={variant}
-            invalid={Boolean(errors.zip)}
-          />
-        </Field>
-
-        <Field label={labels.dogs} htmlFor="dogs" required error={errors.dogs} hideLabel={pill}>
-          {/* No default in `pill`: a pre-filled "1" with the label hidden is a box containing a
-              number and no clue what it counts. The boxed form keeps it — there the label is
-              visible, and one fewer field to fill is one fewer reason to abandon. */}
-          <Input
-            id="dogs"
-            type="number"
-            min={1}
-            max={20}
-            defaultValue={pill ? undefined : 1}
-            placeholder={placeholder(labels.dogs)}
-            variant={variant}
-            invalid={Boolean(errors.dogs)}
-          />
-        </Field>
-
-        {!compact && (
-          <Field label={labels.frequency} htmlFor="frequency" hideLabel={pill}>
-            <Select
-              id="frequency"
-              defaultValue="not-sure"
+      <Stack gap={8}>
+        <Stack gap={4}>
+          <Field label={labels.name} htmlFor="name" required error={errors.name} hideLabel={pill}>
+            <Input
+              id="name"
+              autoComplete="name"
+              placeholder={placeholder(labels.name)}
               variant={variant}
-              options={[
-                { value: "weekly", label: "Weekly" },
-                { value: "biweekly", label: "Every other week" },
-                { value: "not-sure", label: "Not sure yet" },
-              ]}
+              invalid={Boolean(errors.name)}
             />
           </Field>
-        )}
 
-        <Honeypot />
+          <Field label={labels.email} htmlFor="email" required error={errors.email} hideLabel={pill}>
+            <Input
+              id="email"
+              type="email"
+              autoComplete="email"
+              placeholder={placeholder(labels.email)}
+              variant={variant}
+              invalid={Boolean(errors.email)}
+            />
+          </Field>
 
+          <Field label={labels.phone} htmlFor="phone" required error={errors.phone} hideLabel={pill}>
+            <Input
+              id="phone"
+              type="tel"
+              autoComplete="tel"
+              placeholder={placeholder(labels.phone)}
+              variant={variant}
+              invalid={Boolean(errors.phone)}
+            />
+          </Field>
+
+          <Field
+            label={labels.zip}
+            htmlFor="zip"
+            required
+            // The hint is what the visible label cannot say in two words. It is dropped in `pill`
+            // along with the label — a line of explanation under a placeholder-only field puts the
+            // words back that the shape exists to remove.
+            hint={pill ? undefined : "So we can confirm we reach you."}
+            error={errors.zip}
+            hideLabel={pill}
+          >
+            <Input
+              id="zip"
+              inputMode="numeric"
+              autoComplete="postal-code"
+              maxLength={5}
+              placeholder={placeholder(labels.zip)}
+              variant={variant}
+              invalid={Boolean(errors.zip)}
+            />
+          </Field>
+
+          <Field label={labels.dogs} htmlFor="dogs" required error={errors.dogs} hideLabel={pill}>
+            {/* No default in `pill`: a pre-filled "1" with the label hidden is a box containing a
+                number and no clue what it counts. The boxed form keeps it — there the label is
+                visible, and one fewer field to fill is one fewer reason to abandon. */}
+            <Input
+              id="dogs"
+              type="number"
+              min={1}
+              max={20}
+              defaultValue={pill ? undefined : 1}
+              placeholder={placeholder(labels.dogs)}
+              variant={variant}
+              invalid={Boolean(errors.dogs)}
+            />
+          </Field>
+
+          {!compact && (
+            <Field label={labels.frequency} htmlFor="frequency" hideLabel={pill}>
+              <Select
+                id="frequency"
+                defaultValue="not-sure"
+                variant={variant}
+                options={[
+                  { value: "weekly", label: "Weekly" },
+                  { value: "biweekly", label: "Every other week" },
+                  { value: "not-sure", label: "Not sure yet" },
+                ]}
+              />
+            </Field>
+          )}
+
+          {/* Inside the field group: it is a field, just an invisible one, and hanging it in the
+              outer stack would put eight units of air around a zero-height element. */}
+          <Honeypot />
+        </Stack>
+
+        {/* The failure message belongs with the button rather than with the fields — it is about
+            the press that just failed, and it is the line you read before pressing again. */}
         {state === "error" && (
           <Callout tone="warning">
             Something went wrong sending that. Please call us instead and we&apos;ll sort it out.

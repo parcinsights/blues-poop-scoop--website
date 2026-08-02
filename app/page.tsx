@@ -7,9 +7,11 @@ import {
   HowItWorks,
   PricingBand,
   ReviewWall,
+  ServiceAreaMap,
   WhyUs,
 } from "@/components/blocks/blocks";
 import { JsonLd } from "@/components/seo/JsonLd";
+import { cities } from "@/content/cities";
 import { home } from "@/content/pages/home";
 import { ratingSummary, reviews } from "@/content/reviews";
 import { routes } from "@/lib/routes";
@@ -53,15 +55,6 @@ export default function HomePage() {
 
       <HowItWorks heading={home.howItWorks.heading} steps={home.howItWorks.steps} />
 
-      {/* PARKED — the service-area band belongs HERE, between the steps and the prices: "do you
-          come to my street?" is the disqualifying question, and a visitor outside the territory
-          should find that out before reading a number they were never going to be quoted.
-
-          It is built and tested (`ServiceAreaMap` in components/blocks/blocks.tsx, content in
-          content/pages/home.ts) and left out only because the Maps Static API is not yet activated
-          on the Cloud project that owns the key — without it the band ships a broken image. Put
-          the block back once the map loads. See PLAN.md §10. */}
-
       <PricingBand
         heading={home.pricing.heading}
         assurances={home.pricing.assurances}
@@ -71,9 +64,32 @@ export default function HomePage() {
 
       <FaqBand heading={home.faq.heading} items={home.faq.items} cta={home.faq.cta} />
 
+      {/* `raised` matches the FAQ above rather than the map below, so the ribbon reads as the last
+          line of the answers — you have finished asking, here is the button — instead of as an
+          announcement stuck on the front of the coverage band. */}
+      <CtaBanner
+        heading={home.ctaAfterFaq.heading}
+        detail={home.ctaAfterFaq.detail}
+        tone="raised"
+      />
+
+      {/* The coverage map closes the page, and closing on it is the point: "do you come to my
+          street?" is the one question a visitor cannot answer for themselves, and the last thing
+          they should see is either their own town or an honest invitation to ask.
+
+          Renders the map only when the Maps Static API is switched on — see lib/maps.ts. With it
+          off the band still works: the town chips underneath are the actual answer, and the map
+          was always the illustration. */}
+      <ServiceAreaMap
+        heading={home.serviceArea.heading}
+        intro={home.serviceArea.intro}
+        cities={cities}
+        cta={home.serviceArea.cta}
+      />
+
       {/* REBUILD IN PROGRESS — the rest of the homepage is being redesigned one band at a time.
-          The blocks that used to sit here (value props, services grid, pricing, service area, CTA)
-          still exist and still work; they come back as each is redrawn. */}
+          The blocks that used to sit here (value props, services grid, CTA) still exist and still
+          work; they come back as each is redrawn. */}
     </>
   );
 }

@@ -844,37 +844,51 @@ export function ServiceDetails({
             <ServiceTabs label={labels.tablist} tabs={tabs} />
           </div>
 
-          {/* `canvas`, not `default`: a white card on a white band is an invisible card. */}
           <div className="lg:col-span-2">
-            <Card tone="canvas">
-              {/* Centred throughout, and the mark at the top is why: the logo is a symmetrical
-                  object, and left-hanging the words under a centred mark would read as two blocks
-                  that had come apart. The form's own controls are centred to match — see the
-                  `pill` variant in Field. */}
-              <Stack gap={6} align="center">
-                <Stack gap={4} align="center">
-                  {/* The mark alone, not the full lockup: the wordmark is already in the header
-                      two hundred pixels above, and the picture is what makes this card read as
-                      ours rather than as an embedded third-party form. */}
-                  <Image asset="logoMark" sizes="80px" className="h-20 w-auto" />
-                  {/* h2 — the h1 in the hero is the only thing above it. The tab chips are
-                      controls, not headings, so nothing sits between the two levels. */}
-                  <Heading level={2} size="h3" align="center">
-                    {form.heading}
-                  </Heading>
-                  <Text tone="muted">{form.intro}</Text>
-                </Stack>
-                {/* `w-full` — the Stack centres its children by shrinking them, and a form that
-                    shrink-wraps its fields is a column of half-width boxes. */}
-                <div className="w-full">
-                  <QuickLeadForm compact variant="pill" />
-                </div>
-              </Stack>
-            </Card>
+            <LeadFormCard heading={form.heading} intro={form.intro} />
           </div>
         </div>
       </Container>
     </Section>
+  );
+}
+
+/**
+ * The quote form as a standing panel: mark, title, one line, five fields.
+ *
+ * Extracted from `ServiceDetails` when /locations/ needed the same object beside its town list.
+ * It is one component rather than two similar ones on purpose — this card is the conversion path
+ * on every page that carries it, and two copies would be two places for the field list, the tone
+ * and the heading level to drift apart.
+ *
+ * `tone="canvas"`, not `default`: a white card on a white band is an invisible card. That holds on
+ * both callers, since both bands underneath it are `raised`.
+ */
+export function LeadFormCard({ heading, intro }: { heading: string; intro: string }) {
+  return (
+    <Card tone="canvas">
+      {/* Centred throughout, and the mark at the top is why: the logo is a symmetrical object, and
+          left-hanging the words under a centred mark would read as two blocks that had come apart.
+          The form's own controls are centred to match — see the `pill` variant in Field. */}
+      <Stack gap={6} align="center">
+        <Stack gap={4} align="center">
+          {/* The mark alone, not the full lockup: the wordmark is already in the header two
+              hundred pixels above, and the picture is what makes this card read as ours rather
+              than as an embedded third-party form. */}
+          <Image asset="logoMark" sizes="80px" className="h-20 w-auto" />
+          {/* h2 — on both pages that use this, the only thing above it is the page h1. */}
+          <Heading level={2} size="h3" align="center">
+            {heading}
+          </Heading>
+          <Text tone="muted">{intro}</Text>
+        </Stack>
+        {/* `w-full` — the Stack centres its children by shrinking them, and a form that
+            shrink-wraps its fields is a column of half-width boxes. */}
+        <div className="w-full">
+          <QuickLeadForm compact variant="pill" />
+        </div>
+      </Stack>
+    </Card>
   );
 }
 
@@ -1544,7 +1558,7 @@ export function ServiceAreaMapFrame() {
             restriction applies; next/image would fetch it from our server and strip that. */}
         <img
           src={tall}
-          alt={`Map of the area ${site.name} covers: Northwest Philadelphia and the Main Line, with a marker on each town served.`}
+          alt={`Map of the area ${site.name} covers: a single shaded region over Philadelphia and the Main Line, drawn from the boundary of every zip code on the route.`}
           loading="lazy"
           decoding="async"
           width={640}
@@ -1553,6 +1567,97 @@ export function ServiceAreaMapFrame() {
         />
       </picture>
     </div>
+  );
+}
+
+/**
+ * The coverage answer as NAMES, with the quote form beside it.
+ *
+ * It replaced a wall of fifty-six zip codes on /locations/. The zips are still the truth the lead
+ * form is validated against, but they were the wrong thing to show a person: nobody recognises
+ * their own zip faster than their own town, and fifty-six five-digit numbers in a block read as
+ * noise rather than as reach. The zips still run on /pricing/, where the surrounding question is
+ * "am I being quoted", and an exact list is the honest answer to it.
+ *
+ * WHY THE FORM IS IN THIS BAND. Finding your town here is the moment the objection dies, and it is
+ * the only moment on this page when that is true. Sending someone to the bottom of the page to act
+ * on it costs the conversion this band just earned. It is the same `LeadFormCard` the service
+ * pages carry, so the two cannot drift apart.
+ *
+ * The form sits LEFT and the towns RIGHT — the reverse of the service pages. There the form is the
+ * sidebar to the argument; here it is the thing being offered and the list is the qualifier, so it
+ * takes the position the eye starts from. On a phone the two stack, form first.
+ *
+ * The chips are `Button`s, not `Chip`s, because every one of them is a link to a page that ranks.
+ * A static chip would throw that away for identical pixels — `ghost` at `sm` is the same shape the
+ * homepage's map band uses for exactly this.
+ */
+export function ServiceAreaTowns({
+  heading,
+  intro,
+  places,
+  note,
+  form,
+}: {
+  heading: string;
+  intro?: string;
+  /** From `servicedPlaces` in content/cities.ts. Never typed out at a call site. */
+  places: readonly { name: string; slug: string }[];
+  /** The "don't see yours?" escape hatch, split around the link — see `ServiceZips`. */
+  note: { before: string; link: string; after: string };
+  form: { heading: string; intro: string };
+}) {
+  return (
+    <Section tone="raised">
+      <Container>
+        {/* Two fifths to the form, three to the list — the same 2:3 the service pages use, mirrored.
+            `items-start` so the card keeps its own height instead of stretching to the chip block
+            beside it, which on a wide screen is much shorter. */}
+        <div className="grid items-start gap-10 lg:grid-cols-5 lg:gap-16">
+          <div className="lg:col-span-2">
+            <LeadFormCard heading={form.heading} intro={form.intro} />
+          </div>
+
+          <div className="lg:col-span-3">
+            <Stack gap={6}>
+              <Stack gap={3}>
+                {/* The house `center-mobile`: centred on a phone where the chips below it centre
+                    too, left-hung from `sm` up where the block has an edge to hang from. */}
+                <Heading level={2} align="center-mobile">
+                  {heading}
+                </Heading>
+                {intro && (
+                  <Text tone="muted" measure>
+                    {intro}
+                  </Text>
+                )}
+              </Stack>
+
+              {/* A real list — fourteen parallel facts are a list, and a screen reader announcing
+                  the count is the summary a sighted reader gets from the size of the block. */}
+              <ul className="flex list-none flex-wrap justify-center gap-2 pl-0 md:justify-start">
+                {places.map((place) => (
+                  <li key={place.name}>
+                    <Button href={routes.city(place.slug)} variant="ghost" size="sm">
+                      {place.name}
+                    </Button>
+                  </li>
+                ))}
+              </ul>
+
+              {/* Inside the sentence rather than a button under it: this is a footnote for the
+                  minority the list just turned away, and a button would give it the weight of the
+                  band's main action — which is the form on the left. */}
+              <Text size="small" tone="muted">
+                {`${note.before} `}
+                <Link href={routes.contact()}>{note.link}</Link>
+                {note.after}
+              </Text>
+            </Stack>
+          </div>
+        </div>
+      </Container>
+    </Section>
   );
 }
 

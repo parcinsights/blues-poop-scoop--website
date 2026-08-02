@@ -476,6 +476,36 @@ export const reviewsPage = {
 };
 
 /**
+ * /locations/ — the coverage page.
+ *
+ * The whole page answers one question, and the copy's job is to keep answering it in a different
+ * currency each band: the map shows the shape, this band names the towns, the cards below link to
+ * the page for each. Nothing here restates the guarantee or the prices — someone who has not yet
+ * established that we come to their street is not reading either.
+ *
+ * The note is the same escape hatch as `pricingPage.serviceArea`, reworded for names rather than
+ * zips. It is doing real work on this page: the town list is honestly incomplete inside
+ * Philadelphia (see `servicedPlaces` in content/cities.ts), so the invitation to ask is the part
+ * that keeps the band from turning away someone we would actually serve.
+ */
+export const locationsPage = {
+  towns: {
+    heading: "Towns and neighborhoods we cover",
+    intro:
+      "Northwest Philadelphia and the Main Line. Find yours below and you're already on a route we drive.",
+    note: {
+      before: "Somewhere close by that isn't listed?",
+      link: "Ask us",
+      after: " — we'll tell you honestly whether we can reach you.",
+    },
+    form: {
+      heading: "Get a free quote",
+      intro: "Zip code and how many dogs. We'll text you back with a price.",
+    },
+  },
+};
+
+/**
  * /opportunities/ — hiring.
  *
  * A hiring page on a small trade site is read by two people: someone deciding whether to apply,
