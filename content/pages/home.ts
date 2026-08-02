@@ -230,6 +230,28 @@ export const home = {
     detail: "The quote is free and takes about a minute.",
   },
 
+  /**
+   * THE CLOSE. The last band on the page, under the coverage map.
+   *
+   * Not a third ribbon — `CtaBand` is the full band, an h2 at full size and two buttons, and it is
+   * the page's last word rather than an interruption in the middle of it. The two ribbons above
+   * catch someone mid-scroll; this one catches someone who has read everything and is at the
+   * bottom of the page with nowhere else to go.
+   *
+   * It answers the map directly. The band above it ends on "do you come to my street", so this one
+   * opens on the answer to the version of that question we cannot print — if your town was not on
+   * the list, ask anyway. That is also why the phone number sits beside the quote button here: the
+   * out-of-area visitor is the one person on this page a form cannot help.
+   *
+   * The wording shares no line with either ribbon. Three CTAs that say the same thing read as a
+   * page that lost its place, not as three chances to click.
+   */
+  cta: {
+    heading: "Let's get your yard sorted",
+    detail:
+      "Tell us your zip and how many dogs you have and we'll send you a price. Don't see your town? Call us — we're still growing.",
+  },
+
   /** OUTSTANDING — the owner interview. See the note above. */
   story: todo(""),
 } as const;

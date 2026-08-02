@@ -140,6 +140,27 @@ export function Button(props: ButtonProps) {
 
   if ("href" in props && props.href !== undefined) {
     const { href, external } = props;
+
+    /**
+     * `tel:` and `mailto:` are NOT app-router destinations. Handing one to `next/link` gets it
+     * prefetched and intercepted as a client navigation, which on a phone is the difference
+     * between the dialler opening and nothing at all happening — the single most expensive dead
+     * button this site could ship, since the phone CTA is the whole point of the dark band.
+     *
+     * They are also not `external` in the sense that prop means: a new tab for a dialler or a mail
+     * client leaves a blank window behind, so these get a plain `<a>` with no `target` and no
+     * `rel`. `ui/Link` makes the same split for the same reason — see the note there.
+     */
+    const isProtocolHref = /^(tel:|mailto:|sms:)/.test(href);
+
+    if (isProtocolHref) {
+      return (
+        <a href={href} className={classes} aria-label={ariaLabel}>
+          {content}
+        </a>
+      );
+    }
+
     if (external) {
       return (
         <a

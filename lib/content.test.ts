@@ -45,7 +45,6 @@ describe("unwritten pages stay out of the index", () => {
       routes.faq(),
       routes.about(),
       routes.contact(),
-      routes.getStarted(),
     ]) {
       expect(published.has(path), path).toBe(true);
     }

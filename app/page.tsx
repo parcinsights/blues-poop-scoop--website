@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 
 import {
+  CtaBand,
   CtaBanner,
   FaqBand,
   Hero,
@@ -86,6 +87,11 @@ export default function HomePage() {
         cities={cities}
         cta={home.serviceArea.cta}
       />
+
+      {/* The close, under the map. `canvas` rather than the site-default navy: on the dark band the
+          navy quote button disappears into it — --color-surface-dark and --color-brand are the same
+          hex. See CtaBand. The map band above is `alt`, so the tone still changes at the seam. */}
+      <CtaBand heading={home.cta.heading} detail={home.cta.detail} tone="canvas" />
 
       {/* REBUILD IN PROGRESS — the rest of the homepage is being redesigned one band at a time.
           The blocks that used to sit here (value props, services grid, CTA) still exist and still

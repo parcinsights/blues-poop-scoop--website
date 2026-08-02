@@ -73,7 +73,10 @@ export const footerNav: { heading: string; links: NavLink[] }[] = [
     heading: "Get a quote",
     links: [
       { label: "Pricing", href: routes.pricing() },
-      { label: "Get a free quote", href: routes.getStarted() },
+      // Same destination as "Contact" in the column to the right, and deliberately kept: they are
+      // two different intents — "give me a price" and "let me reach a person" — that now land on
+      // one page, and a footer that only answers one of them loses the other's scan path.
+      { label: "Get a free quote", href: routes.contact() },
       { label: "Commercial", href: routes.commercial() },
       { label: "Areas We Serve", href: routes.locations() },
     ],
@@ -91,10 +94,17 @@ export const footerNav: { heading: string; links: NavLink[] }[] = [
   },
 ];
 
-/** The one primary conversion action, referenced by every CTA on the site. */
+/**
+ * The one primary conversion action, referenced by every CTA on the site.
+ *
+ * It points at /contact/, and since 2026-08-02 so does every other CTA — the header's, the
+ * commercial one, the footer's quote link. There used to be two quote pages and therefore two
+ * answers to "where does a button go"; there is now one page, one form, and one destination. See
+ * lib/routes.ts.
+ */
 export const primaryCta = {
   label: "Get my free quote",
-  href: routes.getStarted(),
+  href: routes.contact(),
 } as const;
 
 /**
@@ -105,11 +115,10 @@ export const primaryCta = {
 export const phoneCtaLabel = "Call us now";
 
 /**
- * The header's own button, deliberately NOT `primaryCta`.
- *
- * The in-page CTAs ask for the quote form, because a visitor who has just read a pricing table is
- * ready to fill one in. The header follows someone who has read nothing yet, so it offers the
- * lower-commitment ask — talk to a person — and points at /contact/ instead.
+ * The header's own button. Same destination as `primaryCta` now that there is only one, and a
+ * different LABEL on purpose: the header follows someone who has read nothing yet, so it makes the
+ * lower-commitment ask — talk to a person — where an in-page CTA, which catches a visitor who has
+ * just read a pricing table, asks for the quote outright.
  */
 export const headerCta = {
   label: "Get in touch",
@@ -117,14 +126,9 @@ export const headerCta = {
 } as const;
 
 /**
- * /commercial/'s ask, and the third CTA on the site for the same reason the second one exists: it
- * is a different visitor.
- *
- * It must NOT be `primaryCta`. That points at /get-started/, which asks for a zip code and how many
- * dogs you own — questions a property manager cannot answer about a 200-unit community, and being
- * asked them is the moment they conclude this is a service for houses. The commercial sale starts
- * with a walkthrough, so the button offers the walkthrough and points at /contact/, where a person
- * is on the other end.
+ * /commercial/'s ask. A third set of words for the same page, and a different visitor: a property
+ * manager cannot answer "how many dogs do you have" about a 200-unit community, so the button
+ * offers the walkthrough that actually starts a commercial sale rather than the residential quote.
  */
 export const consultationCta = {
   label: "Get a free property consultation",

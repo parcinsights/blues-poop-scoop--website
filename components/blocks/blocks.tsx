@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import {
   ArrowRight,
   BadgeCheck,
@@ -777,6 +778,70 @@ export function HowItWorks({
   );
 }
 
+// ── Next steps ───────────────────────────────────────────────────────────────
+
+/**
+ * `HowItWorks` turned on its side: the same numbered medallions and pastel rims, stacked as a
+ * column instead of spread as a row.
+ *
+ * It is a separate component rather than a prop on that band because the two are shaped by where
+ * they sit, not by taste. `HowItWorks` is a full-width band of three equals and centres everything.
+ * This one lives in a COLUMN beside a form — three short items in a 2/5 column would be three
+ * squashed cards — so the numeral moves to the left of the words and each step becomes one line
+ * you read down. The vocabulary is deliberately identical, so a visitor who has seen the homepage
+ * recognises these as the same three-step promise.
+ *
+ * A real `<ol>` for the same reason: the order is the meaning, so the drawn numerals are decoration
+ * and hidden — otherwise a screen reader says "one" twice.
+ */
+export function NextSteps({
+  heading,
+  steps,
+}: {
+  heading: string;
+  steps: readonly { title: string; detail: string }[];
+}) {
+  return (
+    <Stack gap={5}>
+      <Heading level={2} size="h4" align="center-mobile">
+        {heading}
+      </Heading>
+      <ol className="flex list-none flex-col gap-4 pl-0">
+        {steps.map((step, index) => (
+          <li
+            key={step.title}
+            className={cx(
+              // White fill and a pastel rim, exactly as on the homepage's step cards — the colour
+              // is worn on the border because these pastels cannot carry muted body text at 4.5:1.
+              // See the note on `medallionAccents`.
+              "flex items-start gap-4 rounded-lg border-2 bg-surface-raised p-5 shadow-sm",
+              medallion(index).edge,
+            )}
+          >
+            <span
+              aria-hidden="true"
+              className={cx(
+                "flex size-10 shrink-0 items-center justify-center rounded-pill font-display text-h5 font-bold",
+                medallion(index).fill,
+              )}
+            >
+              {index + 1}
+            </span>
+            <Stack gap={2}>
+              <Heading level={3} size="h6">
+                {step.title}
+              </Heading>
+              <Text size="small" tone="muted">
+                {step.detail}
+              </Text>
+            </Stack>
+          </li>
+        ))}
+      </ol>
+    </Stack>
+  );
+}
+
 // ── Service details ──────────────────────────────────────────────────────────
 
 /**
@@ -905,15 +970,66 @@ export function ServiceDetails({
 }
 
 /**
- * The quote form as a standing panel: mark, title, one line, five fields.
+ * The panel a form sits in: cream card, optional mark, title, one line, then the fields.
  *
- * Extracted from `ServiceDetails` when /locations/ needed the same object beside its town list.
- * It is one component rather than two similar ones on purpose — this card is the conversion path
- * on every page that carries it, and two copies would be two places for the field list, the tone
- * and the heading level to drift apart.
+ * THE SHELL IS SHARED AND THE FORM IS THE CHILD. Every form on the site that is not the whole page
+ * lives in this object — the short quote form on the service pages and /locations/, the six-field
+ * one on /contact/ — and they must be the same object, because a visitor who sees two differently
+ * shaped forms on two pages of one site is looking at two different companies. What differs is the
+ * fields inside it, so that is the only thing a caller passes.
  *
- * `tone="canvas"`, not `default`: a white card on a white band is an invisible card. That holds on
- * both callers, since both bands underneath it are `raised`.
+ * `tone="canvas"`, not `default`: a white card on a white band is an invisible card. Every band
+ * that carries this is `raised`.
+ */
+export function FormCard({
+  heading,
+  intro,
+  mark = true,
+  children,
+}: {
+  heading: string;
+  intro: string;
+  /**
+   * The logo mark above the title. On by default, and dropped on /contact/ — there the card is the
+   * page's main object rather than a panel beside an argument, and a badge on top of the one thing
+   * the page is for reads as branding on a form instead of as the form itself.
+   */
+  mark?: boolean;
+  /** The form. `pill` variant, always — see the note on `FieldVariant`. */
+  children: ReactNode;
+}) {
+  return (
+    <Card tone="canvas">
+      {/* Centred throughout, and the mark at the top is why: the logo is a symmetrical object, and
+          left-hanging the words under a centred mark would read as two blocks that had come apart.
+          The form's own controls are centred to match — see the `pill` variant in Field.
+
+          It stays centred with the mark off, because the controls below it still are. */}
+      <Stack gap={6} align="center">
+        <Stack gap={4} align="center">
+          {/* The mark alone, not the full lockup: the wordmark is already in the header two
+              hundred pixels above, and the picture is what makes this card read as ours rather
+              than as an embedded third-party form. */}
+          {mark && <Image asset="logoMark" sizes="80px" className="h-20 w-auto" />}
+          {/* h2 — on every page that uses this, the only thing above it is the page h1. */}
+          <Heading level={2} size="h3" align="center">
+            {heading}
+          </Heading>
+          <Text tone="muted">{intro}</Text>
+        </Stack>
+        {/* `w-full` — the Stack centres its children by shrinking them, and a form that
+            shrink-wraps its fields is a column of half-width boxes. */}
+        <div className="w-full">{children}</div>
+      </Stack>
+    </Card>
+  );
+}
+
+/**
+ * The SHORT quote form in that panel — the conversion path on the service pages and /locations/.
+ *
+ * It exists so those two callers cannot drift apart on which form they carry: the shell is shared
+ * with /contact/, the five compact fields are this component's own decision.
  */
 export function LeadFormCard({
   heading,
@@ -923,29 +1039,9 @@ export function LeadFormCard({
   intro: string;
 }) {
   return (
-    <Card tone="canvas">
-      {/* Centred throughout, and the mark at the top is why: the logo is a symmetrical object, and
-          left-hanging the words under a centred mark would read as two blocks that had come apart.
-          The form's own controls are centred to match — see the `pill` variant in Field. */}
-      <Stack gap={6} align="center">
-        <Stack gap={4} align="center">
-          {/* The mark alone, not the full lockup: the wordmark is already in the header two
-              hundred pixels above, and the picture is what makes this card read as ours rather
-              than as an embedded third-party form. */}
-          <Image asset="logoMark" sizes="80px" className="h-20 w-auto" />
-          {/* h2 — on both pages that use this, the only thing above it is the page h1. */}
-          <Heading level={2} size="h3" align="center">
-            {heading}
-          </Heading>
-          <Text tone="muted">{intro}</Text>
-        </Stack>
-        {/* `w-full` — the Stack centres its children by shrinking them, and a form that
-            shrink-wraps its fields is a column of half-width boxes. */}
-        <div className="w-full">
-          <QuickLeadForm compact variant="pill" />
-        </div>
-      </Stack>
-    </Card>
+    <FormCard heading={heading} intro={intro}>
+      <QuickLeadForm compact variant="pill" />
+    </FormCard>
   );
 }
 

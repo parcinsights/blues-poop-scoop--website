@@ -53,7 +53,12 @@ export const routes = {
   opportunities: () => "/opportunities/",
   blog: () => "/blog/",
   blogPost: (slug: string) => `/blog/${slug}/`,
-  getStarted: () => "/get-started/",
+  /**
+   * NO `getStarted`. /get-started/ was a second quote page carrying a second quote form, and two
+   * pages competing for one conversion is two pages nobody links to consistently. Its form and its
+   * job both moved to /contact/ on 2026-08-02, and the old URL 301s there — see lib/redirects.mjs.
+   * Every CTA on the site now points at one page.
+   */
 } as const;
 
 /** Turn a site-relative path into the absolute URL used in canonical, OG, sitemap and schema. */
@@ -89,8 +94,9 @@ export function allRoutes(): RouteEntry[] {
     { path: routes.pricing(), priority: 0.9, changeFrequency: "monthly", implemented: true },
     { path: routes.faq(), priority: 0.6, changeFrequency: "monthly", implemented: true },
     { path: routes.about(), priority: 0.5, changeFrequency: "yearly", implemented: true },
-    { path: routes.contact(), priority: 0.7, changeFrequency: "yearly", implemented: true },
-    { path: routes.getStarted(), priority: 0.9, changeFrequency: "monthly", implemented: true },
+    // The conversion page, and the highest-priority entry after the homepage: it is where every
+    // CTA on the site points and where the quote form lives.
+    { path: routes.contact(), priority: 0.9, changeFrequency: "monthly", implemented: true },
     // Real content from day one — the quotes already exist. Priority sits above /about/ because a
     // review page is a page people look for by name.
     { path: routes.reviews(), priority: 0.6, changeFrequency: "monthly", implemented: true },

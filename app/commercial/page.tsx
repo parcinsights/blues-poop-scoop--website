@@ -78,8 +78,8 @@ export default function CommercialPage() {
           colour, and on cream its rounded corners sit on a tone barely different from their own.
           The strip below is the yellow, which is what gives the two bands their edge.
 
-          `cta` overrides the site-wide quote form: /get-started/ asks for a zip code and a number
-          of dogs, which is not a question a property manager can answer. See `consultationCta`. */}
+          `cta` overrides the site-wide quote CTA: it asks for a zip code and a number of dogs,
+          which is not a question a property manager can answer. See `consultationCta`. */}
       <Hero
         heading={commercial.heading}
         subheading={commercial.intro}

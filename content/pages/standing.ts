@@ -12,7 +12,7 @@ import type {
 } from "../types";
 
 /**
- * The standing pages — /about/, /contact/, /pricing/, /commercial/, /get-started/.
+ * The standing pages — /about/, /contact/, /pricing/, /commercial/.
  *
  * `/about/` is worth more attention than it looks. An about page is the first thing that goes
  * generic across a trade, and a generic one is worth nothing: "we're passionate about pets" is a
@@ -147,6 +147,54 @@ export const contact = {
   } satisfies Seo,
   heading: "Get in touch",
   intro: "Call, email, or send a message and we'll get back to you.",
+
+  /**
+   * The quote form's own words. The page's h1 is the greeting above; this is the title of the
+   * thing you fill in, and it says what the form is for rather than repeating "contact us" — a
+   * form under a heading that names it twice reads as two forms.
+   *
+   * The intro exists to price the form in TIME. Six fields is more than the short form asks for,
+   * and the honest answer to "how long is this going to take" is the cheapest thing on the page to
+   * print — it is what stops someone counting the boxes and leaving.
+   */
+  form: {
+    heading: "Tell us about your yard",
+    intro:
+      "Six quick questions — about a minute. We'll come back with a price and a first visit date.",
+  },
+
+  /**
+   * The column beside the form, for the two kinds of visitor it does not suit: the one who would
+   * rather talk to a person, and the one who wants to know what happens after they press the
+   * button. Both are on the page anyway; saying so out loud costs three lines.
+   *
+   * The steps are what the business actually does — no promise of a timeframe we have not agreed.
+   */
+  aside: {
+    /**
+     * Three steps, each a title you can read at a glance and one line under it. Titled rather than
+     * bare sentences because they are rendered as the same numbered cards the homepage uses for
+     * "how it works" — see `NextSteps` — and a card with no title is a paragraph in a box.
+     */
+    stepsHeading: "What happens next",
+    steps: [
+      {
+        title: "We check your zip",
+        detail: "If we don't reach your street yet, we'll tell you straight away.",
+      },
+      {
+        title: "You get a price",
+        detail: "For the regular visits and for the first clean-up, both up front.",
+      },
+      {
+        title: "You pick a start date",
+        detail: "No contract, no sign-up fee. Cancel whenever you like.",
+      },
+    ],
+    heading: "Prefer to talk?",
+    detail: "Call or text and you'll get one of us — no phone tree, no sales script.",
+  },
+
   body: [] as ContentBlock[],
 };
 
@@ -677,12 +725,7 @@ export const blogIndex = {
     "Notes from the route — seasonal yard care, and the questions our customers actually ask.",
 };
 
-export const getStarted = {
-  seo: {
-    title: "Get a free quote | Blue's Poop Scoop",
-    description:
-      "Tell us your zip code and how many dogs you have, and we'll get back to you with a price.",
-  } satisfies Seo,
-  heading: "Get a free quote",
-  intro: "Tell us a little about your yard and we'll be in touch.",
-};
+/**
+ * /get-started/'s copy used to live here. The page was merged into /contact/ on 2026-08-02 — one
+ * quote form, one destination for every CTA — and its words went with it. See `contact` above.
+ */
