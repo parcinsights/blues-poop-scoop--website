@@ -132,7 +132,8 @@ export const about = {
 
   cta: {
     heading: "Let's get your yard sorted",
-    detail: "Tell us where you are and how many dogs you have — we'll do the rest.",
+    detail:
+      "Tell us where you are and how many dogs you have — we'll do the rest.",
   },
 
   /** OUTSTANDING — a longer authored piece, if the client ever wants one. See the note above. */
@@ -313,7 +314,8 @@ export const commercial = {
   audiences: {
     eyebrow: "Who we serve",
     heading: "Built for properties with pet traffic",
-    intro: "Whether you manage 20 units or 200, we build a plan that fits your grounds.",
+    intro:
+      "Whether you manage 20 units or 200, we build a plan that fits your grounds.",
     items: [
       "Apartment communities",
       "Condos & HOAs",
@@ -379,12 +381,14 @@ export const commercial = {
       {
         icon: "stations",
         title: "All equipment included",
-        detail: "Stations, bags, trash cans, and signage — all provided and installed by us.",
+        detail:
+          "Stations, bags, trash cans, and signage — all provided and installed by us.",
       },
       {
         icon: "schedule",
         title: "Flexible scheduling",
-        detail: "Weekly, bi-weekly, or a custom plan that fits your property's needs.",
+        detail:
+          "Weekly, bi-weekly, or a custom plan that fits your property's needs.",
       },
       {
         icon: "updates",
@@ -394,17 +398,20 @@ export const commercial = {
       {
         icon: "flexible",
         title: "No contracts",
-        detail: "Month-to-month service. Adjust or cancel anytime, no penalties.",
+        detail:
+          "Month-to-month service. Adjust or cancel anytime, no penalties.",
       },
       {
         icon: "insured",
         title: "Fully insured",
-        detail: "Insured for your peace of mind, and happy to send the certificate.",
+        detail:
+          "Insured for your peace of mind, and happy to send the certificate.",
       },
       {
         icon: "local",
         title: "Locally owned",
-        detail: "Philadelphia neighbors serving our own community — not a franchise territory.",
+        detail:
+          "Philadelphia neighbors serving our own community — not a franchise territory.",
       },
     ] satisfies Feature[],
   },
@@ -530,6 +537,128 @@ export const opportunities = {
   intro: todo(
     "We're a small local crew, and we're growing. If you like dogs, working outside, and being trusted to run your own day, we'd like to hear from you.",
   ),
+
+  /**
+   * The three reasons to want this job, as a `FeatureGrid`.
+   *
+   * Note what is NOT in here: money. A perks band that leads with "competitive pay" and no number
+   * is the sentence every applicant has learned to read as "below market", and the number itself
+   * is George's to give. When it arrives it belongs in `role` below, stated plainly, not dressed
+   * up as a benefit here.
+   */
+  perks: {
+    eyebrow: todo("Why this job"),
+    heading: todo("What you get out of it"),
+    points: [
+      {
+        icon: "local",
+        title: todo("A small crew, not a franchise"),
+        detail: todo(
+          "You would be working directly with the two people who own the business, on routes they run themselves. There is no regional manager and no script.",
+        ),
+      },
+      {
+        icon: "schedule",
+        title: todo("Your own route"),
+        detail: todo(
+          "You get a list of yards and a day to do them in. How you order them is up to you, and nobody is tracking you between stops.",
+        ),
+      },
+      {
+        icon: "flexible",
+        title: todo("Outside, with dogs"),
+        detail: todo(
+          "It is honest outdoor work in the same ten towns every week, and most of the customers have a dog that will be pleased to see you.",
+        ),
+      },
+    ] satisfies Feature[],
+  },
+
+  /**
+   * The role itself — the facts an applicant needs before they will spend a phone call on this.
+   *
+   * EVERY ONE OF THESE IS A GUESS and has to be replaced before the page can be published. The
+   * detail strings are deliberately written as the SHAPE of the answer rather than as an answer:
+   * "the rate is $X an hour" is a sentence someone can fill in, and one that cannot be mistaken
+   * for something the client actually said. See the note above the record.
+   */
+  role: {
+    eyebrow: todo("The role"),
+    heading: todo("What the job actually is"),
+    intro: todo(
+      "Straight answers, so you can decide whether it is worth a call. If something here is not clear, ask us — we would rather tell you now than waste your afternoon.",
+    ),
+    points: [
+      {
+        title: todo("Pay"),
+        detail: todo(
+          "OUTSTANDING — George to supply the rate and whether it is hourly or per route.",
+        ),
+      },
+      {
+        title: todo("Hours"),
+        detail: todo(
+          "OUTSTANDING — George to supply the days, the start time, and whether it is full-time, part-time or seasonal.",
+        ),
+      },
+      {
+        title: todo("Getting around"),
+        detail: todo(
+          "OUTSTANDING — George to confirm whether a van is provided or a driver uses their own vehicle, and what licence and insurance that needs.",
+        ),
+      },
+      {
+        title: todo("Where you would work"),
+        detail: todo(
+          "Chestnut Hill, Mt. Airy, Roxborough and East Falls in Philadelphia, plus Ardmore, Bryn Mawr, Haverford, Narberth, Gladwyne and Glenside on the Main Line.",
+        ),
+      },
+      {
+        title: todo("What we need from you"),
+        detail: todo(
+          "OUTSTANDING — George to confirm the requirements. Comfortable around dogs, and able to be on your feet outdoors in any weather, are the two that are certain.",
+        ),
+      },
+      {
+        title: todo("Experience"),
+        detail: todo(
+          "OUTSTANDING — George to confirm. Our assumption is none required and we train on the route.",
+        ),
+      },
+    ] satisfies Feature[],
+  },
+
+  /**
+   * How to apply. Three steps, because the whole point of the band is that applying is short —
+   * a numbered list with two entries reads as an afterthought and one with five reads as a process.
+   *
+   * The destination is the outstanding fact: there is no careers inbox on file, so step one points
+   * at the phone number, which is real. Swap it for an address the day there is one.
+   */
+  apply: {
+    heading: todo("How to apply"),
+    steps: [
+      {
+        title: todo("Get in touch"),
+        detail: todo(
+          "Call or text us. Tell us your name, which towns you can get to, and when you can start.",
+        ),
+      },
+      {
+        title: todo("Talk it through"),
+        detail: todo(
+          "A short call with George — what the days look like, what the pay is, and whatever you want to ask.",
+        ),
+      },
+      {
+        title: todo("Ride along"),
+        detail: todo(
+          "Come out on a route with us before either of us commits. You see the actual work, we see how you are around a dog.",
+        ),
+      },
+    ],
+  },
+
   body: [] as ContentBlock[],
 };
 
@@ -544,7 +673,8 @@ export const blogIndex = {
       "Notes on yard care, pet waste, and dog ownership around Philadelphia and the Main Line.",
   } satisfies Seo,
   heading: "From the blog",
-  intro: "Notes from the route — seasonal yard care, and the questions our customers actually ask.",
+  intro:
+    "Notes from the route — seasonal yard care, and the questions our customers actually ask.",
 };
 
 export const getStarted = {

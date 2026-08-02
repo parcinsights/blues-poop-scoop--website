@@ -98,6 +98,28 @@ export const assets = {
   },
 
   /**
+   * The band under the h1 on /opportunities/ — both owners from behind, walking away up a leafy
+   * path in the branded sweatshirts, the phone number across the back of each.
+   *
+   * It is on the hiring page rather than anywhere else because of what it shows: not faces selling
+   * a service, but the UNIFORM and the walk. Someone reading a job ad is picturing themselves
+   * doing the work, and this is the only picture on file taken from behind — nobody in it is
+   * looking at you, so there is room in the frame to imagine being the third person on that path.
+   *
+   * Cropped to a wide band by `PhotoBand`, and it survives that crop: both figures sit in the
+   * middle third with the lettering at their shoulder blades, which is the part that has to
+   * stay.
+   */
+  opportunitiesHero: {
+    src: "/opportunities.jpg",
+    // Sixteen words, which is the registry's ceiling — the slogan is spent on deliberately. It is
+    // the only text visible in the frame, and text in a picture belongs in its alt.
+    alt: "Two staff walking away up a path, sweatshirts printed “We scoop so you don't have to”",
+    width: 3000,
+    height: 2000,
+  },
+
+  /**
    * ── THE CREW ───────────────────────────────────────────────────────────────
    * One portrait per member of the team band on /about/. All three are cropped by `object-cover`
    * with a TOP anchor in a fixed-height box — every one of them is a tall portrait with the face in

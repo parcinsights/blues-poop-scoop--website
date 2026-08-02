@@ -29,7 +29,14 @@ import {
 import { Link } from "@/components/ui/Link";
 import { Rating } from "@/components/ui/Rating";
 import { Badge, Card, Callout, Chip } from "@/components/ui/surfaces";
-import { Eyebrow, Heading, InlineList, List, Quote, Text } from "@/components/ui/typography";
+import {
+  Eyebrow,
+  Heading,
+  InlineList,
+  List,
+  Quote,
+  Text,
+} from "@/components/ui/typography";
 import type { AssetKey } from "@/content/assets";
 import { priceTiers, pricing } from "@/content/pricing";
 import { phoneCtaLabel, primaryCta } from "@/content/nav";
@@ -262,7 +269,12 @@ export function ServiceHero({
     // change. The photograph and the chips are what give the band its colour.
     <Section tone="raised" spacing="hero">
       <Container>
-        <div className={cx("grid items-center gap-10", image && "lg:grid-cols-2 lg:gap-16")}>
+        <div
+          className={cx(
+            "grid items-center gap-10",
+            image && "lg:grid-cols-2 lg:gap-16",
+          )}
+        >
           <Stack gap={6}>
             {/* Above everything, as it is in the structured data: the trail is where you are. */}
             <Breadcrumbs crumbs={crumbs} />
@@ -326,14 +338,25 @@ export function ServiceHero({
  */
 const medallionAccents = [
   { fill: "bg-accent-mint text-accent-mint-ink", edge: "border-accent-mint" },
-  { fill: "bg-accent-peach text-accent-peach-ink", edge: "border-accent-peach" },
-  { fill: "bg-accent-lilac text-accent-lilac-ink", edge: "border-accent-lilac" },
-  { fill: "bg-accent-lemon text-accent-lemon-ink", edge: "border-accent-lemon" },
+  {
+    fill: "bg-accent-peach text-accent-peach-ink",
+    edge: "border-accent-peach",
+  },
+  {
+    fill: "bg-accent-lilac text-accent-lilac-ink",
+    edge: "border-accent-lilac",
+  },
+  {
+    fill: "bg-accent-lemon text-accent-lemon-ink",
+    edge: "border-accent-lemon",
+  },
 ] as const;
 
 /** The cycle. The modulo cannot miss, but a number index is still `| undefined` to the compiler. */
 function medallion(index: number) {
-  return medallionAccents[index % medallionAccents.length] ?? medallionAccents[0];
+  return (
+    medallionAccents[index % medallionAccents.length] ?? medallionAccents[0]
+  );
 }
 
 /**
@@ -513,7 +536,11 @@ export function StoryBand({
                 {/* The heart is decoration — the sentence beside it is the whole point, and
                     reading a glyph out loud before it would only get in the way. */}
                 <div className="flex items-start gap-3">
-                  <Heart size={20} aria-hidden="true" className="mt-1 shrink-0 text-brand" />
+                  <Heart
+                    size={20}
+                    aria-hidden="true"
+                    className="mt-1 shrink-0 text-brand"
+                  />
                   <Text size="small" weight="semibold">
                     {note}
                   </Text>
@@ -583,7 +610,8 @@ export function TrustBar({
                 key={item.label}
                 className={cx(
                   "flex items-center gap-2 sm:px-8",
-                  (rating !== undefined || index > 0) && "sm:border-l sm:border-line",
+                  (rating !== undefined || index > 0) &&
+                    "sm:border-l sm:border-line",
                 )}
               >
                 {/* Decoration: the words beside it say the same thing, better. */}
@@ -799,7 +827,12 @@ export function ServiceDetails({
   form,
 }: {
   /** Tab words, plus the tablist's own name for screen readers. */
-  labels: { tablist: string; about: string; includes: string; benefits: string };
+  labels: {
+    tablist: string;
+    about: string;
+    includes: string;
+    benefits: string;
+  };
   /** The authored body — the About tab. Empty until someone writes it, which is also the page's publish gate. */
   body: ContentBlock[];
   includes?: readonly string[];
@@ -824,12 +857,22 @@ export function ServiceDetails({
     {
       id: "includes",
       label: labels.includes,
-      panel: includes && includes.length > 0 ? <Paragraphs items={includes} /> : note,
+      panel:
+        includes && includes.length > 0 ? (
+          <Paragraphs items={includes} />
+        ) : (
+          note
+        ),
     },
     {
       id: "benefits",
       label: labels.benefits,
-      panel: benefits && benefits.length > 0 ? <Paragraphs items={benefits} /> : note,
+      panel:
+        benefits && benefits.length > 0 ? (
+          <Paragraphs items={benefits} />
+        ) : (
+          note
+        ),
     },
   ];
 
@@ -872,7 +915,13 @@ export function ServiceDetails({
  * `tone="canvas"`, not `default`: a white card on a white band is an invisible card. That holds on
  * both callers, since both bands underneath it are `raised`.
  */
-export function LeadFormCard({ heading, intro }: { heading: string; intro: string }) {
+export function LeadFormCard({
+  heading,
+  intro,
+}: {
+  heading: string;
+  intro: string;
+}) {
   return (
     <Card tone="canvas">
       {/* Centred throughout, and the mark at the top is why: the logo is a symmetrical object, and
@@ -990,7 +1039,9 @@ export function FeatureGrid({
                       part of the title's line rather than as the card's mark. Centred, the circle
                       sits on the midline above the words rather than beside them. */}
                   <Stack gap={4} align={centred ? "center" : undefined}>
-                    {feature.icon && <Medallion icon={feature.icon} index={index} />}
+                    {feature.icon && (
+                      <Medallion icon={feature.icon} index={index} />
+                    )}
                     <Stack gap={2}>
                       <Heading level={3}>{feature.title}</Heading>
                       <Text tone="muted">{feature.detail}</Text>
@@ -1113,7 +1164,10 @@ export function StatBand({ stats }: { stats: readonly Stat[] }) {
             wraps to three lines under a figure and the strip becomes a paragraph. */}
         <dl className="grid grid-cols-2 gap-8 lg:grid-cols-4">
           {stats.map((stat) => (
-            <div key={stat.label} className="flex flex-col-reverse items-center gap-1 text-center">
+            <div
+              key={stat.label}
+              className="flex flex-col-reverse items-center gap-1 text-center"
+            >
               <Text as="dt" size="small" tone="inverse">
                 {stat.label}
               </Text>
@@ -1142,7 +1196,9 @@ export function PriceTable({ heading }: { heading: string }) {
     <Section>
       <Container>
         <Stack gap={8}>
-          <Heading level={2} align="center-mobile">{heading}</Heading>
+          <Heading level={2} align="center-mobile">
+            {heading}
+          </Heading>
           <div className="overflow-x-auto">
             <table className="w-full border-collapse text-body">
               <caption className="sr-only">
@@ -1164,7 +1220,10 @@ export function PriceTable({ heading }: { heading: string }) {
               <tbody>
                 {priceTiers.map((tier) => (
                   <tr key={tier.id} className="border-b border-line">
-                    <th scope="row" className="py-4 pr-4 font-semibold text-ink">
+                    <th
+                      scope="row"
+                      className="py-4 pr-4 font-semibold text-ink"
+                    >
                       {tier.dogs}
                     </th>
                     <td className="py-4 pr-4">
@@ -1389,13 +1448,22 @@ export function PricingBand({
 export function PhotoBand({
   image,
   priority = false,
+  tone = "canvas",
 }: {
   image: AssetKey;
   /** Set only when this is the largest thing above the fold. Exactly one image per page. */
   priority?: boolean;
+  /**
+   * The surface behind the picture. Only ever visible in the rounded corners and the gutters, so
+   * the choice is not about colour — it is about which neighbour this band should disappear into.
+   * `canvas` is right on /pricing/, where the photograph opens the page under a cream header; pass
+   * the neighbour's own tone where the picture should read as sitting INSIDE the band above it
+   * rather than as a strip of its own.
+   */
+  tone?: SectionTone;
 }) {
   return (
-    <Section tone="canvas" spacing="none">
+    <Section tone={tone} spacing="none">
       <Container>
         <Image
           asset={image}
@@ -1506,10 +1574,17 @@ export function ServiceAreaList({
     <Section tone="alt">
       <Container>
         <Stack gap={6}>
-          <Heading level={2} align="center-mobile">{heading}</Heading>
+          <Heading level={2} align="center-mobile">
+            {heading}
+          </Heading>
           <Cluster gap={3}>
             {cities.map((city) => (
-              <Button key={city.slug} href={routes.city(city.slug)} variant="ghost" size="sm">
+              <Button
+                key={city.slug}
+                href={routes.city(city.slug)}
+                variant="ghost"
+                size="sm"
+              >
                 {city.name}
               </Button>
             ))}
@@ -1646,7 +1721,11 @@ export function ServiceAreaTowns({
               <ul className="flex list-none flex-wrap justify-center gap-2 pl-0 md:justify-start">
                 {places.map((place) => (
                   <li key={place.name}>
-                    <Button href={routes.city(place.slug)} variant="ghost" size="sm">
+                    <Button
+                      href={routes.city(place.slug)}
+                      variant="ghost"
+                      size="sm"
+                    >
                       {place.name}
                     </Button>
                   </li>
@@ -1701,7 +1780,12 @@ export function ServiceAreaMap({
               the CTA's wording is written for. */}
           <Cluster gap={3} justify="center">
             {cities.map((city) => (
-              <Button key={city.slug} href={routes.city(city.slug)} variant="ghost" size="sm">
+              <Button
+                key={city.slug}
+                href={routes.city(city.slug)}
+                variant="ghost"
+                size="sm"
+              >
                 {city.name}
               </Button>
             ))}
@@ -1770,7 +1854,9 @@ export function FaqAccordion({
     <Section tone={tone}>
       <Container width="prose">
         <Stack gap={6}>
-          <Heading level={2} align="center-mobile">{heading}</Heading>
+          <Heading level={2} align="center-mobile">
+            {heading}
+          </Heading>
           <FaqRows items={items} />
         </Stack>
       </Container>
@@ -1796,12 +1882,30 @@ function FaqPaws() {
       aria-hidden="true"
       className="pointer-events-none absolute inset-0 hidden overflow-hidden lg:block"
     >
-      <PawPrint size={72} className="absolute left-6 top-12 -rotate-12 text-brand opacity-10" />
-      <PawPrint size={44} className="absolute left-28 top-52 rotate-12 text-amber opacity-60" />
-      <PawPrint size={56} className="absolute bottom-16 left-10 rotate-6 text-brand opacity-10" />
-      <PawPrint size={52} className="absolute right-24 top-24 rotate-12 text-brand opacity-10" />
-      <PawPrint size={76} className="absolute bottom-24 right-8 -rotate-6 text-amber opacity-50" />
-      <PawPrint size={40} className="absolute bottom-56 right-32 rotate-45 text-brand opacity-10" />
+      <PawPrint
+        size={72}
+        className="absolute left-6 top-12 -rotate-12 text-brand opacity-10"
+      />
+      <PawPrint
+        size={44}
+        className="absolute left-28 top-52 rotate-12 text-amber opacity-60"
+      />
+      <PawPrint
+        size={56}
+        className="absolute bottom-16 left-10 rotate-6 text-brand opacity-10"
+      />
+      <PawPrint
+        size={52}
+        className="absolute right-24 top-24 rotate-12 text-brand opacity-10"
+      />
+      <PawPrint
+        size={76}
+        className="absolute bottom-24 right-8 -rotate-6 text-amber opacity-50"
+      />
+      <PawPrint
+        size={40}
+        className="absolute bottom-56 right-32 rotate-45 text-brand opacity-10"
+      />
     </div>
   );
 }
@@ -1899,7 +2003,9 @@ export function ReviewWall({
     <Section tone="raised">
       <Container>
         <Stack gap={8}>
-          <Heading level={2} align="center-mobile">{heading}</Heading>
+          <Heading level={2} align="center-mobile">
+            {heading}
+          </Heading>
           <div className="columns-1 gap-6 md:columns-2 lg:columns-3">
             {reviews.map((review) => (
               <div key={review.quote} className="mb-6 break-inside-avoid">
@@ -2079,7 +2185,10 @@ export function CtaBanner({
 function CtaBannerPaws() {
   return (
     <div aria-hidden="true" className="pointer-events-none absolute inset-0">
-      <PawPrint size={96} className="absolute -left-7 -top-7 rotate-12 text-amber-dark opacity-50" />
+      <PawPrint
+        size={96}
+        className="absolute -left-7 -top-7 rotate-12 text-amber-dark opacity-50"
+      />
       <PawPrint
         size={72}
         className="absolute -bottom-6 right-8 -rotate-12 text-amber-dark opacity-40"
@@ -2142,8 +2251,13 @@ export function AuthoredBlocks({ blocks }: { blocks: ContentBlock[] }) {
               <div key={index}>
                 {block.heading && <Heading level={2}>{block.heading}</Heading>}
                 {block.items.map((item) => (
-                  <details key={item.question} className="border-b border-line py-3">
-                    <summary className="cursor-pointer font-semibold">{item.question}</summary>
+                  <details
+                    key={item.question}
+                    className="border-b border-line py-3"
+                  >
+                    <summary className="cursor-pointer font-semibold">
+                      {item.question}
+                    </summary>
                     <Text>{item.answer}</Text>
                   </details>
                 ))}
