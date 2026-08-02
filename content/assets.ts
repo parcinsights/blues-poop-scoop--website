@@ -85,6 +85,50 @@ export const assets = {
   },
 
   /**
+   * The photograph beside the story on /about/ — both owners and Blue, on a path in the fall.
+   * Portrait, and cropped to a band exactly as `whyUs` is: the faces sit at about a third of the
+   * way down and the dog at three quarters, so a centre crop keeps all three. Downsized from the
+   * original 1950×2925.
+   */
+  aboutStory: {
+    src: "/about.jpg",
+    alt: "Both owners in branded sweatshirts on a leafy path, with their small white dog",
+    width: 1200,
+    height: 1800,
+  },
+
+  /**
+   * ── THE CREW ───────────────────────────────────────────────────────────────
+   * One portrait per member of the team band on /about/. All three are cropped by `object-cover`
+   * with a TOP anchor in a fixed-height box — every one of them is a tall portrait with the face in
+   * the upper third, and a centre crop takes the head off. Downsized from the camera's 4000×6000.
+   *
+   * Which face belongs to which name was confirmed by the client on 2026-08-01, after the first
+   * pair of files turned out to be the wrong way round. If it ever needs correcting again the fix
+   * is the two `src` lines below and nothing else — no page, block or content record names a file.
+   */
+
+  teamGeorge: {
+    src: "/george.jpg",
+    alt: "George, in a Blue's Poop Scoop cap and branded shirt, outside in front of a hedge",
+    width: 1200,
+    height: 1800,
+  },
+  teamSophie: {
+    src: "/sophie.jpg",
+    alt: "Sophie, in a Blue's Poop Scoop t-shirt, outside in front of a hedge",
+    width: 1200,
+    height: 1800,
+  },
+  /** Blue himself, in the company bandana. The business is named after this dog. */
+  teamBlue: {
+    src: "/blue.webp",
+    alt: "Blue, a small white and grey dog in a blue bandana, lying on the grass",
+    width: 1200,
+    height: 1800,
+  },
+
+  /**
    * ── THE SERVICE CARDS ──────────────────────────────────────────────────────
    * One per service, for the 2×2 grid on /services/. All four are cropped square-ish by
    * `object-cover` in a fixed-height box, so what matters in each is that the subject sits near

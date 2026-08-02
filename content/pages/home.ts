@@ -43,8 +43,8 @@ export const home = {
      * Not a price and not a service list — both of those are a click away, and neither is the
      * reason someone hires this. The problem is the chore and the low-grade guilt around it, so
      * the copy names that, then answers it with the one operating policy that is actually theirs:
-     * they never enter while the dog is outside. See `valueProps` below — it is the same promise,
-     * and it is repeated here on purpose.
+     * they never enter while the dog is outside. See `about.values` in ./standing.ts — it is the
+     * same promise, and it is repeated here on purpose.
      */
     subheading:
       "Your yard should be somewhere you and your dog actually want to be. We keep it that way — on schedule, every week, and never while your pup is outside.",
@@ -57,24 +57,11 @@ export const home = {
     assurances: ["No contracts", "Cancel anytime", "We reply by text"],
   },
 
-  /** Verbatim from the client. Do not smooth these out — the specificity is the value. */
-  valueProps: [
-    {
-      title: "Honest & Dependable",
-      detail:
-        "We show up when we say we will. No excuses, no surprises. Just a clean yard, every time.",
-    },
-    {
-      title: "Pet Safety First",
-      detail:
-        "We never enter when your dog is outside. Your pet's safety always comes first — no exceptions.",
-    },
-    {
-      title: "Locally Owned",
-      detail:
-        "We live and work in the neighborhoods we serve. This is our community, and we treat every yard like it's our own.",
-    },
-  ],
+  /* `valueProps` USED TO LIVE HERE — the client's three "what we stand for" promises. They now
+     live on the record for the page that actually prints them, `about.values` in ./standing.ts,
+     because the homepage stopped rendering them when the /about/ band was built and a copy nobody
+     renders is a second version of the client's own words waiting to drift from the first. If the
+     homepage ever wants them back, it imports that record; it does not retype them. */
 
   /**
    * The "why us" band. Three of the four points are the client's existing commitments restated —

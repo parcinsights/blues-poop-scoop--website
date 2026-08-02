@@ -4,6 +4,7 @@ import {
   BellRing,
   CalendarHeart,
   Dog,
+  Heart,
   MapPin,
   MessageCircleHeart,
   PawPrint,
@@ -25,7 +26,15 @@ import type { AssetKey } from "@/content/assets";
 import { priceTiers, pricing } from "@/content/pricing";
 import { phoneCtaLabel, primaryCta } from "@/content/nav";
 import { site } from "@/content/site";
-import type { ContentBlock, FaqItem, Feature, PointIcon, WhyUsPoint } from "@/content/types";
+import type {
+  ContentBlock,
+  FaqItem,
+  Feature,
+  PointIcon,
+  Stat,
+  TeamMember,
+  WhyUsPoint,
+} from "@/content/types";
 import { cx } from "@/lib/cx";
 import { serviceAreaMapIsConfigured, serviceAreaMapUrl } from "@/lib/maps";
 import { routes } from "@/lib/routes";
@@ -438,6 +447,87 @@ export function WhyUs({
   );
 }
 
+// ── Story band ───────────────────────────────────────────────────────────────
+
+/**
+ * A run of prose beside a photograph. It carries the origin story on /about/.
+ *
+ * DELIBERATELY NOT `WhyUs`, which is the same two-column shape. That band is an ARGUMENT — four
+ * claims with a medallion each and a button out of it — and this one is somebody talking. Feed the
+ * story through `WhyUs` and it comes out as four selling points; the whole value of an about page
+ * is that it is the one place on the site not making a pitch.
+ *
+ * The picture sits on the RIGHT here and on the left in `WhyUs`, so the two never read as the same
+ * band with different words. On a phone the words come first and the photograph closes the story —
+ * the reverse of `WhyUs`, where the faces have to earn the claims that follow them.
+ *
+ * `note` is the aside at the end — the line that is charming rather than persuasive. It gets the
+ * callout treatment so it reads as a margin note rather than as a fourth paragraph.
+ */
+export function StoryBand({
+  eyebrow,
+  heading,
+  paragraphs,
+  note,
+  image,
+  tone = "raised",
+}: {
+  eyebrow?: string;
+  heading: string;
+  /** One string per paragraph. Prose, not bullets — see the note above. */
+  paragraphs: readonly string[];
+  note?: string;
+  image: AssetKey;
+  tone?: "canvas" | "raised" | "alt";
+}) {
+  return (
+    <Section tone={tone}>
+      <Container>
+        <div className="grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
+          <Stack gap={6}>
+            <Stack gap={4}>
+              {eyebrow && <Eyebrow>{eyebrow}</Eyebrow>}
+              <Heading level={2} align="center-mobile">
+                {heading}
+              </Heading>
+            </Stack>
+
+            <Stack gap={4}>
+              {paragraphs.map((paragraph) => (
+                <Text key={paragraph} tone="muted">
+                  {paragraph}
+                </Text>
+              ))}
+            </Stack>
+
+            {note && (
+              <Callout tone="info">
+                {/* The heart is decoration — the sentence beside it is the whole point, and
+                    reading a glyph out loud before it would only get in the way. */}
+                <div className="flex items-start gap-3">
+                  <Heart size={20} aria-hidden="true" className="mt-1 shrink-0 text-brand" />
+                  <Text size="small" weight="semibold">
+                    {note}
+                  </Text>
+                </div>
+              </Callout>
+            )}
+          </Stack>
+
+          {/* Cropped to a band and never shown whole, exactly as `WhyUs` is: a 2:3 frame at full
+              height is most of a phone screen before a word of the story appears. The default
+              centre anchor is where the faces and the dog are. */}
+          <Image
+            asset={image}
+            sizes="(min-width: 64rem) 50vw, 100vw"
+            className="h-96 w-full rounded-lg object-cover sm:h-120 lg:h-160"
+          />
+        </div>
+      </Container>
+    </Section>
+  );
+}
+
 // ── Trust bar ────────────────────────────────────────────────────────────────
 
 /**
@@ -821,8 +911,13 @@ export function FeatureGrid({
   /**
    * The band's surface. `raised` is plain white, and it flips the cards to cream — a white card on
    * a white band is an invisible card. See `Card`.
+   *
+   * `canvas` is the house off-white, the same surface every page's first band takes. Use it where
+   * the band should read as a continuation of the page rather than as an alternate stripe: on
+   * /about/ the promises sit between two white bands and the deeper `alt` cream made them the
+   * loudest thing on a page whose job is to be quiet. The cards stay white on it, as on `alt`.
    */
-  tone?: "alt" | "raised";
+  tone?: "alt" | "canvas" | "raised";
   /**
    * `center` puts the whole band on the midline, cards included. Use it where the band is a set of
    * equals with a medallion each; `start` is the plain left-hung treatment /about/ takes.
@@ -884,6 +979,130 @@ export function FeatureGrid({
             ))}
           </ul>
         </Stack>
+      </Container>
+    </Section>
+  );
+}
+
+// ── Team band ────────────────────────────────────────────────────────────────
+
+/**
+ * The crew, one card each: a face, a name, the job, and what they actually do.
+ *
+ * The dog gets a card. That is not a joke at the expense of the band — the business is named after
+ * him, the reviews mention him, and a visitor who scrolls past two owners and finds Blue listed as
+ * Fearless Leader has just learned more about who they would be letting into their yard than any
+ * paragraph could tell them.
+ *
+ * Centred, cards included: three people with a portrait each are a row of equals, and a left-hung
+ * name under a centred photograph looks like a caption that slipped. Same call `FeatureGrid` makes
+ * at `align="center"`.
+ *
+ * The photographs are anchored TOP rather than centre. Every portrait on file is a tall frame with
+ * the face in the upper third, and the centre of one of those is a torso. See the crew block in
+ * content/assets.ts.
+ */
+export function TeamBand({
+  eyebrow,
+  heading,
+  intro,
+  members,
+}: {
+  eyebrow?: string;
+  heading: string;
+  intro?: string;
+  members: readonly TeamMember[];
+}) {
+  return (
+    // White, so the cards can carry the cream — a cream card on the cream band is invisible.
+    <Section tone="raised">
+      <Container>
+        <Stack gap={8} align="center">
+          <Stack gap={4} align="center">
+            {eyebrow && <Eyebrow>{eyebrow}</Eyebrow>}
+            {/* Centred at every width, not the house `center-mobile`: the whole band sits on the
+                midline, and a title that snapped left at `md` would be the only thing that did. */}
+            <Heading level={2} align="center">
+              {heading}
+            </Heading>
+            {intro && (
+              <Text tone="muted" measure>
+                {intro}
+              </Text>
+            )}
+          </Stack>
+
+          {/* A real list — three parallel people. `w-full` because the Stack above centres its
+              children by shrinking them. */}
+          <ul className="grid w-full list-none grid-cols-1 gap-6 pl-0 sm:grid-cols-2 lg:grid-cols-3">
+            {members.map((member) => (
+              <li key={member.name}>
+                <Card tone="canvas">
+                  <Stack gap={5} align="center">
+                    <Image
+                      asset={member.image}
+                      sizes="(min-width: 64rem) 22rem, (min-width: 40rem) 45vw, 90vw"
+                      className="h-72 w-full rounded-md object-cover object-top"
+                    />
+                    <Stack gap={3} align="center">
+                      <Stack gap={2} align="center">
+                        <Heading level={3}>{member.name}</Heading>
+                        {/* A badge rather than an eyebrow: the role is a label ON the person, the
+                            way "Most popular" is a label on a price card. */}
+                        <Badge tone="brand">{member.role}</Badge>
+                      </Stack>
+                      <Text size="small" tone="muted">
+                        {member.bio}
+                      </Text>
+                    </Stack>
+                  </Stack>
+                </Card>
+              </li>
+            ))}
+          </ul>
+        </Stack>
+      </Container>
+    </Section>
+  );
+}
+
+// ── Stat band ────────────────────────────────────────────────────────────────
+
+/**
+ * Four figures on the navy, and it is the only band on the site that is nothing but numbers.
+ *
+ * It works because the numbers are short and one of them is a joke — 5, 100%, 0 and 1 read in a
+ * single glance, and "1 bestest boy" at the end is what stops the strip reading as a corporate
+ * stat block. Give it a figure that needs a sentence to explain it and the band stops working.
+ *
+ * A real `<dl>`: each label is the term and its figure is the value, so a screen reader says
+ * "Google rating, 5 stars" rather than reading four bare numerals. The column is REVERSED in CSS so
+ * the figure sits on top visually while the markup keeps term-before-value order.
+ *
+ * Amber on navy is 5.49:1 — the one place on the site amber is used as INK rather than as a fill,
+ * and it clears AA at that pairing. Nothing smaller than these figures may take it. See the palette
+ * note at the top of theme.css.
+ */
+export function StatBand({ stats }: { stats: readonly Stat[] }) {
+  return (
+    <Section tone="dark" spacing="sm">
+      <Container>
+        {/* Two columns on a phone rather than four in a row: at four, "Locally owned & operated"
+            wraps to three lines under a figure and the strip becomes a paragraph. */}
+        <dl className="grid grid-cols-2 gap-8 lg:grid-cols-4">
+          {stats.map((stat) => (
+            <div key={stat.label} className="flex flex-col-reverse items-center gap-1 text-center">
+              <Text as="dt" size="small" tone="inverse">
+                {stat.label}
+              </Text>
+              {/* `leading-none` because these are numerals with no descenders, and h1's line box
+                  would otherwise leave a gap under the figure wider than the one above the label. */}
+              <dd className="font-display text-h1 font-bold leading-none text-amber">
+                {stat.value}
+              </dd>
+            </div>
+          ))}
+        </dl>
       </Container>
     </Section>
   );

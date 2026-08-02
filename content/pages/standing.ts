@@ -1,26 +1,141 @@
+import { ratingSummary } from "../reviews";
 import { site } from "../site";
 import { todo } from "../todo";
-import type { ContentBlock, FaqItem, Feature, PointIcon, Seo } from "../types";
+import type {
+  ContentBlock,
+  FaqItem,
+  Feature,
+  PointIcon,
+  Seo,
+  Stat,
+  TeamMember,
+} from "../types";
 
 /**
  * The standing pages — /about/, /contact/, /pricing/, /commercial/, /get-started/.
  *
  * `/about/` is worth more attention than it looks. An about page is the first thing that goes
  * generic across a trade, and a generic one is worth nothing: "we're passionate about pets" is a
- * sentence on ten thousand sites. What belongs here is George — how he started, how long he has
- * been doing this, what he drives, where the waste goes, how many yards he covers. Facts a
- * franchise cannot copy.
+ * sentence on ten thousand sites. What belongs here are the specifics — who these two people are,
+ * what the dog is called, what they will and will not do in your yard. Facts a franchise cannot
+ * copy, told in the client's own voice.
  */
 
 export const about = {
   seo: {
     title: "About Blue's Poop Scoop",
-    description: `Locally owned pet waste removal serving Philadelphia and the Main Line. Meet ${site.owner}.`,
+    description: `Locally owned pet waste removal serving Philadelphia and the Main Line. Meet ${site.owner}, Sophie and Blue.`,
   } satisfies Seo,
-  heading: "About Blue's Poop Scoop",
+  heading: "Meet the team behind the scoop",
   intro:
-    "We live and work in the neighborhoods we serve. This is our community, and we treat every yard like it's our own.",
-  /** OUTSTANDING — the owner interview. See the note above. */
+    "We're a small, local team that genuinely loves what we do — keeping Philadelphia yards clean so families can get back out in them.",
+
+  /**
+   * The origin story. Two paragraphs and an aside, and every sentence in it is the client's own —
+   * the idea, the two names, the dog, the promise to show up on time. Nothing here is a claim the
+   * business would have to defend, which is exactly why it can be told plainly.
+   */
+  story: {
+    eyebrow: "Our story",
+    heading: "How it all started",
+    paragraphs: [
+      "Blue's Poop Scoop was born out of a simple idea: we scoop, so you don't have to. As dog owners ourselves, we know how fast a yard gets out of hand — and we wanted to give Philadelphia families one less thing to worry about.",
+      `We're ${site.owner} and Sophie, a two-person team right here in the Philadelphia area. What started with our own dog Blue quickly became a mission to help our neighbors enjoy their yards again. We take pride in showing up on time, doing a thorough job, and treating every yard like it's our own.`,
+    ],
+    note: "Named after our dog Blue, who supervises every operation from the couch.",
+  },
+
+  /**
+   * The three promises. The titles and details are VERBATIM from the client — down to the title
+   * case, which is theirs and not the house style — and they moved here from `home.valueProps`
+   * when this band was built. Do not smooth them out; the specificity is the value.
+   *
+   * The heading is `site.tagline` rather than a retyped copy of it: it is the line already on their
+   * own site, and two versions of a tagline is how a business ends up with two.
+   *
+   * The medallions are new. On the homepage these ran as three plain cards; here they are the
+   * page's only band of icons, and three bare cards between a photograph and three portraits read
+   * as the gap between them.
+   */
+  values: {
+    eyebrow: "What we stand for",
+    heading: site.tagline,
+    points: [
+      {
+        icon: "guarantee",
+        title: "Honest & Dependable",
+        detail:
+          "We show up when we say we will. No excuses, no surprises. Just a clean yard, every time.",
+      },
+      {
+        icon: "safety",
+        title: "Pet Safety First",
+        detail:
+          "We never enter when your dog is outside. Your pet's safety always comes first — no exceptions.",
+      },
+      {
+        icon: "local",
+        title: "Locally Owned",
+        detail:
+          "We live and work in the neighborhoods we serve. This is our community, and we treat every yard like it's our own.",
+      },
+    ] satisfies Feature[],
+  },
+
+  /**
+   * The crew. Two owners and the dog, in that order, because the dog is the punchline and a
+   * punchline goes last.
+   *
+   * The bios are the client's own and say what each person actually does — one runs the route, one
+   * runs everything around it. That division of labour is the fact worth printing: it tells a
+   * customer who texts them back and who turns up.
+   */
+  team: {
+    eyebrow: "The crew",
+    heading: "Two owners and one very good dog",
+    members: [
+      {
+        name: site.owner,
+        role: "Co-Owner & Lead Scooper",
+        bio: "George is the visionary and systems master. He built the systems that keep the business running smoothly, and he handles the day-to-day scooping. If there's a mess, he'll find it.",
+        image: "teamGeorge",
+      },
+      {
+        name: "Sophie",
+        role: "Co-Owner & Operations",
+        bio: "Sophie runs operations — customer messages, social media, scheduling, and making sure every client feels taken care of.",
+        image: "teamSophie",
+      },
+      {
+        name: "Blue",
+        role: "Fearless Leader & Mascot",
+        bio: "Blue is the reason we started this company. He keeps morale high and naps on schedule. True leadership.",
+        image: "teamBlue",
+      },
+    ] satisfies TeamMember[],
+  },
+
+  /**
+   * The strip under the crew. Four figures, and the last one is a joke — that is what stops it
+   * reading as a corporate stat block on a page about two people and a dog.
+   *
+   * The star count comes from `ratingSummary`, the same record the hero and the review cards use,
+   * so the page cannot advertise a rating the rest of the site disagrees with. "Locally owned" and
+   * "no contracts" are stated across the site already; both are the client's own terms.
+   */
+  stats: [
+    { value: `${ratingSummary.stars}★`, label: "Google rating" },
+    { value: "100%", label: "Locally owned & operated" },
+    { value: "0", label: "Contracts required" },
+    { value: "1", label: "Bestest boy" },
+  ] satisfies Stat[],
+
+  cta: {
+    heading: "Let's get your yard sorted",
+    detail: "Tell us where you are and how many dogs you have — we'll do the rest.",
+  },
+
+  /** OUTSTANDING — a longer authored piece, if the client ever wants one. See the note above. */
   body: [] as ContentBlock[],
 };
 

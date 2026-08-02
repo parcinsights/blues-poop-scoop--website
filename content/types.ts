@@ -217,6 +217,34 @@ export type Feature = {
   icon?: PointIcon;
 };
 
+/**
+ * One member of the crew on /about/, the dog included.
+ *
+ * The photograph is required rather than optional, and that is the point of the band: a named
+ * person with a face is the one thing on this site a franchise cannot copy. A crew card with no
+ * picture is a bio, and a bio belongs in a paragraph.
+ */
+export type TeamMember = {
+  name: string;
+  /** The job title as they would say it out loud, not as HR would write it. */
+  role: string;
+  /** Two or three sentences. What they actually do, in the client's own voice. */
+  bio: string;
+  image: AssetKey;
+};
+
+/**
+ * One figure in the stats strip. `value` is the thing read at a glance — two or three characters,
+ * never a sentence — and `label` is what it counts.
+ *
+ * Every one of them has to be a fact. A number is the most believable thing on a page and therefore
+ * the most expensive thing to make up.
+ */
+export type Stat = {
+  value: string;
+  label: string;
+};
+
 /** A real customer quote. Rendered as content — never as review structured data (see lib/schema.ts). */
 export type Review = {
   quote: string;
