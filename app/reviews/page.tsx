@@ -40,9 +40,12 @@ export default function ReviewsPage() {
       />
       <PageShell crumbs={crumbs} heading={reviewsPage.heading} intro={reviewsPage.intro} />
       <ReviewWall heading="In our customers' words" reviews={reviews} />
+      {/* `canvas`, matching the services CTAs: on the dark band the navy buttons disappear into
+          it, because --color-surface-dark and --color-brand are the same hex. See CtaBand. */}
       <CtaBand
         heading="Want a yard you can walk barefoot in?"
         detail={`Call ${site.phone.display} or get a free quote — most yards are priced in a minute.`}
+        tone="canvas"
       />
     </>
   );
