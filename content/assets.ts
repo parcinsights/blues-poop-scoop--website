@@ -68,6 +68,23 @@ export const assets = {
     height: 1600,
   },
   /**
+   * The photograph under the /commercial/ hero — both owners on the lawn of a brick building,
+   * with the rake and the scooper. It is the one picture on file taken on GROUNDS rather than in
+   * somebody's back yard, which is the whole reason it belongs to this page: a property manager
+   * scanning it sees a building like theirs, not a garden.
+   *
+   * It runs at the full container width with no crop, so unlike the other photographs here its
+   * shape is the shape it renders at. Downsized from the camera's 6000×4000 — the band never
+   * renders wider than ~1140 CSS pixels and the original was 4.2MB.
+   */
+  commercialHero: {
+    src: "/commercial.jpg",
+    alt: "Two Blue's Poop Scoop owners on a lawn outside a brick building, holding a scooper",
+    width: 2400,
+    height: 1600,
+  },
+
+  /**
    * ── THE SERVICE CARDS ──────────────────────────────────────────────────────
    * One per service, for the 2×2 grid on /services/. All four are cropped square-ish by
    * `object-cover` in a fixed-height box, so what matters in each is that the subject sits near

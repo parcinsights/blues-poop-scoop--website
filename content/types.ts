@@ -190,7 +190,14 @@ export type PointIcon =
   | "local"
   | "flexible"
   | "reachable"
-  | "insured";
+  | "insured"
+  // The commercial vocabulary: the equipment we install, the schedule we keep, and the message
+  // that lands after a visit. Kept in the same union as the residential keys rather than in one of
+  // its own — a medallion is a medallion, and two parallel icon registries is how the same idea
+  // ends up drawn two different ways on two pages.
+  | "stations"
+  | "schedule"
+  | "updates";
 
 /** One reason to hire this business — the "why us" band, and the guarantees on /pricing/. */
 export type WhyUsPoint = {

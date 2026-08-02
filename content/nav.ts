@@ -115,3 +115,18 @@ export const headerCta = {
   label: "Get in touch",
   href: routes.contact(),
 } as const;
+
+/**
+ * /commercial/'s ask, and the third CTA on the site for the same reason the second one exists: it
+ * is a different visitor.
+ *
+ * It must NOT be `primaryCta`. That points at /get-started/, which asks for a zip code and how many
+ * dogs you own — questions a property manager cannot answer about a 200-unit community, and being
+ * asked them is the moment they conclude this is a service for houses. The commercial sale starts
+ * with a walkthrough, so the button offers the walkthrough and points at /contact/, where a person
+ * is on the other end.
+ */
+export const consultationCta = {
+  label: "Get a free property consultation",
+  href: routes.contact(),
+} as const;

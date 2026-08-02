@@ -1,6 +1,6 @@
 import { site } from "../site";
 import { todo } from "../todo";
-import type { ContentBlock, Feature, Seo } from "../types";
+import type { ContentBlock, FaqItem, Feature, PointIcon, Seo } from "../types";
 
 /**
  * The standing pages — /about/, /contact/, /pricing/, /commercial/, /get-started/.
@@ -115,15 +115,228 @@ export const pricingPage = {
   body: [] as ContentBlock[],
 };
 
+/**
+ * /commercial/ — the second front door.
+ *
+ * Everything below is the client's own copy from their current site, restructured into the bands
+ * the page renders. That is why almost none of it is wrapped in `todo()`: it is not our invention,
+ * it is what this business already tells property managers in public. Where their wording claims
+ * something the rest of this repo has not verified, the note on that field says so.
+ *
+ * WHAT THIS PAGE SELLS, and it is not the residential service with a different heading: stations.
+ * We supply the dispensers and the cans, we install them, and we come back to restock and empty
+ * them. A homeowner is buying a scooped lawn; a property manager is buying equipment they do not
+ * have to own and a complaint that stops arriving. The two pages share a crew and nothing else.
+ *
+ * The page stays UNPUBLISHED — `body` is empty, so `isPublishable` is false, the page carries
+ * noindex and lib/routes.ts keeps it out of the sitemap. That gate is deliberately independent of
+ * how finished the page looks: it flips when the client confirms they are actually taking this
+ * work, which is a business fact and not a design one. See lib/content.test.ts.
+ */
 export const commercial = {
   seo: {
-    title: todo("Commercial Pet Waste Removal | Blue's Poop Scoop"),
-    description: todo(
-      "Scheduled pet waste removal for apartment communities, HOAs and dog parks around Philadelphia.",
-    ),
+    title: "Commercial Pet Waste Removal | HOAs & Apartments | Philadelphia",
+    description:
+      "We supply, install and service pet waste stations for apartment communities, HOAs and dog parks around Philadelphia. No contracts, all equipment included.",
   } satisfies Seo,
-  heading: todo("Pet waste removal for properties and communities"),
-  intro: todo(""),
+
+  /**
+   * The h1 leads with the equipment rather than with the cleaning, because that is the part a
+   * property manager does not already know they can buy. "Commercial pet waste removal" is what
+   * they search; "stations, installed and serviced for you" is what makes them read the next line.
+   */
+  heading: "Pet waste stations, installed & serviced for you",
+  intro:
+    "We supply bag dispensers and trash cans, install them on your property, and keep them stocked — so your grounds stay clean and residents stay happy.",
+  /** The three objections a manager has before clicking, answered in three fragments. */
+  assurances: ["No contracts", "All equipment included", "Custom plans"],
+
+  /**
+   * The strip under the hero. Three facts, and the rating is the client's real Google standing —
+   * the label is the same placeholder the homepage carries and needs the same fix: the actual
+   * review count, so it can be checked. See `ratingSummary` in content/reviews.ts.
+   */
+  trust: [
+    { icon: "local", label: "Philadelphia based" },
+    { icon: "flexible", label: "No contracts" },
+  ] satisfies { icon: PointIcon; label: string }[],
+
+  /** What the service actually consists of — the three parts of the job, in the order they happen. */
+  services: {
+    heading: "Everything your property needs",
+    intro:
+      "We handle the full pet waste process — equipment, installation, restocking, and removal. Nothing on this list is something you buy or store yourself.",
+    features: [
+      {
+        icon: "stations",
+        title: "Station installation",
+        detail:
+          "We provide and install pet waste bag dispensers and trash cans in the spots across your property where they will actually get used.",
+      },
+      {
+        icon: "schedule",
+        title: "Ongoing servicing",
+        detail:
+          "Regular bag restocking, liner changes, and trash removal on a schedule that works for your community.",
+      },
+      {
+        icon: "updates",
+        title: "Visit confirmations",
+        detail:
+          "You'll hear from us after every visit, so you always know the work got done without having to go and check.",
+      },
+    ] satisfies Feature[],
+  },
+
+  /**
+   * The eight property types, and the band's job is recognition rather than information: a manager
+   * scanning for "condos & HOAs" needs to find those exact words, because the alternative is
+   * deciding a page about "communities" is about somebody else.
+   *
+   * They are tags, not links — there are no pages behind them. See `AudienceBand`.
+   */
+  audiences: {
+    eyebrow: "Who we serve",
+    heading: "Built for properties with pet traffic",
+    intro: "Whether you manage 20 units or 200, we build a plan that fits your grounds.",
+    items: [
+      "Apartment communities",
+      "Condos & HOAs",
+      "Dog parks",
+      "Office parks",
+      "Veterinary clinics",
+      "Senior living",
+      "Hotels",
+      "Public parks",
+    ],
+  },
+
+  /**
+   * The same three-step band the homepage runs, with the commercial version of each step. The one
+   * that earns the band is the second: "nothing for you to buy" is the answer to the question a
+   * manager is actually holding, which is what this costs to start.
+   */
+  howItWorks: {
+    heading: "Three easy steps",
+    steps: [
+      {
+        title: "Free property walkthrough",
+        detail:
+          "We visit your property, assess foot traffic and pet areas, and recommend the right number and placement of stations.",
+      },
+      {
+        title: "We install everything",
+        detail:
+          "Bag dispensers, trash cans, and signage — all provided and installed by our team. Nothing for you to buy.",
+      },
+      {
+        title: "Sit back & relax",
+        detail:
+          "We return on schedule to restock bags, swap liners, and haul waste. You get a confirmation after every visit.",
+      },
+    ],
+  },
+
+  /**
+   * The review wall, and the heading is careful on purpose: every quote on it is from a RESIDENTIAL
+   * customer, because those are the reviews that exist. "What our customers say" is true. Anything
+   * implying a property manager left one would not be, and this is the easiest place on the page to
+   * do that by accident.
+   */
+  reviews: {
+    heading: "What our customers say about us",
+  },
+
+  /**
+   * The six promises, directly before the closing CTA. Five are terms the client already publishes;
+   * the sixth is the one to watch.
+   *
+   * NOTE ON "insured": the client's own site says "licensed and insured". The word `licensed` is
+   * dropped here because nothing in this repo records what licence that refers to, and a licence
+   * claim on a commercial page is exactly the kind of thing a property manager's insurer asks to
+   * see. `insured` alone is what /pricing/ already commits to. Put it back the moment George
+   * supplies the licence.
+   */
+  promise: {
+    eyebrow: "Our promise",
+    heading: "Why property managers work with us",
+    points: [
+      {
+        icon: "stations",
+        title: "All equipment included",
+        detail: "Stations, bags, trash cans, and signage — all provided and installed by us.",
+      },
+      {
+        icon: "schedule",
+        title: "Flexible scheduling",
+        detail: "Weekly, bi-weekly, or a custom plan that fits your property's needs.",
+      },
+      {
+        icon: "updates",
+        title: "Visit confirmations",
+        detail: "You hear from us after every single service visit.",
+      },
+      {
+        icon: "flexible",
+        title: "No contracts",
+        detail: "Month-to-month service. Adjust or cancel anytime, no penalties.",
+      },
+      {
+        icon: "insured",
+        title: "Fully insured",
+        detail: "Insured for your peace of mind, and happy to send the certificate.",
+      },
+      {
+        icon: "local",
+        title: "Locally owned",
+        detail: "Philadelphia neighbors serving our own community — not a franchise territory.",
+      },
+    ] satisfies Feature[],
+  },
+
+  /** The close. The ask is the walkthrough, because that is the only thing being sold at this point. */
+  cta: {
+    heading: "Want to know what your property needs?",
+    detail:
+      "We'll walk the grounds, tell you how many stations it takes and where they go, and price it from there. No charge, and no obligation to book anything.",
+  },
+
+  /**
+   * Five questions, and the first one is the whole objection: a manager reading this is assuming
+   * there is a capital purchase hiding somewhere. There is not, and the answer says so first.
+   */
+  faq: {
+    heading: "Common questions about commercial service",
+    items: [
+      {
+        question: "Do we need to buy the bag dispensers and trash cans?",
+        answer:
+          "No. We provide, install, and maintain all equipment as part of your service plan. If anything breaks, we replace it.",
+      },
+      {
+        question: "How often do you service the stations?",
+        answer:
+          "We customize the schedule based on your property's needs. Most communities choose weekly or bi-weekly service, which includes bag restocking, liner changes, and waste removal.",
+      },
+      {
+        question: "Is there a contract or commitment?",
+        answer:
+          "No long-term contracts. We believe in earning your business every visit, so you can adjust or cancel at any time.",
+      },
+      {
+        question: "How many stations does my property need?",
+        answer:
+          "That depends on the size of your property and where residents actually walk their dogs. During our free walkthrough we'll recommend the right number and placement.",
+      },
+      {
+        question: "What areas do you serve?",
+        answer:
+          "We serve commercial properties throughout the greater Philadelphia area. Call us to confirm availability for your property.",
+      },
+    ] satisfies FaqItem[],
+  },
+
+  /** The publish gate, and nothing else renders from it. See the note at the top of this record. */
   body: [] as ContentBlock[],
 };
 

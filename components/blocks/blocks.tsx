@@ -1,11 +1,14 @@
 import {
   ArrowRight,
   BadgeCheck,
+  BellRing,
+  CalendarHeart,
   Dog,
   MapPin,
   MessageCircleHeart,
   PawPrint,
   ShieldCheck,
+  Signpost,
 } from "lucide-react";
 
 import { ServiceTabs, type ServiceTab } from "@/components/blocks/ServiceTabs";
@@ -17,7 +20,7 @@ import { Cluster, Container, Grid, Section, Split, Stack } from "@/components/ui
 import { Link } from "@/components/ui/Link";
 import { Rating } from "@/components/ui/Rating";
 import { Badge, Card, Callout, Chip } from "@/components/ui/surfaces";
-import { Heading, InlineList, List, Quote, Text } from "@/components/ui/typography";
+import { Eyebrow, Heading, InlineList, List, Quote, Text } from "@/components/ui/typography";
 import type { AssetKey } from "@/content/assets";
 import { priceTiers, pricing } from "@/content/pricing";
 import { phoneCtaLabel, primaryCta } from "@/content/nav";
@@ -36,12 +39,32 @@ import type { Crumb } from "@/lib/schema";
 // ── Hero ─────────────────────────────────────────────────────────────────────
 
 /**
- * Pass `image` and the hero becomes the split treatment: words on the page gutter, photograph
- * bleeding off the right edge of the screen. Without it, the plain centred-column hero every
- * other page uses.
+ * THE FRONT-DOOR HERO, in two arrangements. Both carry the same words in the same order — rating,
+ * h1, standfirst, two buttons, reassurance strip — and differ only in where the photograph goes.
+ * That is why they are one component and not two: `ServiceHero` is a separate file-section because
+ * its CONTENT differs (chips, a price button); these two do not.
  *
- * Pass `crumbs` and the trail sits above the h1, which is what lets an inner page use this hero
- * instead of `PageShell` — the homepage passes none, because a one-item trail is noise.
+ *   `split`    words on the page gutter, photograph bleeding off the right edge of the screen.
+ *              The homepage. It is the widest, loudest treatment on the site.
+ *   `stacked`  everything centred in one column, photograph underneath at the full container
+ *              width. /commercial/.
+ *
+ * WHY /commercial/ IS STACKED rather than split. Split puts the words in a half-width column, and
+ * the commercial hero's job is to be read by somebody who does not yet know this service exists —
+ * "pet waste stations, installed & serviced for you" is a sentence that has to land whole. Centred
+ * across the full measure it reads as an announcement; in a half column beside a photograph it
+ * reads as the top of an article. The photograph then arrives as the evidence rather than as the
+ * thing competing with the claim.
+ *
+ * The picture in `stacked` is NOT cropped — no fixed height, no `object-cover`. It renders at its
+ * own aspect at the container width, because the shot is two people standing on grounds and every
+ * landscape crop of it takes either their heads or the scooper. See `commercialHero` in
+ * content/assets.ts.
+ *
+ * Pass `crumbs` and the trail sits above everything, which is what lets an inner page use this hero
+ * instead of `PageShell` — the homepage passes none, because a one-item trail is noise. It stays
+ * HARD LEFT even when the hero is centred: a breadcrumb is where you are, not part of the title
+ * block, and centring it makes it read as a kicker. Same rule `PricingBand` follows.
  */
 export function Hero({
   heading,
@@ -50,6 +73,9 @@ export function Hero({
   crumbs,
   rating,
   assurances,
+  cta = primaryCta,
+  layout = "split",
+  tone = "canvas",
   showPhone = true,
 }: {
   heading: string;
@@ -61,15 +87,29 @@ export function Hero({
   rating?: { stars: number; label: string };
   /** The reassurance strip under the buttons — "No contracts", "Cancel anytime". */
   assurances?: readonly string[];
+  /**
+   * Override ONLY where the page's next step genuinely is not the residential quote form —
+   * /commercial/, where the visitor is a property manager and the form asks how many dogs they
+   * own. Everywhere else this stays `primaryCta`: one site, one primary action.
+   */
+  cta?: { label: string; href: string };
+  /** See the note above. `stacked` centres the words and puts the picture underneath. */
+  layout?: "split" | "stacked";
+  /**
+   * The band. `canvas` is the house off-white every other page opens on; `raised` is plain white,
+   * for a stacked hero whose photograph is the only thing carrying colour — on canvas the picture's
+   * rounded corners sit on a tone barely different from their own and the frame goes soft.
+   */
+  tone?: "canvas" | "raised";
   showPhone?: boolean;
 }) {
-  const body = (
-    <Stack gap={6}>
-      {/* Above the rating and the h1 both: the trail is where you ARE, and it is the first thing
-          on the page for the same reason it is the first thing in the structured data. */}
-      {crumbs && <Breadcrumbs crumbs={crumbs} />}
+  const stacked = layout === "stacked";
+
+  /** Everything except the trail and the picture. Identical in both arrangements. */
+  const words = (
+    <Stack gap={6} align={stacked ? "center" : undefined}>
       {rating && <Rating stars={rating.stars} label={rating.label} />}
-      {/* `display` is the oversized treatment, and this is the one h1 on the site that gets it. */}
+      {/* `display` is the oversized treatment, and a front door is the only thing that gets it. */}
       <Heading level={1} size={image ? "display" : "h1"}>
         {heading}
       </Heading>
@@ -80,10 +120,10 @@ export function Hero({
       )}
       {/* The strip sits tighter to the buttons than the Stack's own rhythm — it is a footnote on
           them, not the next thing down the page. */}
-      <Stack gap={4}>
-        <Cluster gap={4}>
-          <Button href={primaryCta.href} size="lg">
-            {primaryCta.label}
+      <Stack gap={4} align={stacked ? "center" : undefined}>
+        <Cluster gap={4} justify={stacked ? "center" : "start"}>
+          <Button href={cta.href} size="lg">
+            {cta.label}
           </Button>
           {showPhone && (
             <Button
@@ -102,14 +142,48 @@ export function Hero({
     </Stack>
   );
 
+  /* The trail above everything, as it is in the structured data. It is its own Stack child rather
+     than part of `words` so that centring the words does not drag it onto the midline. */
+  const body = (
+    <Stack gap={6}>
+      {crumbs && <Breadcrumbs crumbs={crumbs} />}
+      {words}
+    </Stack>
+  );
+
+  if (stacked) {
+    return (
+      // `hero`, not `hero-media`: the picture stops at the container here, so the band's bottom
+      // padding is the air under a photograph rather than a strip of cream beside one.
+      <Section tone={tone} spacing="hero">
+        <Container>
+          <Stack gap={10}>
+            {body}
+            {image && (
+              <Image
+                asset={image}
+                // The page's LCP element. Exactly one image per page gets this.
+                priority
+                // Capped at the container, which is 75rem minus its own gutters.
+                sizes="(min-width: 75rem) 71rem, 100vw"
+                // `h-auto` is what keeps the picture uncropped — see the note above. `block` or the
+                // img keeps its inline descender space and leaves a hairline of band under it.
+                className="block h-auto w-full rounded-lg"
+              />
+            )}
+          </Stack>
+        </Container>
+      </Section>
+    );
+  }
+
   return (
-    <Section tone="canvas" spacing={image ? "hero-media" : "hero"}>
+    <Section tone={tone} spacing={image ? "hero-media" : "hero"}>
       {image ? (
         <Split
           media={
             <Image
               asset={image}
-              // The page's LCP element. Exactly one image per page gets this.
               priority
               sizes="(min-width: 64rem) 50vw, 100vw"
               className="h-96 w-full object-cover sm:h-120 lg:h-full lg:rounded-l-lg"
@@ -129,9 +203,10 @@ export function Hero({
 
 /**
  * The top of a service page. Same bones as the homepage hero — words left, photograph right — with
- * one deliberate difference: the picture STOPS AT THE CONTAINER. `Hero` runs its image off the
- * right edge of the screen, which is the treatment the front door gets and only the front door; a
- * service page that did the same would make every one of the four look like a second homepage.
+ * one deliberate difference: the picture STOPS AT THE CONTAINER. `Hero layout="split"` runs its
+ * image off the right edge of the screen, which is the treatment the front door gets and only the
+ * front door; a service page that did the same would make every one of the four look like a second
+ * homepage.
  *
  * So this is a plain two-column grid inside a `Container`, not `Split`.
  *
@@ -259,6 +334,15 @@ const pointIcons: Record<PointIcon, typeof BadgeCheck> = {
   flexible: MessageCircleHeart,
   reachable: MessageCircleHeart,
   insured: ShieldCheck,
+  // A waste station IS a post with a dispenser on it, which is the whole reason this glyph is a
+  // signpost rather than a trash can: the trash can is one part of what we install, and drawing the
+  // part makes "Station Installation" read as "we bring you a bin".
+  stations: Signpost,
+  // The heart is not decoration. `schedule` sits next to `reachable` and `flexible` in the same
+  // grids, and a bare calendar beside two hearted glyphs reads as the one item on the page that
+  // came from a different set.
+  schedule: CalendarHeart,
+  updates: BellRing,
 };
 
 /**
@@ -349,6 +433,141 @@ export function WhyUs({
             </Cluster>
           </Stack>
         </div>
+      </Container>
+    </Section>
+  );
+}
+
+// ── Trust bar ────────────────────────────────────────────────────────────────
+
+/**
+ * The thin strip directly under a hero: the two or three facts a visitor wants confirmed before
+ * they will read anything else. On /commercial/ that is the star row, where we are, and the terms.
+ *
+ * Deliberately NOT cards, and not a `FeatureGrid`. A card is something you read; this is a caption
+ * on the hero above it, and three cards here would look like the page's first real section rather
+ * than the last line of its first one.
+ *
+ * `alt` — the deeper cream, and the yellowest surface in the palette that still carries ink at AA.
+ * It is the band that gives a white hero its bottom edge: two light bands in a row need a tone
+ * change between them or the page opens as one undifferentiated screen, and a rule there would be
+ * a line drawn under a hero rather than a strip sitting below it.
+ *
+ * The rating is the same `Rating` row the homepage hero and the review cards use, so the claim here
+ * and the evidence further down the page are visibly the same thing. Visible trust only: no
+ * `aggregateRating` markup ever comes out of it. See content/reviews.ts.
+ */
+export function TrustBar({
+  rating,
+  items,
+}: {
+  rating?: { stars: number; label: string };
+  /** Two or three at most. This is a strip, and a fourth item wraps it into a paragraph. */
+  items: readonly { icon: PointIcon; label: string }[];
+}) {
+  return (
+    <Section tone="alt" spacing="sm">
+      <Container>
+        {/* Stacked on a phone, one row from `sm`. The dividers are a left border that only exists
+            once the row does — a hairline above a stacked item reads as a table, not a separator.
+            `gap-0` in the row because the air between items is their own `px-8`, which is what puts
+            each rule exactly halfway between its neighbours. */}
+        <ul className="flex list-none flex-col items-center gap-5 pl-0 sm:flex-row sm:flex-wrap sm:justify-center sm:gap-0">
+          {rating && (
+            <li className="sm:px-8">
+              <Rating stars={rating.stars} label={rating.label} />
+            </li>
+          )}
+          {items.map((item, index) => {
+            const Icon = pointIcons[item.icon];
+            return (
+              <li
+                key={item.label}
+                className={cx(
+                  "flex items-center gap-2 sm:px-8",
+                  (rating !== undefined || index > 0) && "sm:border-l sm:border-line",
+                )}
+              >
+                {/* Decoration: the words beside it say the same thing, better. */}
+                <Icon size={20} aria-hidden="true" className="text-brand" />
+                <Text as="span" size="small" weight="semibold">
+                  {item.label}
+                </Text>
+              </li>
+            );
+          })}
+        </ul>
+      </Container>
+    </Section>
+  );
+}
+
+// ── Audience band ────────────────────────────────────────────────────────────
+
+/**
+ * Who the page is for, as a wrapped row of tags. On /commercial/ it is the eight kinds of property
+ * a manager might be arriving from, and the band exists for one reason: whichever one they are,
+ * they should find their own word for it printed on the page.
+ *
+ * Tags rather than cards, and that is the point. Eight cards would be the largest band on the page
+ * and would say these are eight different services; they are eight names for the same one. A row of
+ * pills reads as a list you scan and stop at.
+ *
+ * They are NOT links and must not become any — there are no pages behind them, and eight clickable
+ * tags promise eight routes that do not exist. Same rule as the zip chips; see `ServiceZips`.
+ *
+ * The fills cycle the four accent pairs the medallions use, so a tag's colour is a property of
+ * where it sits rather than of what it says. Each pair is a fill and the only ink allowed on it,
+ * checked at 4.5:1 in lib/theme.test.ts — never mix the halves.
+ */
+export function AudienceBand({
+  eyebrow,
+  heading,
+  intro,
+  audiences,
+}: {
+  /** The small uppercase kicker — "Who we serve". */
+  eyebrow?: string;
+  heading: string;
+  intro?: string;
+  audiences: readonly string[];
+}) {
+  return (
+    <Section tone="canvas">
+      <Container>
+        <Stack gap={8} align="center">
+          <Stack gap={4} align="center">
+            {eyebrow && <Eyebrow>{eyebrow}</Eyebrow>}
+            {/* Centred at every width, not the house `center-mobile`: the whole band sits on the
+                midline, and a title that snapped left at `md` would be the only thing that did.
+                Same exception `HowItWorks` and `PricingBand` take. */}
+            <Heading level={2} align="center">
+              {heading}
+            </Heading>
+            {intro && (
+              <Text tone="muted" measure>
+                {intro}
+              </Text>
+            )}
+          </Stack>
+
+          {/* A real list — this is a set of parallel items, and "list, eight items" up front is
+              the summary a sighted reader gets from the shape of the row. `w-full` because the
+              Stack above centres its children by shrinking them, and a shrunk row wraps early. */}
+          <ul className="flex w-full list-none flex-wrap justify-center gap-3 pl-0">
+            {audiences.map((audience, index) => (
+              <li
+                key={audience}
+                className={cx(
+                  "rounded-pill px-5 py-2 text-small font-semibold",
+                  medallion(index).fill,
+                )}
+              >
+                {audience}
+              </li>
+            ))}
+          </ul>
+        </Stack>
       </Container>
     </Section>
   );
@@ -584,12 +803,18 @@ export function ServiceDetails({
  * items" up front is the summary a sighted reader gets from the row itself.
  */
 export function FeatureGrid({
+  eyebrow,
   heading,
   intro,
   features,
   tone = "alt",
   align = "start",
 }: {
+  /**
+   * The small uppercase kicker over the title — "Our promise". It is a label FOR the heading, not
+   * a heading of its own, which is why it is not in the outline. See `Eyebrow`.
+   */
+  eyebrow?: string;
   heading: string;
   intro?: string;
   features: readonly Feature[];
@@ -611,6 +836,7 @@ export function FeatureGrid({
       <Container>
         <Stack gap={8} align={centred ? "center" : undefined}>
           <Stack gap={4} align={centred ? "center" : undefined}>
+            {eyebrow && <Eyebrow>{eyebrow}</Eyebrow>}
             {/* Centred at every width when the band is, not the house `center-mobile`: a title
                 that snapped left at `md` would be the only thing here off the midline. */}
             <Heading level={2} align={centred ? "center" : "center-mobile"}>
@@ -1251,11 +1477,21 @@ export function FaqBand({
   heading,
   items,
   cta,
+  ctaHref = routes.faq(),
 }: {
   heading: string;
   items: readonly FaqItem[];
-  /** The label on the link through to /faq/. */
-  cta: string;
+  /**
+   * The label on the link out. OPTIONAL: /commercial/ asks its own five questions and has no
+   * deeper set to send anyone to — the site FAQ is a residential page, and pointing a property
+   * manager at "do I need to be home?" is worse than ending the band on the last answer.
+   */
+  cta?: string;
+  /**
+   * Where that link goes. Defaults to /faq/, which is right for the homepage and wrong for any
+   * band whose questions are not a subset of the site's.
+   */
+  ctaHref?: string;
 }) {
   if (items.length === 0) return null;
   return (
@@ -1273,11 +1509,13 @@ export function FaqBand({
               {heading}
             </Heading>
             <FaqRows items={items} />
-            <Cluster gap={4} justify="center">
-              <Button href={routes.faq()} variant="secondary" size="md">
-                {cta}
-              </Button>
-            </Cluster>
+            {cta && (
+              <Cluster gap={4} justify="center">
+                <Button href={ctaHref} variant="secondary" size="md">
+                  {cta}
+                </Button>
+              </Cluster>
+            )}
           </Stack>
         </Container>
       </div>
@@ -1364,11 +1602,14 @@ export function CtaBand({
   heading,
   detail,
   tone = "dark",
+  cta = primaryCta,
 }: {
   heading: string;
   detail?: string;
   /** `canvas` is the light off-white close — same colour as a page's first band. */
   tone?: "dark" | "canvas";
+  /** Override only where the page's next step is not the residential quote form. See `Hero`. */
+  cta?: { label: string; href: string };
 }) {
   // On the cream band the words are the page's normal ink, and the supporting line demotes to
   // muted as it does everywhere else. `inverse` there would be cream on cream.
@@ -1387,8 +1628,8 @@ export function CtaBand({
             </Text>
           )}
           <Cluster gap={4} justify="center">
-            <Button href={primaryCta.href} size="lg">
-              {primaryCta.label}
+            <Button href={cta.href} size="lg">
+              {cta.label}
             </Button>
             <Button href={`tel:${site.phone.e164}`} variant="ghost" size="lg">
               Call {site.phone.display}
