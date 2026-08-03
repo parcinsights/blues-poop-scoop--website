@@ -39,8 +39,8 @@ export const metadata: Metadata = buildMetadata({ ...pricingPage.seo, path: rout
  *
  * It used to close on `PriceTable` plus a pricing FAQ. The table is gone because this page now
  * shows the same three tiers as cards, and printing them twice on one page is not a second look
- * at the prices, it is a reason to doubt which set is real. The table still runs on the location
- * pages, which have no cards.
+ * at the prices, it is a reason to doubt which set is real. The table still runs on the city×service
+ * money pages; the town pages moved to the cards when they were redrawn.
  *
  * The order is a buyer's own order: what it costs → why the money is safe → do you come to my
  * street → has anyone else done this → what happens when I click.
