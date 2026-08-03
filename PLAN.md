@@ -201,8 +201,16 @@ operable accordions, `prefers-reduced-motion` respected.
 Two forms, deliberately different, because the CRMs demand different things.
 
 **QuickLeadForm** — hero, footer, and inline CTA bands. Fields: name, email, phone, zip, number of
-dogs. `POST /api/lead` → **GHL webhook only**. Not enough information or intent to create a client
-record; GHL automation texts/emails the owner. Sweep&Go is not called.
+dogs. One component behind every placement (`LeadFormCard` → `QuickLeadForm`), so the service pages
+and `/locations/` cannot drift apart. `POST /api/lead` branches on the zip:
+
+- **in the service area** → GHL webhook only. Not enough information or intent to create a client
+  record, and Sweep&Go has no endpoint that would take it anyway — see §7a.
+- **outside it** → Sweep&Go `out_of_service_form` **and** GHL. The owner still owes that person a
+  reply, and a zip just outside the line is what decides where the line moves next.
+
+Either way GHL gets it; one sink succeeding is a success for the visitor, and a partial failure is
+loud in the log rather than on the screen.
 
 **OnboardingForm** — its own page at `/get-started/`, multi-step. Collects everything
 `PUT /api/v1/residential/onboarding` requires: first/last name, email, cell, home address, city,
@@ -214,6 +222,72 @@ zip routes to `POST /api/v2/client_on_boarding/out_of_service_form` and still no
 Both routes: Zod-validated server-side, honeypot field, rate limited by IP, credentials in env only
 (`GHL_WEBHOOK_URL`, `SWEEPANDGO_API_TOKEN`) and never in the client bundle. Failures are logged with
 the payload retained so no lead is silently dropped.
+
+### 7a. What Sweep&Go's API actually does — probed live 2026-08-03
+
+Against a real token, not read off the spec. Three of these contradict what the plan above assumed,
+so read them before building the onboarding step.
+
+**There is no create-an-in-service-lead endpoint.** `lead:in_service_area` appears in their tag list
+but it is a WEBHOOK they fire outward when a lead lands, not a route we can call. Probed and 404 or
+405: `/client_on_boarding/in_service_form`, `/client_on_boarding/service_form`,
+`/client_on_boarding/save_lead`, `/client_on_boarding/lead`, `POST /api/v1/leads`,
+`POST /api/v2/leads`, `POST /api/v1/leads/create`, `POST /api/v2/free_quotes`. The only writes that
+exist are the out-of-area form, the residential onboarding PUT, and create-client-with-package.
+
+So an in-area short-form lead has nowhere to go in Sweep&Go. It goes to GHL alone. Forcing one in
+via the onboarding PUT would put a live client on the dispatch board with an invented street address.
+
+**`POST /client_on_boarding/out_of_service_form` works.** Verified end to end: it returns
+`{"success":"success"}` and the lead appears in `GET /api/v1/leads/list` as `type: out_of_area`.
+`address` is required and the short form has no address field, so we send an explicit
+`"No address given - web quote form (zip NNNNN)"` rather than a blank or an invented street.
+
+Note `GET /api/v1/leads/out_of_service` returned `total: 0` while `leads/list` showed the same leads.
+That read endpoint filters on something other than `type`. Confirm with the client which list in
+their dashboard these actually surface in before telling him where to look.
+
+**`PUT /api/v1/residential/onboarding` requires 11 fields**, per its own 422 on an empty body:
+`zip_code` `number_of_dogs` `last_time_yard_was_thoroughly_cleaned` `clean_up_frequency`
+`first_name` `last_name` `email` `city` `home_address` `state` `initial_cleanup_required`.
+The spec also lists `marketing_allowed` as required; the server does not enforce it. Phone is NOT
+required, which is odd for this business — send it anyway.
+
+Two enum vocabularies must be mapped at the seam, not stored in our shape:
+`clean_up_frequency` takes `once_a_week | bi_weekly | once_a_month` (plus daily/every-N-week values
+we do not offer); `last_time_yard_was_thoroughly_cleaned` takes only nine buckets —
+`one_week, two_weeks, three_weeks, one_month, two_months, 3-4_months, 5-6_months, 7-9_months,
+10+_months` — while our `LAST_CLEANED` has thirteen values. Our 4/5/6/7/8/9-month options collapse
+into their three wide buckets. Either map lossily or trim our list to their nine.
+
+**The zip check cannot be trusted on the current token.** `POST
+/client_on_boarding/check_zip_code_exists` is real and answers correctly, but the account behind our
+test token is not George's: of our 56 serviced zips, **zero** return `exists`, while 19025
+(Glenside) does. Gating on the live call today would route every visitor to the out-of-area form.
+Gate on our own `servicedZips` until the client's real service area is loaded into his account, then
+switch.
+
+### 7b. DEFERRED — the two-step form, pending the client's decision
+
+Proposed and NOT built. The client has to decide whether he wants it, because it trades website
+conversion for CRM completeness and that is his call to make, not ours.
+
+The shape: every form on the site opens as **one field, the zip**. Submit it, check the service
+area, then branch — in-area reveals the full onboarding form, out-of-area reveals a short
+name/email/phone form that files an out-of-area lead. This mirrors Sweep&Go's own onboarding flow
+and keeps the hero card a single input until someone has shown intent.
+
+The cost, and the reason this is a conversation and not a ticket: the in-area branch is ~9 visible
+fields (the 11 required minus `state`, always PA, and `city`, derivable from zip), and completing it
+creates a LIVE CLIENT on the dispatch board with no agreed price and no human review. That is a lot
+of friction for a website form, and a real client record created by a stranger.
+
+Two questions to settle before building:
+1. `initial_cleanup_required` — ask it outright, or infer it from `last_time_yard_was_thoroughly_
+   cleaned` (past ~3 weeks implies yes)? Inferring saves a field but bills someone a first-visit
+   surcharge they never explicitly agreed to.
+2. Does a completed full form onboard immediately, or land in GHL carrying the full onboarding
+   payload so the owner confirms a price and triggers the onboard himself?
 
 ---
 
@@ -296,5 +370,13 @@ Console access, Google Business Profile access.
   stays, it competes with our own location pages for the same queries.
 - Sweep&Go documents no rate limits and no sandbox. Test-mode behaviour needs confirming before we
   point a live form at the client's production CRM.
+- **The two-step zip-gate form is with the client — see §7b.** It adds real friction to a website
+  form and creates live clients from strangers, so it is his call. Nothing is built.
+- **The Sweep&Go token in `.env.local` is a test token on somebody else's account** — its service
+  area is 19025, not ours. Needs replacing with the client's before the zip gate or onboarding can
+  be switched to the live check.
+- Two test leads sit in that account from this work — `TEST LEAD please ignore` and
+  `E2E Out Of Area TEST`, both zip 08540. Their API has no delete-lead endpoint; clear them from the
+  dashboard.
 - Commercial landing page needs real commercial facts. Their current page says "Coming Soon" — if
   they have never done a commercial job, the page can only offer the service, not evidence it.
