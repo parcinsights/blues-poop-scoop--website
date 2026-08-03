@@ -280,6 +280,149 @@ export const pricingPage = {
 };
 
 /**
+ * /residential/ — the homeowner's front door, and the twin of /commercial/ below.
+ *
+ * Everything here is the client's own copy from their current site, restructured into the bands the
+ * page renders. That is why so little of it is wrapped in `todo()`: it is not our invention, it is
+ * what this business already tells homeowners in public.
+ *
+ * WHAT THIS RECORD DOES NOT CONTAIN, deliberately: the three steps, the prices, the guarantee, the
+ * coverage sentence and the questions. Every one of those is already written for the homepage,
+ * /pricing/ or content/faq.ts, and the residential page renders those SAME records — see
+ * app/residential/page.tsx. A second copy of "how it works" that happens to live on the residential
+ * page is a second version of the client's words waiting to drift from the first.
+ *
+ * So what is left is what only this page says: the claim at the top, the six reasons under it, and
+ * the three CTAs that carry a homeowner between them.
+ */
+export const residential = {
+  seo: {
+    title: "Residential Dog Poop Removal | Philadelphia & the Main Line",
+    description:
+      "Weekly and bi-weekly yard scooping for Philadelphia homeowners. No contracts, a text before and after every visit, and we never enter while your dog is outside.",
+  } satisfies Seo,
+
+  /**
+   * The client's own h1, kept verbatim — the same call /commercial/ makes about its own copy.
+   *
+   * "Most Trusted" IS THE ONE LINE ON THIS PAGE THAT NOTHING BACKS. It is ordinary trade puffery and
+   * it is what they already say in public, so it stands; but it is also the opposite of how the rest
+   * of this site argues, which is by printing specifics a franchise cannot copy — the reviews below
+   * it, the safety policy, the refund. If George ever wants a defensible version, this is the field
+   * to change, and the honest replacement is a fact rather than a softer adjective.
+   */
+  heading: "Philadelphia's most trusted residential poop scoop service",
+  intro:
+    "We scoop so you don't have to. Reliable weekly or bi-weekly service for your yard.",
+
+  /**
+   * The strip under the hero. Three facts and NO rating — the hero above already carries the stars,
+   * and the same claim twice in touching bands reads as a site that only has the one thing to say.
+   * /commercial/ splits it the other way round for exactly that reason: no rating in its hero, the
+   * rating in its strip.
+   */
+  trust: [
+    { icon: "local", label: "Philadelphia & the Main Line" },
+    { icon: "safety", label: "Never while your dog's out" },
+    { icon: "updates", label: "Text before and after" },
+  ] satisfies { icon: PointIcon; label: string }[],
+
+  /**
+   * The six reasons, and they are the client's own six. Left-hung rather than centred, the call
+   * `commercial.promise` makes at the same count: three items with a medallion each are a row of
+   * equals you take in at a glance, six are a list you read down.
+   *
+   * Two of them restate promises the site makes elsewhere — the pet-safety policy and the
+   * no-contract terms — and that repetition is the point on a page somebody can land on cold from
+   * search without ever seeing the homepage.
+   */
+  whyUs: {
+    eyebrow: "Why Blue's Poop Scoop",
+    heading: "Why Philly homeowners choose us",
+    features: [
+      {
+        icon: "guarantee",
+        title: "Thorough & reliable",
+        detail: "We double-check every inch of your yard so nothing gets missed.",
+      },
+      {
+        icon: "schedule",
+        title: "Flexible scheduling",
+        detail: "Weekly or bi-weekly cleanups to fit your routine.",
+      },
+      {
+        icon: "updates",
+        title: "Text notifications",
+        detail: "We text you when we're on the way and when the job's done.",
+      },
+      {
+        icon: "safety",
+        title: "Pet-safe visits",
+        detail:
+          "We never enter when your dog is outside. Your pet's safety always comes first.",
+      },
+      {
+        icon: "disposal",
+        title: "Double-bagged disposal",
+        detail:
+          "All waste is collected and double-bagged for sanitation and odor control.",
+      },
+      {
+        icon: "flexible",
+        title: "No contracts",
+        detail: "Pause or cancel anytime. No hidden fees, no commitments.",
+      },
+    ] satisfies Feature[],
+  },
+
+  /**
+   * The guarantee band is `pricingPage.guarantee` — the same heading, the same intro, the same three
+   * promises. Only the kicker is this page's, because /pricing/ does not use one. See the page.
+   */
+  promise: {
+    eyebrow: "Our promise",
+  },
+
+  /** The wall. Worded for this page's reader rather than reusing the homepage's line. */
+  reviews: {
+    heading: "What Philly dog owners say about us",
+  },
+
+  /**
+   * The mid-page ribbon, between the prices and the guarantee. Same seam the homepage uses it at and
+   * the same job — catch somebody who has just read a number — but not one shared line: two pages
+   * running the identical ribbon is how a visitor who came via search reads the second one as the
+   * first one repeating itself.
+   */
+  ctaBanner: {
+    heading: "Ready to hand the scooping over?",
+    detail: "Your zip and how many dogs. That's the whole form.",
+  },
+
+  /**
+   * The close, under the coverage map — so it answers the map, exactly as the homepage's does: the
+   * band above it can still turn a visitor away, and the phone number beside the quote button is
+   * the only thing on the page that helps somebody whose street we do not reach yet.
+   */
+  cta: {
+    heading: "Let's get your yard on the route",
+    detail:
+      "Tell us your zip and how many dogs, and we'll come back with a price and a first visit date. No contract, cancel whenever you like.",
+  },
+
+  /**
+   * The questions are `residentialFaqs` from content/faq.ts, trimmed to the first five — that list
+   * is ordered the way a homeowner's doubt actually arrives, so the first five are the earliest
+   * ones. The band links out to /faq/ for the rest, which is also what stops this page and /faq/
+   * printing the same eight answers at each other.
+   */
+  faq: {
+    heading: "Questions homeowners ask",
+    cta: "See all questions",
+  },
+};
+
+/**
  * /commercial/ — the second front door.
  *
  * Everything below is the client's own copy from their current site, restructured into the bands

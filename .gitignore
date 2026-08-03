@@ -18,3 +18,4 @@ coverage/
 # The 48MB state boundary download that scripts/build-service-area.mjs works from. Its output
 # (content/service-area.ts) is checked in; the raw input is re-fetchable and does not belong here.
 .cache/
+.env*

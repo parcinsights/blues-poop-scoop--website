@@ -85,6 +85,33 @@ export const assets = {
   },
 
   /**
+   * The photograph in the /residential/ hero — both owners and Blue on a leafy path in the fall,
+   * the dog on the lead between them. The residential answer to `commercialHero`: that one is the
+   * only shot on file taken on GROUNDS, and this is the one where the business is a couple out
+   * walking their dog, which is what a homeowner is deciding to let into their yard.
+   *
+   * IT IS THE SAME FRAME AS `aboutStory`, differently graded and at the camera's full size. Two
+   * keys on one photograph is deliberate — /about/ and /residential/ are never on screen together —
+   * but it is the reason to swap this for its own shot the moment there is one.
+   *
+   * Cropped to a band by the hero's `contained` arrangement, which caps it at 30rem — a 2:3 portrait
+   * left to its own shape is most of a screen of picture before a word of the page arrives. The
+   * centre anchor keeps both faces, which sit about a third of the way down; it LOSES BLUE, who is
+   * at the bottom of the frame. That is the price of capping the height, and the fix if it ever
+   * matters enough is a crop anchor on `Hero`'s image rather than a taller band.
+   *
+   * NOT DOWNSIZED, unlike everything else here: it is the camera's 1950×2925 at 1.1MB, and nothing
+   * renders it wider than ~550 CSS pixels. Next serves a resized file either way, so this only
+   * costs repo weight — but it is the one asset in this registry still carrying it.
+   */
+  residentialHero: {
+    src: "/residential.jpg",
+    alt: "Both owners in branded sweatshirts on a leafy path, their small white dog on a lead",
+    width: 1950,
+    height: 2925,
+  },
+
+  /**
    * The photograph beside the story on /about/ — both owners and Blue, on a path in the fall.
    * Portrait, and cropped to a band exactly as `whyUs` is: the faces sit at about a third of the
    * way down and the dog at three quarters, so a centre crop keeps all three. Downsized from the

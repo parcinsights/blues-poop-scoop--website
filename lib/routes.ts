@@ -45,6 +45,7 @@ export const routes = {
   city: (slug: string) => `/locations/${slug}/`,
   cityService: (citySlug: string, serviceSlug: string) => `/locations/${citySlug}/${serviceSlug}/`,
   pricing: () => "/pricing/",
+  residential: () => "/residential/",
   commercial: () => "/commercial/",
   about: () => "/about/",
   contact: () => "/contact/",
@@ -111,6 +112,11 @@ export function allRoutes(): RouteEntry[] {
       changeFrequency: "yearly",
       implemented: isPublishable(opportunities.body),
     },
+    // The residential front door. Published from day one, unlike its commercial twin: this is the
+    // service the business actually performs, and every word on the page is the client's own. It
+    // sits below the homepage and /contact/ and level with /pricing/ — it is a landing page for
+    // "poop scooping in Philadelphia" searches, not a second homepage.
+    { path: routes.residential(), priority: 0.8, changeFrequency: "monthly", implemented: true },
     // Commercial stays unpublished until the client confirms they actually sell it — their
     // current site says "Coming Soon", and a page offering a service nobody performs is worse
     // than no page.

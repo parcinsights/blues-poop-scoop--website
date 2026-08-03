@@ -197,7 +197,11 @@ export type PointIcon =
   // ends up drawn two different ways on two pages.
   | "stations"
   | "schedule"
-  | "updates";
+  | "updates"
+  // What happens to the waste after it leaves the yard. The residential page is the only one that
+  // sells that as a point of its own — "double-bagged" is a specific promise, and none of the keys
+  // above draws it without saying something else instead.
+  | "disposal";
 
 /** One reason to hire this business — the "why us" band, and the guarantees on /pricing/. */
 export type WhyUsPoint = {

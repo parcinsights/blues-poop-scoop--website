@@ -36,6 +36,15 @@ export const headerNav: NavGroup[] = [
     ],
   },
   { label: "Pricing", href: routes.pricing() },
+  /**
+   * Residential and Commercial, side by side, because that is the one fork a visitor makes before
+   * anything else on this site is relevant to them: my yard, or the grounds I manage.
+   *
+   * This is NOT the old "Residential" menu the note above describes. That one listed the two
+   * frequencies and duplicated Services; this is a single link to a single page, and the frequencies
+   * are still a price on it rather than a choice in a nav bar.
+   */
+  { label: "Residential", href: routes.residential() },
   { label: "Commercial", href: routes.commercial() },
   { label: "Reviews", href: routes.reviews() },
   {
@@ -77,6 +86,8 @@ export const footerNav: { heading: string; links: NavLink[] }[] = [
       // two different intents — "give me a price" and "let me reach a person" — that now land on
       // one page, and a footer that only answers one of them loses the other's scan path.
       { label: "Get a free quote", href: routes.contact() },
+      // The same fork the header makes, kept together for the same reason.
+      { label: "Residential", href: routes.residential() },
       { label: "Commercial", href: routes.commercial() },
       { label: "Areas We Serve", href: routes.locations() },
     ],

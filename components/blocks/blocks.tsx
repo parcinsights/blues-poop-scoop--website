@@ -11,6 +11,7 @@ import {
   PawPrint,
   ShieldCheck,
   Signpost,
+  Trash2,
 } from "lucide-react";
 
 import { ServiceTabs, type ServiceTab } from "@/components/blocks/ServiceTabs";
@@ -69,10 +70,23 @@ import type { Crumb } from "@/lib/schema";
  * That is why they are one component and not two: `ServiceHero` is a separate file-section because
  * its CONTENT differs (chips, a price button); these two do not.
  *
- *   `split`    words on the page gutter, photograph bleeding off the right edge of the screen.
- *              The homepage. It is the widest, loudest treatment on the site.
- *   `stacked`  everything centred in one column, photograph underneath at the full container
- *              width. /commercial/.
+ *   `split`     words on the page gutter, photograph bleeding off the right edge of the screen.
+ *               The homepage. It is the widest, loudest treatment on the site.
+ *   `stacked`   everything centred in one column, photograph underneath at the full container
+ *               width. /commercial/.
+ *   `contained` words left, photograph right, both stopping at the container and the picture
+ *               rounded on all four corners. /residential/.
+ *
+ * WHY /residential/ IS CONTAINED. Split is the front door's treatment and this page is a front door,
+ * so it started there — but split's picture is a full half-VIEWPORT running off the edge with a
+ * 40rem floor under it (see `Split`), and against a 2:3 portrait that is a very tall band before the
+ * page has said anything. Contained caps it at 30rem, and the four rounded corners are what stop the
+ * shorter picture reading as a split hero that failed to bleed.
+ *
+ * It is deliberately the same shape as `ServiceHero` and NOT the same component: this one carries
+ * the hero's own words — rating, standfirst, assurance strip — and that one carries a service's
+ * chips and its price button. Same bones, different content, which is the line this file draws
+ * everywhere else too.
  *
  * WHY /commercial/ IS STACKED rather than split. Split puts the words in a half-width column, and
  * the commercial hero's job is to be read by somebody who does not yet know this service exists —
@@ -118,8 +132,11 @@ export function Hero({
    * own. Everywhere else this stays `primaryCta`: one site, one primary action.
    */
   cta?: { label: string; href: string };
-  /** See the note above. `stacked` centres the words and puts the picture underneath. */
-  layout?: "split" | "stacked";
+  /**
+   * See the note above. `stacked` centres the words and puts the picture underneath; `contained`
+   * keeps the split's two columns but stops the picture at the container and rounds it.
+   */
+  layout?: "split" | "stacked" | "contained";
   /**
    * The band. `canvas` is the house off-white every other page opens on; `raised` is plain white,
    * for a stacked hero whose photograph is the only thing carrying colour — on canvas the picture's
@@ -202,6 +219,39 @@ export function Hero({
               />
             )}
           </Stack>
+        </Container>
+      </Section>
+    );
+  }
+
+  if (layout === "contained") {
+    return (
+      // `hero`, not `hero-media`: the picture stops at the container on this arrangement too, so the
+      // band's padding is air under a photograph rather than cream beside one.
+      <Section tone={tone} spacing="hero">
+        <Container>
+          <div
+            className={cx(
+              "grid items-center gap-10",
+              image && "lg:grid-cols-2 lg:gap-16",
+            )}
+          >
+            {body}
+            {image && (
+              <Image
+                asset={image}
+                // The page's LCP element. Exactly one image per page gets this.
+                priority
+                // Half of a CONTAINER, not half of the viewport: the container tops out at 75rem
+                // and the columns are 4rem apart, so this never renders wider than ~34rem.
+                sizes="(min-width: 75rem) 34rem, (min-width: 64rem) 46vw, 100vw"
+                // A FIXED height at every step, unlike `split` — which hands the picture the row's
+                // height and puts a 40rem floor under it. That is the whole point of this
+                // arrangement: a portrait photograph cannot make the band tall.
+                className="h-80 w-full rounded-lg object-cover sm:h-96 lg:h-120"
+              />
+            )}
+          </div>
         </Container>
       </Section>
     );
@@ -389,6 +439,9 @@ const pointIcons: Record<PointIcon, typeof BadgeCheck> = {
   // came from a different set.
   schedule: CalendarHeart,
   updates: BellRing,
+  // The bin, and here it IS the whole point: `stations` avoids a trash can because that band sells
+  // the post rather than the bin, and this one sells what we carry off the property.
+  disposal: Trash2,
 };
 
 /**
