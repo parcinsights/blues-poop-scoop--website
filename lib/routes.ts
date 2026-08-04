@@ -55,6 +55,11 @@ export const routes = {
   blog: () => "/blog/",
   blogPost: (slug: string) => `/blog/${slug}/`,
   /**
+   * Where every form lands after a successful submit. It is in this registry so that no component
+   * writes the string, and deliberately NOT in `allRoutes()` — see the note there.
+   */
+  thankYou: () => "/thank-you/",
+  /**
    * NO `getStarted`. /get-started/ was a second quote page carrying a second quote form, and two
    * pages competing for one conversion is two pages nobody links to consistently. Its form and its
    * job both moved to /contact/ on 2026-08-02, and the old URL 301s there — see lib/redirects.mjs.
@@ -86,6 +91,12 @@ export type RouteEntry = {
  * Every page on the site — planned and built — derived from content. `app/sitemap.ts` reads the
  * implemented subset. A page that exists in the app but not here is a bug; routes.test.ts checks
  * both directions against the filesystem.
+ *
+ * ONE DELIBERATE EXCEPTION: `routes.thankYou()`. It is a real page and it is missing from this
+ * list on purpose, because this list is the sitemap. A thank-you URL that Google knows about is a
+ * thank-you URL people reach without submitting a form, which corrupts the only number the page
+ * exists to produce — and a sitemap entry for a `noindex` page is a contradiction besides. It has
+ * no inbound links either; the forms are the only way in.
  */
 export function allRoutes(): RouteEntry[] {
   const entries: RouteEntry[] = [

@@ -1,22 +1,17 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 import { Button } from "@/components/ui/Button";
 import { Checkbox, Field, Honeypot, Input, Select } from "@/components/ui/Field";
 import { Callout } from "@/components/ui/surfaces";
 import { Stack } from "@/components/ui/layout";
-import { Text } from "@/components/ui/typography";
-import {
-  CLEANUP_FREQUENCIES,
-  LAST_CLEANED,
-  contactRequestSchema,
-  type CleanupFrequency,
-  type LastCleaned,
-} from "@/lib/validation";
+import { routes } from "@/lib/routes";
+import { CLEANUP_FREQUENCIES, contactRequestSchema, type CleanupFrequency } from "@/lib/validation";
 
 /**
- * The form on /contact/. Six fields and a consent box, in the SAME card the short form uses on
+ * The form on /contact/. Five fields and a consent box, in the SAME card the short form uses on
  * /locations/ and the service pages — `pill` controls, centred, labels carried as placeholders,
  * inside `FormCard`. The only thing /contact/ drops is the logo mark; see `FormCard`.
  *
@@ -27,11 +22,10 @@ import {
  * WHAT THE PILL COSTS, AND WHAT IS DONE ABOUT IT. A placeholder disappears under the first
  * keystroke — see the note on `FieldVariant`. Three consequences, handled here rather than papered
  * over: every placeholder repeats its `<label>` word for word, so the hidden label a screen reader
- * announces is the same question a sighted reader read; the two selects open on the QUESTION as
- * their empty option rather than on a generic "Choose one", because a round control reading
- * "Choose one" twice in a column is two identical mystery boxes; and the number field carries no
- * default, since a pre-filled "1" with no visible label is a box containing a number and no clue
- * what it counts.
+ * announces is the same question a sighted reader read; the select opens on the QUESTION as its
+ * empty option rather than on a generic "Choose one", because a round control reading "Choose one"
+ * is a mystery box; and the number field carries no default, since a pre-filled "1" with no
+ * visible label is a box containing a number and no clue what it counts.
  *
  * The field ORDER is the client's and it is deliberate — see `contactRequestSchema` for why the
  * price questions come before the contact details.
@@ -51,15 +45,14 @@ const labels = {
   zip: "Zip code",
   dogs: "How many dogs?",
   frequency: "How often?",
-  lastCleaned: "Last thorough clean-up?",
   email: "Email address",
   phone: "Cell phone number",
 } as const;
 
 /**
- * The words for the stored values, in the two selects. Typed as a total `Record`, so adding a value
- * to `LAST_CLEANED` without writing a label for it fails the build rather than rendering a blank
- * line in a dropdown.
+ * The words for the stored values, in the select. Typed as a total `Record`, so adding a value to
+ * `CLEANUP_FREQUENCIES` without writing a label for it fails the build rather than rendering a
+ * blank line in a dropdown.
  */
 const frequencyLabels: Record<CleanupFrequency, string> = {
   weekly: "Once a week",
@@ -67,43 +60,22 @@ const frequencyLabels: Record<CleanupFrequency, string> = {
   monthly: "Once a month",
 };
 
-const lastCleanedLabels: Record<LastCleaned, string> = {
-  "1-week": "About a week ago",
-  "2-weeks": "Two weeks ago",
-  "3-weeks": "Three weeks ago",
-  "1-month": "About a month ago",
-  "2-months": "Two months ago",
-  "3-months": "Three months ago",
-  "4-months": "Four months ago",
-  "5-months": "Five months ago",
-  "6-months": "Six months ago",
-  "7-months": "Seven months ago",
-  "8-months": "Eight months ago",
-  "9-months": "Nine months ago",
-  "10-plus-months": "Ten months or more",
-};
-
 /**
- * Each select opens on its own QUESTION as an empty option — this is the select's placeholder, and
- * it is what makes the two round controls readable with their labels hidden. "" is not a valid
- * value and the schema rejects it, so an unanswered question stays unanswered instead of quietly
- * becoming whichever option happened to be first in the list.
+ * The select opens on its own QUESTION as an empty option — this is the select's placeholder, and
+ * it is what makes a round control readable with its label hidden. "" is not a valid value and the
+ * schema rejects it, so an unanswered question stays unanswered instead of quietly becoming
+ * whichever option happened to be first in the list.
  */
 const frequencyOptions = [
   { value: "", label: labels.frequency },
   ...CLEANUP_FREQUENCIES.map((value) => ({ value, label: frequencyLabels[value] })),
 ];
 
-// Mapped from the tuple rather than written out again, so the dropdown runs shortest-to-longest in
-// the same order the values are declared in — the order is data, not a coincidence of typing.
-const lastCleanedOptions = [
-  { value: "", label: labels.lastCleaned },
-  ...LAST_CLEANED.map((value) => ({ value, label: lastCleanedLabels[value] })),
-];
-
 export function ContactForm() {
+  const router = useRouter();
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [state, setState] = useState<"idle" | "sending" | "sent" | "error">("idle");
+  /** No `sent` — a success navigates to /thank-you/. See QuickLeadForm for the whole reason. */
+  const [state, setState] = useState<"idle" | "sending" | "error">("idle");
 
   async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -135,21 +107,14 @@ export function ContactForm() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(parsed.data),
       });
-      setState(response.ok ? "sent" : "error");
+      if (!response.ok) {
+        setState("error");
+        return;
+      }
+      router.push(routes.thankYou());
     } catch {
       setState("error");
     }
-  }
-
-  if (state === "sent") {
-    return (
-      <Callout tone="success">
-        <strong>Thanks — we&apos;ve got it.</strong>
-        <Text>
-          We&apos;ll be back to you shortly with a price for your yard and a first clean-up date.
-        </Text>
-      </Callout>
-    );
   }
 
   return (
@@ -160,10 +125,12 @@ export function ContactForm() {
       <Stack gap={8}>
         {/**
          * TWO FIELDS PER ROW from `sm` up, and the pairing is not arbitrary — each row is one
-         * question asked twice: where and how big (zip, dogs), how often and how bad (frequency,
-         * last clean-up), and the two ways to reach you (email, phone). Six lines stacked in a
-         * column made a form that had to be scrolled to be understood; three rows of two is the
-         * whole thing at a glance, which is the point of a card this wide.
+         * question asked twice: where and how big (zip, dogs), and the two ways to reach you
+         * (email, phone). Frequency lost its partner when the last-clean-up question went, so it
+         * spans the row instead of sitting beside a hole: a lone half-width pill reads as a field
+         * whose neighbour failed to render. Five lines stacked in a column made a form that had to
+         * be scrolled to be understood; this is the whole thing at a glance, which is the point of
+         * a card this wide.
          *
          * One column below `sm`. Two pills side by side on a phone are two half-width boxes whose
          * placeholders clip, which is the failure the pill variant is least able to survive.
@@ -202,37 +169,23 @@ export function ContactForm() {
             />
           </Field>
 
-          <Field
-            label={labels.frequency}
-            htmlFor="frequency"
-            required
-            error={errors.frequency}
-            hideLabel
-          >
-            <Select
-              id="frequency"
-              defaultValue=""
-              options={frequencyOptions}
-              variant="pill"
-              invalid={Boolean(errors.frequency)}
-            />
-          </Field>
-
-          <Field
-            label={labels.lastCleaned}
-            htmlFor="lastCleaned"
-            required
-            error={errors.lastCleaned}
-            hideLabel
-          >
-            <Select
-              id="lastCleaned"
-              defaultValue=""
-              options={lastCleanedOptions}
-              variant="pill"
-              invalid={Boolean(errors.lastCleaned)}
-            />
-          </Field>
+          <div className="sm:col-span-2">
+            <Field
+              label={labels.frequency}
+              htmlFor="frequency"
+              required
+              error={errors.frequency}
+              hideLabel
+            >
+              <Select
+                id="frequency"
+                defaultValue=""
+                options={frequencyOptions}
+                variant="pill"
+                invalid={Boolean(errors.frequency)}
+              />
+            </Field>
+          </div>
 
           <Field label={labels.email} htmlFor="email" required error={errors.email} hideLabel>
             <Input

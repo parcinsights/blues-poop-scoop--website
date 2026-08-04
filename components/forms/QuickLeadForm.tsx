@@ -1,12 +1,13 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 import { Button } from "@/components/ui/Button";
 import { Field, Honeypot, Input, Select, type FieldVariant } from "@/components/ui/Field";
 import { Callout } from "@/components/ui/surfaces";
 import { Stack } from "@/components/ui/layout";
-import { Text } from "@/components/ui/typography";
+import { routes } from "@/lib/routes";
 import { quickLeadSchema } from "@/lib/validation";
 
 /**
@@ -45,8 +46,14 @@ export function QuickLeadForm({
   /** See the note on `FieldVariant`. `pill` hides the labels and carries them as placeholders. */
   variant?: FieldVariant;
 }) {
+  const router = useRouter();
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [state, setState] = useState<"idle" | "sending" | "sent" | "error">("idle");
+  /**
+   * No `sent`. A success leaves this page for /thank-you/, so the state it would describe belongs
+   * to a component that is already unmounting — the form stays in `sending` until the navigation
+   * lands, which is also what keeps the button disabled through it.
+   */
+  const [state, setState] = useState<"idle" | "sending" | "error">("idle");
 
   const pill = variant === "pill";
   /** In `pill` the label lives in the placeholder, so every field has to carry one. */
@@ -76,19 +83,14 @@ export function QuickLeadForm({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(parsed.data),
       });
-      setState(response.ok ? "sent" : "error");
+      if (!response.ok) {
+        setState("error");
+        return;
+      }
+      router.push(routes.thankYou());
     } catch {
       setState("error");
     }
-  }
-
-  if (state === "sent") {
-    return (
-      <Callout tone="success">
-        <strong>Thanks — we&apos;ve got it.</strong>
-        <Text>We&apos;ll be in touch shortly with a price for your yard.</Text>
-      </Callout>
-    );
   }
 
   return (

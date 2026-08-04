@@ -5,12 +5,12 @@ import { contactRequestSchema, isServicedZip } from "@/lib/validation";
 
 /**
  * The contact form's sink. Same destination as /api/lead — GoHighLevel, where an automation texts
- * and emails George — and a separate route because it carries a different payload: a frequency, an
- * initial-cleanup answer and an SMS consent, and no name.
+ * and emails George — and a separate route because it carries a different payload: a frequency and
+ * an SMS consent, and no name.
  *
  * `source` is what tells the two apart once they are both sitting in the same CRM inbox, and it
- * matters: a contact-form lead has answered the two questions that set a price, so it can be quoted
- * from the notification alone, where a short-form lead needs a call back first.
+ * matters: a contact-form lead has said how often it wants us out and agreed to be texted, so the
+ * reply can open with a price rather than with a question.
  *
  * Sweep&Go is not called here either. This form now collects nearly everything their onboarding
  * endpoint wants — the gap is the street address — so this is the route phase 5 will extend rather

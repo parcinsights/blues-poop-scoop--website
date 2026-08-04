@@ -207,6 +207,58 @@ export const contact = {
  * homepage runs — a visitor who arrives here from search gets the landing page's argument without
  * having to go and find the landing page.
  */
+/**
+ * /thank-you/ — where every form on the site lands after a successful submit.
+ *
+ * A PAGE rather than an inline success message, and the reason is counting. A conversion here is
+ * now one page view of one URL, which is the only thing an analytics property and a CRM
+ * automation can both be pointed at without either being taught about four different forms in
+ * three different card shapes. The inline callout also had a second problem: it left someone
+ * sitting on a page whose entire job had just finished, with nothing to do next.
+ *
+ * It is `noindex` and it is absent from the sitemap — see lib/routes.ts. A thank-you page in the
+ * index is a page people arrive at without having submitted anything, which quietly poisons the
+ * one number it exists to produce.
+ */
+export const thankYou = {
+  seo: {
+    title: "Thanks — we've got your request",
+    description:
+      "Your request is in. We'll be back to you shortly with a price for your yard and a first visit date.",
+  } satisfies Seo,
+  heading: "Thanks — we've got it.",
+  intro:
+    "Your request is in and one of us has it. We'll be back to you shortly with a price for your yard and a date for the first visit.",
+
+  /**
+   * The same three steps /contact/ prints beside its form, said in the past tense of someone who
+   * has now pressed the button. They are repeated on purpose: the promise made next to the form
+   * is the promise that has to be kept on the page after it, and a thank-you that says only
+   * "thanks" makes the visitor wonder what they actually signed up for.
+   */
+  stepsHeading: "What happens next",
+  steps: [
+    {
+      title: "We check your zip",
+      detail: "If we don't reach your street yet, we'll tell you straight away — no waiting.",
+    },
+    {
+      title: "You get a price",
+      detail: "For the regular visits and for the first clean-up, both up front. Usually a text back within the hour.",
+    },
+    {
+      title: "You pick a start date",
+      detail: "No contract, no sign-up fee. Pause or cancel whenever you like.",
+    },
+  ],
+
+  /** For the visitor who does not want to wait for the text. */
+  aside: {
+    heading: "Need us sooner?",
+    detail: "Call or text and you'll get one of us — no phone tree, no sales script.",
+  },
+};
+
 export const pricingPage = {
   seo: {
     title: "Pricing | Blue's Poop Scoop",

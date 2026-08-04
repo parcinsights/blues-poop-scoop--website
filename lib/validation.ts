@@ -58,45 +58,22 @@ export const CLEANUP_FREQUENCIES = ["weekly", "biweekly", "monthly"] as const;
 export type CleanupFrequency = (typeof CLEANUP_FREQUENCIES)[number];
 
 /**
- * How long the yard has been left. This is the initial-cleanup question, and it is the reason the
- * first visit costs more than the ones after it: a yard nobody has touched since spring is an
- * afternoon, not twenty minutes.
- *
- * Weeks at the short end and months at the long, because that is how people actually hold the
- * answer — nobody says "seven weeks", they say "a couple of months". The list ends at `10-plus`
- * rather than climbing forever: past that point the answer is "a long time" and the price is a
- * conversation either way.
- *
- * The labels live with the form; these are the values that go to the CRM. See ContactForm.
+ * NO `LAST_CLEANED`. The contact form used to ask how long the yard had been left — the
+ * initial-cleanup question, and the reason a first visit costs more than the ones after it. It is
+ * gone from the form and therefore from the payload: thirteen options in a dropdown is the
+ * heaviest question on a form of five, and it is one George can settle in the reply text that is
+ * already being sent. It goes back in as a field on the onboarding flow, not on the quote form.
  */
-export const LAST_CLEANED = [
-  "1-week",
-  "2-weeks",
-  "3-weeks",
-  "1-month",
-  "2-months",
-  "3-months",
-  "4-months",
-  "5-months",
-  "6-months",
-  "7-months",
-  "8-months",
-  "9-months",
-  "10-plus-months",
-] as const;
-export type LastCleaned = (typeof LAST_CLEANED)[number];
-
 export const contactRequestSchema = z.object({
   zip: z
     .string()
     .trim()
     .regex(/^\d{5}$/, "Please enter a 5-digit zip code"),
   dogs: z.coerce.number().int().min(1, "At least one dog").max(20),
-  // Both selects open on an empty option rather than on a guess. "" fails the enum, which is the
+  // The select opens on an empty option rather than on a guess. "" fails the enum, which is the
   // whole point: a pre-selected "weekly" is an answer the visitor never gave, and it would go to
   // the CRM looking exactly like one they did.
   frequency: z.enum(CLEANUP_FREQUENCIES, { error: "Please choose how often you'd like us out" }),
-  lastCleaned: z.enum(LAST_CLEANED, { error: "Please choose roughly how long it's been" }),
   email: z.email("Please enter a valid email address"),
   phone: z
     .string()
