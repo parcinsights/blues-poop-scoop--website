@@ -174,7 +174,7 @@ export const home = {
     assurances: ["No hidden fees", "No contracts", "Pause anytime"],
     promise:
       "Every plan backed by our 30-day promise. Full refund, no questions asked — and you only pay for visits we actually complete.",
-    cta: "Get my free quote",
+    cta: "Get started now",
   },
 
   /**

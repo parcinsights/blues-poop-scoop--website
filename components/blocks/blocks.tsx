@@ -175,7 +175,7 @@ export function Hero({
               /* The visible words are not the whole story — a screen reader gets the number too.
                  It must START with the visible label: WCAG 2.5.3 (Label in Name) requires the
                  accessible name to CONTAIN the visible text, so that someone driving the page by
-                 voice can say "click call us now" and be understood. A bare
+                 voice can say "click call/text us now" and be understood. A bare
                  `Call (610) 410-0506` replaced the visible words instead of extending them, and
                  broke exactly that. */
               ariaLabel={`${phoneCtaLabel} — ${site.phone.display}`}
@@ -2260,8 +2260,15 @@ export function CtaBand({
             <Button href={cta.href} size="lg">
               {cta.label}
             </Button>
-            <Button href={`tel:${site.phone.e164}`} variant="ghost" size="lg">
-              Call {site.phone.display}
+            <Button
+              href={`tel:${site.phone.e164}`}
+              variant="ghost"
+              size="lg"
+              /* Same WCAG 2.5.3 rule as the hero's phone button above: the accessible name starts
+                 with the visible label and appends the number, rather than replacing it. */
+              ariaLabel={`${phoneCtaLabel} — ${site.phone.display}`}
+            >
+              {phoneCtaLabel}
             </Button>
           </Cluster>
         </Stack>

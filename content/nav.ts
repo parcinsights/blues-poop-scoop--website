@@ -114,16 +114,17 @@ export const footerNav: { heading: string; links: NavLink[] }[] = [
  * lib/routes.ts.
  */
 export const primaryCta = {
-  label: "Get my free quote",
+  label: "Get started now",
   href: routes.contact(),
 } as const;
 
 /**
- * The phone CTA's words where the number itself is not what sells the click — the hero, which
- * already carries the number in the header above it. The dark CTA band still spells the number
- * out, because by then the visitor has read the page and is dialling rather than deciding.
+ * The phone CTA's words. The number itself is not what sells the click — the header already
+ * carries it — so the button sells the two ways to reach us instead, text being the one most
+ * people actually use. Every phone button on the site says this; the number rides along in the
+ * accessible name.
  */
-export const phoneCtaLabel = "Call us now";
+export const phoneCtaLabel = "Call/text us now";
 
 /**
  * The header's own button. Same destination as `primaryCta` now that there is only one, and a

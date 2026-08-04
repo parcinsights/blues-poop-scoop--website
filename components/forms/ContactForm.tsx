@@ -286,7 +286,7 @@ export function ContactForm() {
         )}
 
         <Button type="submit" size="lg" block disabled={state === "sending"}>
-          {state === "sending" ? "Sending…" : "Get my free quote"}
+          {state === "sending" ? "Sending…" : "Get started now"}
         </Button>
       </Stack>
     </form>
