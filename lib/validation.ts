@@ -11,13 +11,37 @@ import { servicedZips } from "@/content/cities";
 
 export const FREQUENCIES = ["weekly", "biweekly", "not-sure"] as const;
 
+/**
+ * A US phone number, in whatever shape the field handed over.
+ *
+ * It NORMALISES rather than merely accepting. `PhoneInput` submits "(267) 640-6798", a paste might
+ * arrive as "+1 267.640.6798", and the CRM should never have to hold both — so the punctuation is
+ * stripped here and what leaves is ten digits. Two records for one person, differing only in
+ * brackets, is the failure this prevents.
+ *
+ * The rule is the NANP's, not "ten of anything": an area code and an exchange both start 2–9, so
+ * "0006406798" is not a number that can exist and is rejected rather than filed. The field caps
+ * the length already — this is the half that does not trust the field, since the API takes JSON
+ * from anywhere.
+ */
+const phoneSchema = z
+  .string()
+  .transform((value) => {
+    const digits = value.replace(/\D/g, "");
+    // A leading 1 on an eleven-digit number is the country code, not an area code — the same rule
+    // `PhoneInput` applies to a paste. Both ends do it, because the API takes JSON from callers
+    // that never went near the field.
+    return digits.length === 11 && digits.startsWith("1") ? digits.slice(1) : digits;
+  })
+  .refine(
+    (digits) => /^[2-9]\d{2}[2-9]\d{6}$/.test(digits),
+    "Please enter a valid 10-digit phone number",
+  );
+
 export const quickLeadSchema = z.object({
   name: z.string().trim().min(2, "Please enter your name"),
   email: z.email("Please enter a valid email address"),
-  phone: z
-    .string()
-    .trim()
-    .regex(/^[\d\s()+.-]{10,}$/, "Please enter a valid phone number"),
+  phone: phoneSchema,
   zip: z
     .string()
     .trim()
@@ -75,10 +99,7 @@ export const contactRequestSchema = z.object({
   // the CRM looking exactly like one they did.
   frequency: z.enum(CLEANUP_FREQUENCIES, { error: "Please choose how often you'd like us out" }),
   email: z.email("Please enter a valid email address"),
-  phone: z
-    .string()
-    .trim()
-    .regex(/^[\d\s()+.-]{10,}$/, "Please enter a valid phone number"),
+  phone: phoneSchema,
   /**
    * Whether they agreed to be texted. OPTIONAL, deliberately: consent that is required in order to
    * submit is not consent, and a form that withholds a quote until you accept marketing texts is

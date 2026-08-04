@@ -1,10 +1,18 @@
+"use client";
+
 import { ChevronDown } from "lucide-react";
+import { useState } from "react";
 import type { ReactNode, SelectHTMLAttributes, InputHTMLAttributes } from "react";
 
 import { cx } from "@/lib/cx";
 
 /**
  * Form primitives.
+ *
+ * `"use client"` because `PhoneInput` holds state. Both forms that import this file are already
+ * client components, so nothing changes about what ships — the directive is here so that a future
+ * server component importing `Field` fails loudly instead of failing at build time with a message
+ * about hooks.
  *
  * Every field has a real `<label>` bound by `htmlFor`, not a placeholder pretending to be one —
  * a placeholder disappears the moment someone types, which is exactly when they need to know what
@@ -139,6 +147,72 @@ export function Input({ id, invalid, variant = "boxed", ...rest }: InputProps) {
     <input
       id={id}
       name={rest.name ?? id}
+      aria-invalid={invalid || undefined}
+      aria-describedby={invalid ? `${id}-error` : undefined}
+      className={cx(control, inputPadding, variants[variant], invalid && "border-danger-ink")}
+      {...rest}
+    />
+  );
+}
+
+/**
+ * The ten digits of a US number, and nothing else. Everything a person might type or paste around
+ * them — spaces, dashes, brackets, dots, a leading +1 — is thrown away here rather than being
+ * carried around and stripped later.
+ *
+ * The `1` case is a paste, not a typo: "+1 (267) 640-6798" off a contact card is eleven digits,
+ * and the leading one is a country code rather than the start of an area code. Dropping it only
+ * when it makes eleven means a genuine ten-digit number starting with 1 — which the NANP does not
+ * issue anyway — is never quietly mangled.
+ */
+function phoneDigits(input: string): string {
+  const digits = input.replace(/\D/g, "");
+  const national = digits.length === 11 && digits.startsWith("1") ? digits.slice(1) : digits;
+  return national.slice(0, PHONE_LENGTH);
+}
+
+const PHONE_LENGTH = 10;
+
+/** `(267) 640-6798` — but only once all ten are there. See `PhoneInput`. */
+function formatPhone(digits: string): string {
+  if (digits.length < PHONE_LENGTH) return digits;
+  return `(${digits.slice(0, 3)}) ${digits.slice(3, 6)}-${digits.slice(6)}`;
+}
+
+/**
+ * The phone field. Formats as you type, and the brackets and dash are never anything you have to
+ * delete.
+ *
+ * THE STATE IS TEN DIGITS. What the input displays is derived from them on every render, so the
+ * punctuation has no existence of its own: backspace at the end of "(267) 640-6798" removes the
+ * 8, not the bracket it happens to sit next to, and there is no way to end up with a stray "(" in
+ * the box. It also means the field cannot exceed ten digits — a `maxLength` would have had to
+ * count the punctuation and would have capped the number four characters early.
+ *
+ * FORMATTING ONLY AT TEN. A partial number stays bare: "26764" is what someone typed and it is
+ * what they see, where "(267) 64" is a shape promising a number that is not there yet. The
+ * punctuation appearing is the field telling them they are done.
+ *
+ * The value that reaches the schema is the formatted string, and the schema reduces it back to
+ * digits — see `phoneSchema` in lib/validation.ts. Neither end trusts the other's punctuation.
+ */
+export function PhoneInput({
+  id,
+  invalid,
+  variant = "boxed",
+  ...rest
+}: Omit<InputProps, "type" | "value" | "onChange" | "maxLength">) {
+  const [digits, setDigits] = useState("");
+
+  return (
+    <input
+      id={id}
+      name={rest.name ?? id}
+      type="tel"
+      inputMode="tel"
+      autoComplete="tel"
+      value={formatPhone(digits)}
+      onChange={(event) => setDigits(phoneDigits(event.target.value))}
       aria-invalid={invalid || undefined}
       aria-describedby={invalid ? `${id}-error` : undefined}
       className={cx(control, inputPadding, variants[variant], invalid && "border-danger-ink")}

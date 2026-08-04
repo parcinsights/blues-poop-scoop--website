@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 import { Button } from "@/components/ui/Button";
-import { Checkbox, Field, Honeypot, Input, Select } from "@/components/ui/Field";
+import { Checkbox, Field, Honeypot, Input, PhoneInput, Select } from "@/components/ui/Field";
 import { Callout } from "@/components/ui/surfaces";
 import { Stack } from "@/components/ui/layout";
 import { routes } from "@/lib/routes";
@@ -124,13 +124,14 @@ export function ContactForm() {
     <form onSubmit={onSubmit} noValidate className="relative">
       <Stack gap={8}>
         {/**
-         * TWO FIELDS PER ROW from `sm` up, and the pairing is not arbitrary — each row is one
-         * question asked twice: where and how big (zip, dogs), and the two ways to reach you
-         * (email, phone). Frequency lost its partner when the last-clean-up question went, so it
-         * spans the row instead of sitting beside a hole: a lone half-width pill reads as a field
-         * whose neighbour failed to render. Five lines stacked in a column made a form that had to
-         * be scrolled to be understood; this is the whole thing at a glance, which is the point of
-         * a card this wide.
+         * TWO FIELDS PER ROW from `sm` up. Five fields into a two-column grid leaves the last one
+         * — phone — alone on its row, and that is fine: every control is the same width, which is
+         * what makes a grid of pills read as one set of things rather than as a layout. Nothing
+         * spans. A field stretched to fill the odd space would be the only wide control on the
+         * card, and the eye reads that as importance rather than as arithmetic.
+         *
+         * Five lines stacked in a single column made a form that had to be scrolled to be
+         * understood; this is the whole thing at a glance, which is the point of a card this wide.
          *
          * One column below `sm`. Two pills side by side on a phone are two half-width boxes whose
          * placeholders clip, which is the failure the pill variant is least able to survive.
@@ -169,23 +170,21 @@ export function ContactForm() {
             />
           </Field>
 
-          <div className="sm:col-span-2">
-            <Field
-              label={labels.frequency}
-              htmlFor="frequency"
-              required
-              error={errors.frequency}
-              hideLabel
-            >
-              <Select
-                id="frequency"
-                defaultValue=""
-                options={frequencyOptions}
-                variant="pill"
-                invalid={Boolean(errors.frequency)}
-              />
-            </Field>
-          </div>
+          <Field
+            label={labels.frequency}
+            htmlFor="frequency"
+            required
+            error={errors.frequency}
+            hideLabel
+          >
+            <Select
+              id="frequency"
+              defaultValue=""
+              options={frequencyOptions}
+              variant="pill"
+              invalid={Boolean(errors.frequency)}
+            />
+          </Field>
 
           <Field label={labels.email} htmlFor="email" required error={errors.email} hideLabel>
             <Input
@@ -199,10 +198,10 @@ export function ContactForm() {
           </Field>
 
           <Field label={labels.phone} htmlFor="phone" required error={errors.phone} hideLabel>
-            <Input
+            {/* Formats itself to (267) 640-6798 as the tenth digit lands, and refuses an eleventh
+                — see `PhoneInput`. */}
+            <PhoneInput
               id="phone"
-              type="tel"
-              autoComplete="tel"
               placeholder={labels.phone}
               variant="pill"
               invalid={Boolean(errors.phone)}

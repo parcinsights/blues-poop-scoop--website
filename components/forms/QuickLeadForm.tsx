@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 import { Button } from "@/components/ui/Button";
-import { Field, Honeypot, Input, Select, type FieldVariant } from "@/components/ui/Field";
+import { Field, Honeypot, Input, PhoneInput, Select, type FieldVariant } from "@/components/ui/Field";
 import { Callout } from "@/components/ui/surfaces";
 import { Stack } from "@/components/ui/layout";
 import { routes } from "@/lib/routes";
@@ -130,10 +130,10 @@ export function QuickLeadForm({
           </Field>
 
           <Field label={labels.phone} htmlFor="phone" required error={errors.phone} hideLabel={pill}>
-            <Input
+            {/* The same self-formatting field /contact/ uses. One phone control on the site, so
+                the number reaching the CRM has one shape wherever it was typed. */}
+            <PhoneInput
               id="phone"
-              type="tel"
-              autoComplete="tel"
               placeholder={placeholder(labels.phone)}
               variant={variant}
               invalid={Boolean(errors.phone)}
