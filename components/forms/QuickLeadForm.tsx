@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
 
+import { fieldLabels as labels, frequencyOptions } from "@/components/forms/fields";
 import { Button } from "@/components/ui/Button";
 import { Field, Honeypot, Input, PhoneInput, Select, type FieldVariant } from "@/components/ui/Field";
 import { Turnstile, type TurnstileHandle } from "@/components/ui/Turnstile";
@@ -12,38 +13,23 @@ import { routes } from "@/lib/routes";
 import { quickLeadSchema } from "@/lib/validation";
 
 /**
- * The short lead form — hero, footer, and inline CTA bands.
+ * The short lead form — hero, footer, the inline CTA bands, and the card on the service pages and
+ * /locations/.
  *
- * It collects only what someone will actually type before they are convinced: name, email, phone,
- * zip, dog count. It posts to GHL alone. It does NOT create a Sweep&Go client, because Sweep&Go's
- * onboarding endpoint needs a full address, a frequency and an initial-cleanup decision — asking
- * for all that up front is how a quote form loses most of its submissions. The full onboarding
- * lives on its own page for people who have already decided.
+ * It asks the six questions every form on the site asks: name, email, phone, zip, dog count,
+ * frequency. See `leadFields` for why that set is defined in one place and why no caller may trim
+ * it — a `compact` prop used to drop the frequency select on the card placements, which meant the
+ * most-seen form on the site sent the CRM a lead with a hole in it.
  *
- * This is the only client component on the site apart from nothing else — the rest is static.
+ * It posts to GHL alone. It does NOT create a Sweep&Go client, because Sweep&Go's onboarding
+ * endpoint needs a full street address and an initial-cleanup decision — asking for all that up
+ * front is how a quote form loses most of its submissions. The full onboarding lives on its own
+ * page for people who have already decided.
  */
-
-/**
- * Every label, once. They are the labels AND — in the `pill` variant — the placeholders, and the
- * two must match word for word: a hidden label that says something different from the placeholder
- * above it is worse than either alone, because a screen reader and a sighted reader are then being
- * given different forms.
- */
-const labels = {
-  name: "Your name",
-  email: "Email",
-  phone: "Phone",
-  zip: "Zip code",
-  dogs: "How many dogs?",
-  frequency: "How often?",
-} as const;
 
 export function QuickLeadForm({
-  compact = false,
   variant = "boxed",
 }: {
-  /** Drops the frequency select — for the form dropped inside another page. */
-  compact?: boolean;
   /** See the note on `FieldVariant`. `pill` hides the labels and carries them as placeholders. */
   variant?: FieldVariant;
 }) {
@@ -188,20 +174,24 @@ export function QuickLeadForm({
             />
           </Field>
 
-          {!compact && (
-            <Field label={labels.frequency} htmlFor="frequency" hideLabel={pill}>
-              <Select
-                id="frequency"
-                defaultValue="not-sure"
-                variant={variant}
-                options={[
-                  { value: "weekly", label: "Weekly" },
-                  { value: "biweekly", label: "Every other week" },
-                  { value: "not-sure", label: "Not sure yet" },
-                ]}
-              />
-            </Field>
-          )}
+          {/* Opens on its own question rather than on a guess — see `frequencyOptions`. "Not sure
+              yet" is on the list, so a required frequency costs a visitor nothing and the CRM
+              never receives a blank where an answer should be. */}
+          <Field
+            label={labels.frequency}
+            htmlFor="frequency"
+            required
+            error={errors.frequency}
+            hideLabel={pill}
+          >
+            <Select
+              id="frequency"
+              defaultValue=""
+              variant={variant}
+              options={frequencyOptions}
+              invalid={Boolean(errors.frequency)}
+            />
+          </Field>
 
           {/* Inside the field group: it is a field, just an invisible one, and hanging it in the
               outer stack would put eight units of air around a zero-height element. */}

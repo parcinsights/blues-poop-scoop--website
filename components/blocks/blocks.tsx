@@ -1006,8 +1006,8 @@ function Paragraphs({ items }: { items: readonly string[] }) {
  *
  * The form is the whole conversion path on this page now, which is why it sits BESIDE the copy
  * rather than under it: on a laptop it is visible the moment the band is, and someone convinced by
- * the first tab never has to go looking. It is the short form — five fields — and the compact
- * variant at that. See QuickLeadForm for what it deliberately does not ask.
+ * the first tab never has to go looking. It is the site's one form — the same six questions asked
+ * on /contact/, in the `pill` card. See QuickLeadForm.
  */
 export function ServiceDetails({
   labels,
@@ -1161,10 +1161,10 @@ export function FormCard({
 }
 
 /**
- * The SHORT quote form in that panel — the conversion path on the service pages and /locations/.
+ * The quote form in that panel — the conversion path on the service pages and /locations/.
  *
- * It exists so those two callers cannot drift apart on which form they carry: the shell is shared
- * with /contact/, the five compact fields are this component's own decision.
+ * It exists so those two callers cannot drift apart on which form they carry. The shell is shared
+ * with /contact/ and so are the questions: the same six, in the same words. See `leadFields`.
  */
 export function LeadFormCard({
   heading,
@@ -1175,7 +1175,7 @@ export function LeadFormCard({
 }) {
   return (
     <FormCard heading={heading} intro={intro}>
-      <QuickLeadForm compact variant="pill" />
+      <QuickLeadForm variant="pill" />
     </FormCard>
   );
 }

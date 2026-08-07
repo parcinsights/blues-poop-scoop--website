@@ -16,14 +16,11 @@ const validQuickLead = {
   phone: "(267) 640-6798",
   zip: "19118",
   dogs: "2",
+  frequency: "weekly",
 };
 
 const validContactRequest = {
-  zip: "19118",
-  dogs: "2",
-  frequency: "weekly",
-  email: "jane@example.com",
-  phone: "(267) 640-6798",
+  ...validQuickLead,
   smsConsent: true,
 };
 
@@ -72,11 +69,49 @@ describe("contact request", () => {
   it("no longer requires a last-clean-up answer", () => {
     expect(contactRequestSchema.safeParse(validContactRequest).success).toBe(true);
   });
+});
+
+/**
+ * THE POINT OF `leadFields`. Every form on the site asks the same six questions, so the two schemas
+ * must accept the same keys — `smsConsent` excepted, which is a permission and lives on /contact/
+ * alone. A form that quietly drops a question is the bug this whole shape exists to make
+ * impossible, and it is invisible until a lead arrives in the CRM with a hole in it.
+ */
+describe("one field set, every form", () => {
+  const questions = ["name", "email", "phone", "zip", "dogs", "frequency", "company"];
+
+  it("asks the same questions on both schemas", () => {
+    expect(Object.keys(quickLeadSchema.shape).sort()).toEqual([...questions].sort());
+    expect(Object.keys(contactRequestSchema.shape).sort()).toEqual(
+      [...questions, "smsConsent"].sort(),
+    );
+  });
+
+  it("requires every question on both", () => {
+    for (const missing of ["name", "email", "phone", "zip", "dogs", "frequency"]) {
+      const { [missing]: _dropped, ...rest } = validContactRequest as Record<string, unknown>;
+      expect(quickLeadSchema.safeParse(rest).success, `quick lead without ${missing}`).toBe(false);
+      expect(contactRequestSchema.safeParse(rest).success, `contact without ${missing}`).toBe(
+        false,
+      );
+    }
+  });
 
   /** "" is what an unanswered select submits, and it must not become a silent "weekly". */
-  it("refuses an unanswered frequency", () => {
+  it("refuses an unanswered frequency on either form", () => {
+    expect(quickLeadSchema.safeParse({ ...validQuickLead, frequency: "" }).success).toBe(false);
     expect(contactRequestSchema.safeParse({ ...validContactRequest, frequency: "" }).success).toBe(
       false,
     );
+  });
+
+  /** Both offer the whole vocabulary now — "not-sure" and "monthly" used to be one form each. */
+  it("accepts every frequency on either form", () => {
+    for (const frequency of ["weekly", "biweekly", "monthly", "not-sure"]) {
+      expect(quickLeadSchema.safeParse({ ...validQuickLead, frequency }).success).toBe(true);
+      expect(contactRequestSchema.safeParse({ ...validContactRequest, frequency }).success).toBe(
+        true,
+      );
+    }
   });
 });

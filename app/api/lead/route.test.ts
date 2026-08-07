@@ -20,6 +20,7 @@ const validLead = {
   phone: "2676406798",
   zip: "19001",
   dogs: 1,
+  frequency: "weekly",
   turnstileToken: "token",
 };
 

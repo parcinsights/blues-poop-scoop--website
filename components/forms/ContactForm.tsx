@@ -3,22 +3,26 @@
 import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
 
+import { fieldLabels as labels, frequencyOptions } from "@/components/forms/fields";
 import { Button } from "@/components/ui/Button";
 import { Checkbox, Field, Honeypot, Input, PhoneInput, Select } from "@/components/ui/Field";
 import { Turnstile, type TurnstileHandle } from "@/components/ui/Turnstile";
 import { Callout } from "@/components/ui/surfaces";
 import { Stack } from "@/components/ui/layout";
 import { routes } from "@/lib/routes";
-import { CLEANUP_FREQUENCIES, contactRequestSchema, type CleanupFrequency } from "@/lib/validation";
+import { contactRequestSchema } from "@/lib/validation";
 
 /**
- * The form on /contact/. Five fields and a consent box, in the SAME card the short form uses on
- * /locations/ and the service pages — `pill` controls, centred, labels carried as placeholders,
- * inside `FormCard`. The only thing /contact/ drops is the logo mark; see `FormCard`.
+ * The form on /contact/. The same six questions every other form on the site asks, plus a consent
+ * box, in the SAME card the short form uses on /locations/ and the service pages — `pill` controls,
+ * centred, labels carried as placeholders, inside `FormCard`. The only thing /contact/ drops is the
+ * logo mark; see `FormCard`.
  *
  * That decision is the whole design of this page. A site with one form shape has one form; a site
  * with a rounded centred card on four pages and a stack of grey boxes on the fifth has a form and
- * a form-looking thing, and the fifth is the one people don't trust.
+ * a form-looking thing, and the fifth is the one people don't trust. The same argument settles the
+ * QUESTIONS, which is why this form no longer asks a set of its own: they come from `leadFields`
+ * and their wording comes from `fieldLabels`.
  *
  * WHAT THE PILL COSTS, AND WHAT IS DONE ABOUT IT. A placeholder disappears under the first
  * keystroke — see the note on `FieldVariant`. Three consequences, handled here rather than papered
@@ -31,46 +35,8 @@ import { CLEANUP_FREQUENCIES, contactRequestSchema, type CleanupFrequency } from
  * The field ORDER is the client's and it is deliberate — see `contactRequestSchema` for why the
  * price questions come before the contact details.
  *
- * It posts to /api/contact, not /api/lead: different payload, different source tag in the CRM.
+ * It posts to /api/contact, not /api/lead: same payload, different source tag in the CRM.
  */
-
-/**
- * Every label, once. They are the labels AND the placeholders, and the two must match word for
- * word — a hidden label that says something different from the placeholder over it hands a screen
- * reader and a sighted reader two different forms.
- *
- * They are short for the same reason: at this width a placeholder that wraps is a placeholder that
- * gets clipped, so each is the question at its shortest honest length.
- */
-const labels = {
-  zip: "Zip code",
-  dogs: "How many dogs?",
-  frequency: "How often?",
-  email: "Email address",
-  phone: "Cell phone number",
-} as const;
-
-/**
- * The words for the stored values, in the select. Typed as a total `Record`, so adding a value to
- * `CLEANUP_FREQUENCIES` without writing a label for it fails the build rather than rendering a
- * blank line in a dropdown.
- */
-const frequencyLabels: Record<CleanupFrequency, string> = {
-  weekly: "Once a week",
-  biweekly: "Every other week",
-  monthly: "Once a month",
-};
-
-/**
- * The select opens on its own QUESTION as an empty option — this is the select's placeholder, and
- * it is what makes a round control readable with its label hidden. "" is not a valid value and the
- * schema rejects it, so an unanswered question stays unanswered instead of quietly becoming
- * whichever option happened to be first in the list.
- */
-const frequencyOptions = [
-  { value: "", label: labels.frequency },
-  ...CLEANUP_FREQUENCIES.map((value) => ({ value, label: frequencyLabels[value] })),
-];
 
 export function ContactForm() {
   const router = useRouter();
@@ -131,13 +97,12 @@ export function ContactForm() {
     <form onSubmit={onSubmit} noValidate className="relative">
       <Stack gap={8}>
         {/**
-         * TWO FIELDS PER ROW from `sm` up. Five fields into a two-column grid leaves the last one
-         * — phone — alone on its row, and that is fine: every control is the same width, which is
-         * what makes a grid of pills read as one set of things rather than as a layout. Nothing
-         * spans. A field stretched to fill the odd space would be the only wide control on the
-         * card, and the eye reads that as importance rather than as arithmetic.
+         * TWO FIELDS PER ROW from `sm` up. Six fields fill three even rows. Every control is the
+         * same width, which is what makes a grid of pills read as one set of things rather than as
+         * a layout. Nothing spans. A field stretched to fill an odd space would be the only wide
+         * control on the card, and the eye reads that as importance rather than as arithmetic.
          *
-         * Five lines stacked in a single column made a form that had to be scrolled to be
+         * Six lines stacked in a single column made a form that had to be scrolled to be
          * understood; this is the whole thing at a glance, which is the point of a card this wide.
          *
          * One column below `sm`. Two pills side by side on a phone are two half-width boxes whose
@@ -190,6 +155,19 @@ export function ContactForm() {
               options={frequencyOptions}
               variant="pill"
               invalid={Boolean(errors.frequency)}
+            />
+          </Field>
+
+          {/* The contact details, after the three that set the price — see the note on the schema.
+              The name is the first of them: it is the easiest question on the card, and it opens
+              the half of the form someone has already decided to finish. */}
+          <Field label={labels.name} htmlFor="name" required error={errors.name} hideLabel>
+            <Input
+              id="name"
+              autoComplete="name"
+              placeholder={labels.name}
+              variant="pill"
+              invalid={Boolean(errors.name)}
             />
           </Field>
 

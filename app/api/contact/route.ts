@@ -7,13 +7,13 @@ import { contactRequestSchema } from "@/lib/validation";
 
 /**
  * The contact form's sink. Same destination as /api/lead — GoHighLevel, where an automation texts
- * and emails George — and a separate route because it carries a different payload: a frequency and
- * an SMS consent, and no name.
+ * and emails George — and a separate route because it carries one extra answer, the SMS consent,
+ * and because its Turnstile `action` must differ from the short form's.
  *
- * The PAYLOAD is identical — same keys, same order, `name` null here because this form does not ask
- * for one. `source` is the only field that tells the two apart once they are both sitting in the
- * same CRM inbox, and it matters: a contact-form lead has said how often it wants us out and may
- * have agreed to be texted, so the reply can open with a price rather than with a question.
+ * The PAYLOAD is identical: same keys, same order, same values for the six questions both forms
+ * ask. `source` and `smsConsent` are the only fields that tell the two apart once they are sitting
+ * in the same CRM inbox, and `source` matters — a contact-form lead may have agreed to be texted,
+ * so the reply can open with a price rather than with a question.
  *
  * Sweep&Go is not called here either. This form now collects nearly everything their onboarding
  * endpoint wants — the gap is the street address — so this is the route phase 5 will extend rather

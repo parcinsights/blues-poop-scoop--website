@@ -18,6 +18,7 @@ const quick = quickLeadSchema.parse({
 });
 
 const contact = contactRequestSchema.parse({
+  name: "George",
   zip: "19001",
   dogs: "2",
   frequency: "monthly",
@@ -33,11 +34,11 @@ describe("toWebhookLead", () => {
     expect(fromQuick).toEqual(fromContact);
   });
 
-  it("drops the honeypot and keeps every question as a value, null when unasked", () => {
+  it("drops the honeypot and carries every question as a real value", () => {
     const payload = toWebhookLead("contact-form", contact);
     expect(payload).toMatchObject({
       source: "contact-form",
-      name: null, // the contact form does not ask
+      name: "George",
       phone: "2676406798", // normalised by the schema, not by the payload
       dogs: 2,
       frequency: "monthly",

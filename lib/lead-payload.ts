@@ -4,14 +4,15 @@ import { isServicedZip } from "@/lib/validation";
 /**
  * ONE payload shape, for every form on the site.
  *
- * The two forms ask different questions — the short one asks for a name and offers "not sure" as a
- * frequency, the contact one drops the name and adds an SMS consent — but the webhook receiving
- * them is a single GoHighLevel inbound trigger, and a trigger that gets two different key sets is
- * a trigger that has to be built twice and drifts the moment a third form appears.
+ * Every form now asks the same six questions — see `leadFields` — so every key below carries a
+ * real answer on every submission. The webhook receiving them is a single GoHighLevel inbound
+ * trigger, and a trigger that gets two different key sets is a trigger that has to be built twice
+ * and drifts the moment a third form appears.
  *
- * So every key below is ALWAYS present, and a question a given form never asked arrives as `null`
- * rather than as a missing key. `null` is an answer ("we did not ask") that a CRM mapping can see;
- * an absent key is a field that silently maps to nothing.
+ * `smsConsent` is the one thing the forms differ on, and it is a permission rather than a question:
+ * only /contact/ has room to state what is being agreed to, so a lead from anywhere else claims
+ * nothing. It is still ALWAYS present — `false` is an answer a CRM mapping can read, an absent key
+ * is a field that silently maps to nothing.
  *
  * Adding a form means calling this and nothing else.
  */
@@ -22,19 +23,15 @@ export type WebhookLead = {
   source: LeadSource;
   /** ISO 8601, server clock. */
   submittedAt: string;
-  /** Null on the contact form, which deliberately does not ask for a name. */
-  name: string | null;
+  name: string;
   email: string;
   /** Ten digits, punctuation already stripped by `phoneSchema`. */
   phone: string;
   zip: string;
   dogs: number;
-  /**
-   * The two forms offer different vocabularies — "not-sure" only on the short one, "monthly" only
-   * on the contact one — so this stays a string rather than a union. Null when unanswered.
-   */
-  frequency: string | null;
-  /** Only the contact form asks. False on the short form, which therefore claims no consent. */
+  /** One of `FREQUENCIES`. A string rather than a union so the CRM contract survives a new option. */
+  frequency: string;
+  /** Only /contact/ asks. False elsewhere, which therefore claims no consent. */
   smsConsent: boolean;
   /** Checked against our own `servicedZips`, the same list the site renders. */
   inServiceArea: boolean;
@@ -43,24 +40,22 @@ export type WebhookLead = {
 /**
  * Build the canonical payload from whichever form's validated data we have.
  *
- * Both schemas are discriminated structurally rather than by a tag: the short form has a `name`,
- * the contact form has an `smsConsent`. Optional chaining is avoided on purpose — every branch
- * writes every key, so a new field cannot be added to one form and forgotten in the other.
+ * The two schemas are discriminated structurally rather than by a tag: `smsConsent` is the only
+ * key one has and the other does not. Everything else is read straight off `lead`, because both
+ * schemas spread the same `leadFields` — which is what makes a field added there impossible to
+ * forget here.
  */
 export function toWebhookLead(source: LeadSource, lead: QuickLead | ContactRequest): WebhookLead {
-  const quick = "name" in lead ? lead : null;
-  const contact = "smsConsent" in lead ? lead : null;
-
   return {
     source,
     submittedAt: new Date().toISOString(),
-    name: quick ? quick.name : null,
+    name: lead.name,
     email: lead.email,
     phone: lead.phone,
     zip: lead.zip,
     dogs: lead.dogs,
-    frequency: (quick ? quick.frequency : contact?.frequency) ?? null,
-    smsConsent: contact ? contact.smsConsent : false,
+    frequency: lead.frequency,
+    smsConsent: "smsConsent" in lead ? lead.smsConsent : false,
     inServiceArea: isServicedZip(lead.zip),
   };
 }

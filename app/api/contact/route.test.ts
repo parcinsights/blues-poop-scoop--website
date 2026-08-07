@@ -5,13 +5,14 @@ import { POST } from "./route";
 /**
  * The contact route's half of the gate. The lead route's test covers the shared behaviour; what is
  * worth proving separately is that this route expects its OWN action, so a token minted on the
- * short form cannot be spent here, and that its payload is the same shape with `name` null.
+ * short form cannot be spent here, and that its payload is the same shape the other route sends.
  */
 
 const GHL = "https://webhook.test/ghl";
 const SITEVERIFY = "https://challenges.cloudflare.com/turnstile/v0/siteverify";
 
 const validRequest = {
+  name: "George",
   zip: "19001",
   dogs: 2,
   frequency: "weekly",
@@ -62,7 +63,7 @@ afterEach(() => {
 });
 
 describe("POST /api/contact", () => {
-  it("delivers a verified request in the same payload shape, with no name", async () => {
+  it("delivers a verified request in the same payload shape", async () => {
     const fetchSpy = stubNetwork("contact");
     const response = await post(validRequest);
 
@@ -70,7 +71,7 @@ describe("POST /api/contact", () => {
     const payload = JSON.parse(String((ghlCalls(fetchSpy)[0]![1] as RequestInit).body));
     expect(payload).toMatchObject({
       source: "contact-form",
-      name: null,
+      name: "George",
       frequency: "weekly",
       smsConsent: true,
       inServiceArea: true,

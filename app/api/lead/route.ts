@@ -91,11 +91,9 @@ export async function POST(request: Request) {
           // back and a lead you can actually act on when the route reaches that zip.
           comment: [
             `${parsed.data.dogs} dog${parsed.data.dogs === 1 ? "" : "s"}`,
-            parsed.data.frequency ? `wants ${parsed.data.frequency}` : null,
+            `wants ${parsed.data.frequency}`,
             "via website quick quote form",
-          ]
-            .filter(Boolean)
-            .join(" · "),
+          ].join(" · "),
           // The short form never asks for SMS consent, so it cannot claim any. The contact form is
           // where that checkbox lives.
           marketingAllowed: false,
