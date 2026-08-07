@@ -10,7 +10,7 @@ export function Card({
   as: _as,
 }: {
   children: ReactNode;
-  tone?: "default" | "featured" | "canvas";
+  tone?: "default" | "featured" | "canvas" | "sky";
   /**
    * `square` locks the card to a 1:1 box — but only from `lg`, and that qualifier is the whole
    * point. A square is a shape you can only afford when the card is WIDE: at the page width two
@@ -34,6 +34,25 @@ export function Card({
         // review card and the top of the page are the same colour. No border and no shadow — the
         // fill alone separates it, and a hairline on top of a colour change reads as doubled.
         tone === "canvas" && "bg-canvas",
+        /**
+         * THE LOUD ONE — a full-strength sky rim with NO FILL, glowing outward onto the band.
+         *
+         * It exists for one object: the quote form on /contact/, which the client asked on
+         * 2026-08-06 to make stand out. `canvas` could not do it there — the form is the page's
+         * whole reason to exist, and an off-white card on a white band is a card you have to look
+         * for.
+         *
+         * It started as a sky WASH inside that rim and lost the fill on 2026-08-07. Dropping it is
+         * the better version: a tinted panel makes the form feel like a region of the page, and an
+         * outline with light coming off it makes the same shape feel like an object sitting on top
+         * of it. The fill was also the only thing that constrained what could go inside — every
+         * control in the card is now on the plain band, so nothing has to be re-checked for
+         * contrast against a tint.
+         *
+         * Use it sparingly and never twice on one screen: it is loud because it is rare, and a
+         * second glowing card on the same page spends the whole effect. See `--shadow-glow`.
+         */
+        tone === "sky" && "bg-transparent border-2 border-sky shadow-glow",
       )}
     >
       {children}

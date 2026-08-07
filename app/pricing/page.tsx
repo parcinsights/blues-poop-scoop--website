@@ -1,17 +1,16 @@
 import type { Metadata } from "next";
 
 import {
+  CoverageMap,
   CtaBand,
   FeatureGrid,
   HowItWorks,
   PhotoBand,
   PricingBand,
   ReviewWall,
-  ServiceZips,
 } from "@/components/blocks/blocks";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { SectionDivider } from "@/components/ui/layout";
-import { servicedZips } from "@/content/cities";
 import { home } from "@/content/pages/home";
 import { pricingPage } from "@/content/pages/standing";
 import { reviews } from "@/content/reviews";
@@ -85,7 +84,7 @@ export default function PricingPage() {
 
       {/* White and centred, unlike /about/'s run of the same block: three promises with a
           medallion each are a row of equals, and the white band is what separates the guarantee
-          from the cream prices above and the cream zip list below. */}
+          from the cream prices above and the cream coverage map below. */}
       <FeatureGrid
         tone="raised"
         align="center"
@@ -94,11 +93,15 @@ export default function PricingPage() {
         features={pricingPage.guarantee.points}
       />
 
-      <ServiceZips
+      {/* THE MAP, not the zip wall it replaced. Same outline as /locations/ and the homepage, so
+          the three cannot disagree about where the van goes — and the two buttons are the half a
+          picture cannot do: the full list for anyone who cannot place themselves on a shape, and
+          contact for the visitor the map is bad news for. See `CoverageMap`. */}
+      <CoverageMap
         heading={pricingPage.serviceArea.heading}
         intro={pricingPage.serviceArea.intro}
-        zips={servicedZips}
-        note={pricingPage.serviceArea.note}
+        listLabel={pricingPage.serviceArea.listLabel}
+        contactLabel={pricingPage.serviceArea.contactLabel}
       />
 
       <ReviewWall heading={pricingPage.reviews.heading} reviews={reviews} />

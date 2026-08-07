@@ -57,21 +57,31 @@ const TOLERANCE = 0.0005;
 // ── The zip list, read out of content/cities.ts rather than repeated ─────────
 
 /**
- * `servicedZips` is derived at runtime from two arrays and a Set, so it cannot simply be imported
+ * `servicedZips` is derived at runtime from two files and a Set, so it cannot simply be imported
  * into a plain .mjs script without a TypeScript loader. Re-deriving it here by the same rule keeps
  * the script dependency-free; the test in lib/maps.test.ts is what guarantees the two agree.
+ *
+ * BOTH FILES, and they are different things. `content/cities.ts` holds the ten places with a page
+ * of their own; `content/neighborhoods.ts` holds the whole coverage list. The union of the two is
+ * the territory, exactly as `servicedZips` computes it. Every `zips:` array in either file counts,
+ * which is the same rule read twice rather than a list maintained twice.
  */
 function readServicedZips() {
-  const source = readFileSync("content/cities.ts", "utf8");
-  const quoted = (block) => [...block.matchAll(/"(\d{5})"/g)].map((m) => m[1]);
-
-  const cityZips = [...source.matchAll(/zips:\s*\[([^\]]*)\]/g)].flatMap((m) => quoted(m[1]));
-  const philadelphia = quoted(
-    source.match(/export const philadelphiaZips[^=]*=\s*\[([\s\S]*?)\]/)?.[1] ?? "",
+  const sources = ["content/cities.ts", "content/neighborhoods.ts"].map((path) =>
+    readFileSync(path, "utf8"),
   );
 
-  const all = [...new Set([...cityZips, ...philadelphia])].sort();
-  if (all.length < 10) throw new Error(`Only found ${all.length} zips in content/cities.ts`);
+  const all = [
+    ...new Set(
+      sources.flatMap((source) =>
+        [...source.matchAll(/zips:\s*\[([^\]]*)\]/g)].flatMap((m) =>
+          [...m[1].matchAll(/"(\d{5})"/g)].map((z) => z[1]),
+        ),
+      ),
+    ),
+  ].sort();
+
+  if (all.length < 10) throw new Error(`Only found ${all.length} zips across the content files`);
   return all;
 }
 
@@ -137,40 +147,78 @@ const dissolved = union(featureCollection(matched));
 const simplified = simplify(dissolved, { tolerance: TOLERANCE, highQuality: true });
 
 /**
- * The rings, largest first. Ring 0 is the territory.
+ * ── Every disjoint region, not just the biggest one ──────────────────────────
  *
- * A dissolved set of zips can come back with holes — a zip that is entirely surrounded by served
- * ones but is not itself served. Right now that is 19066, Merion Station, ringed by Bala Cynwyd,
- * Narberth and Wynnewood. Only the outer ring is exported, because the Maps Static API has no way
- * to cut a hole out of a filled path: every path is drawn, none subtracts. So a hole would have to
- * be faked by painting over the fill, which on a road map means painting over the roads.
+ * The territory is no longer one blob. Until 2026-08-07 it was — the zip list was the whole of
+ * Philadelphia plus a contiguous run of Main Line towns — so exporting `rings[0]` and calling it
+ * "the territory" was true. The real coverage list is not contiguous: Media and Swarthmore sit
+ * across a gap of unserved ground from everything else, and exporting only the largest ring
+ * silently deleted them from the map. A place we serve, missing from the picture of where we
+ * serve, is the one failure this map exists to prevent.
  *
- * The count is reported so that an added hole is not silent. If one appears that is big enough to
- * matter, the honest fix is the zip list, not the drawing.
+ * So each POLYGON's outer ring is exported, and lib/maps.ts draws one `path=` per ring. Google's
+ * Static API takes as many as the URL can hold.
+ *
+ * HOLES ARE STILL DROPPED, and that is a genuine limitation rather than a decision: the Static API
+ * has no way to cut a hole out of a filled path — every path is drawn, none subtracts — so an
+ * unserved pocket ringed by served ground gets painted over. Faking it means drawing the hole in
+ * the map's own background colour, which on a road map means painting over the roads. The total
+ * hole area is reported below; today it is about 2.5% of the territory, and the honest fix if that
+ * ever grows is the zip list rather than the drawing.
+ *
+ * Slivers under MIN_AREA are dropped too. They are simplification artefacts — a few thousand square
+ * metres, well under one pixel at the size anyone sees this — and each one costs URL budget.
  */
-const rings =
-  simplified.geometry.type === "MultiPolygon"
-    ? simplified.geometry.coordinates.flat()
-    : simplified.geometry.coordinates;
-const outer = rings[0];
-const encoded = encodePolyline(outer);
+const MIN_AREA_KM2 = 0.25;
 
-const lats = outer.map((p) => p[1]);
-const lngs = outer.map((p) => p[0]);
+/** Shoelace, in square kilometres at this latitude. Only ever compared against MIN_AREA_KM2. */
+const DEG2_TO_KM2 = 111.32 * 111.32 * Math.cos((40 * Math.PI) / 180);
+function ringArea(ring) {
+  let sum = 0;
+  for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
+    sum += ring[j][0] * ring[i][1] - ring[i][0] * ring[j][1];
+  }
+  return Math.abs(sum / 2) * DEG2_TO_KM2;
+}
+
+const polygons =
+  simplified.geometry.type === "MultiPolygon"
+    ? simplified.geometry.coordinates
+    : [simplified.geometry.coordinates];
+
+const holes = polygons.flatMap((polygon) => polygon.slice(1));
+const kept = polygons
+  .map((polygon) => polygon[0])
+  .filter((ring) => ringArea(ring) >= MIN_AREA_KM2)
+  .sort((a, b) => ringArea(b) - ringArea(a));
+
+if (kept.length === 0) throw new Error("No region survived the minimum-area filter");
+
+const encodedRings = kept.map(encodePolyline);
+
+const points = kept.flat();
+const lats = points.map((p) => p[1]);
+const lngs = points.map((p) => p[0]);
 const round = (n) => Number(n.toFixed(5));
 
 const file = `/**
  * GENERATED by scripts/build-service-area.mjs — do not edit by hand.
  *
- * The outline of every serviced zip, dissolved into one shape and encoded as a Google polyline.
- * Re-run the script after changing the zip list in cities.ts; lib/maps.test.ts fails if you don't.
+ * The outline of every serviced zip, dissolved and encoded as Google polylines. Re-run the script
+ * after changing a zip list in content/; lib/maps.test.ts fails if you don't.
  *
  * Source: US Census ZCTA (ZIP Code Tabulation Area) boundaries, simplified to ${TOLERANCE}°.
  */
 
-/** The territory, as a Google-encoded polyline. Feeds \`path=enc:\` on the Maps Static API. */
-export const serviceAreaOutline =
-  ${JSON.stringify(encoded)};
+/**
+ * The territory, as one Google-encoded polyline PER DISJOINT REGION, largest first. Each feeds its
+ * own \`path=enc:\` on the Maps Static API — see lib/maps.ts.
+ *
+ * More than one because the coverage area is not contiguous: ${encodedRings.length} separate pieces today.
+ */
+export const serviceAreaOutlines: string[] = [
+${encodedRings.map((ring) => `  ${JSON.stringify(ring)},`).join("\n")}
+];
 
 /** South-west and north-east corners, for anything that needs to frame the shape itself. */
 export const serviceAreaBounds = {
@@ -188,8 +236,14 @@ ${zips.map((z) => `  "${z}",`).join("\n")}
 
 writeFileSync(OUT, file);
 
+const totalChars = encodedRings.reduce((sum, ring) => sum + ring.length, 0);
+const holeArea = holes.reduce((sum, ring) => sum + ringArea(ring), 0);
+const keptArea = kept.reduce((sum, ring) => sum + ringArea(ring), 0);
+
 process.stdout.write(
-  `${OUT}: ${zips.length} zips → ${outer.length} points, ${encoded.length} chars` +
-    (rings.length > 1 ? `, ${rings.length - 1} hole(s) dropped` : "") +
-    "\n",
+  `${OUT}: ${zips.length} zips → ${kept.length} region(s), ` +
+    `${points.length} points, ${totalChars} chars\n` +
+    `  dropped ${polygons.length - kept.length} sliver(s) under ${MIN_AREA_KM2} km²\n` +
+    `  ${holes.length} hole(s) painted over: ${holeArea.toFixed(1)} km² of ${keptArea.toFixed(0)} ` +
+    `(${((100 * holeArea) / keptArea).toFixed(1)}% — the Static API cannot subtract a path)\n`,
 );

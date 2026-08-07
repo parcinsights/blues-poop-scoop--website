@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { servicedZips } from "@/content/cities";
-import { serviceAreaBounds, serviceAreaOutline, serviceAreaZips } from "@/content/service-area";
+import { serviceAreaBounds, serviceAreaOutlines, serviceAreaZips } from "@/content/service-area";
 import { serviceAreaMapUrl } from "@/lib/maps";
 
 /**
@@ -44,12 +44,19 @@ describe("serviceAreaMapUrl", () => {
     }
   }
 
-  it("draws the outline as an encoded path", () => {
+  it("draws EVERY disjoint region as its own encoded path", () => {
     const url = withMapEnabled(() => serviceAreaMapUrl({ width: 640, height: 360 }));
     // Compared decoded: a polyline is full of backslashes, braces and `@`, all of which a query
     // string has to escape. That escaping is correct and Google undoes it — the assertion is that
     // the path survives the round trip, not that it travels raw.
-    expect(decodeURIComponent(url!)).toContain(`enc:${serviceAreaOutline}`);
+    const decoded = decodeURIComponent(url!);
+    // Every region, not just the first. The territory is not contiguous, and a map that drew only
+    // the largest piece would silently omit Media and Swarthmore — which is precisely the bug this
+    // replaced. See scripts/build-service-area.mjs.
+    expect(serviceAreaOutlines.length).toBeGreaterThan(1);
+    for (const outline of serviceAreaOutlines) {
+      expect(decoded).toContain(`enc:${outline}`);
+    }
   });
 
   it("stays inside Google's URL limit", () => {

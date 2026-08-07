@@ -63,8 +63,18 @@ export default function ContactPage() {
           <div className="grid items-start gap-10 lg:grid-cols-3 lg:gap-16">
             <div className="lg:col-span-2">
               {/* The same card the service pages and /locations/ carry, without the mark — see
-                  `FormCard`. The fields inside it are the only difference. */}
-              <FormCard heading={contact.form.heading} intro={contact.form.intro} mark={false}>
+                  `FormCard`. The fields inside it are the only difference.
+
+                  `sky` is the exception this page gets and no other: on every other page the form
+                  is a panel beside an argument and the quiet cream is right, but here it is the
+                  whole point of the visit, and a cream card on a white band was something a visitor
+                  had to go looking for. The sky wash and rim make it the first object found. */}
+              <FormCard
+                heading={contact.form.heading}
+                intro={contact.form.intro}
+                mark={false}
+                tone="sky"
+              >
                 <ContactForm />
               </FormCard>
             </div>

@@ -64,6 +64,22 @@
     border-top: var(--header-height) solid transparent;
   }
 
+  /**
+   * The bar grows at `md`, where the social row above the lockup appears — `pt-4` plus a 24px row
+   * (a 16px glyph in 4px of padding), so it adds 1.5rem on top of the 6rem lockup row. See the
+   * note on `--header-height` in theme.css.
+   *
+   * It is an override of the token rather than a second token, so every rule above keeps asking the
+   * same question — "how tall is the bar" — and gets the right answer at each width. The literal
+   * `48rem` is `--breakpoint-md`; a media query cannot read a custom property, which is the one
+   * place in this file a raw value is unavoidable.
+   */
+  @media (min-width: 48rem) {
+    :root {
+      --header-height: 7.5rem;
+    }
+  }
+
   body {
     background-color: var(--color-surface);
     color: var(--color-ink);
@@ -376,8 +392,14 @@
     inset: 0;
     z-index: 40;
     background-color: var(--color-canvas);
-    /* Clears the header bar (64px mark + 2×16px padding) so the toggle stays visible as an X. */
-    padding-top: 6rem;
+    /**
+     * Clears the header bar so the toggle stays visible and tappable as an X.
+     *
+     * It reads the TOKEN rather than repeating 6rem, which it used to. The drawer is open below
+     * `lg` and the social row appears at `md`, so between those two widths the bar is 8.5rem and a
+     * hardcoded 6rem put the first menu item underneath it.
+     */
+    padding-top: var(--header-height);
     padding-bottom: calc(var(--spacing) * 8);
     overflow-y: auto;
     overscroll-behavior: contain;

@@ -5,10 +5,14 @@
  * defined, typed state rather than a crash, and so the work left to do is written down at the
  * place it will happen rather than in a chat log.
  *
- * ── DEFERRED: GoHighLevel ────────────────────────────────────────────────────
- * Needs: GHL_WEBHOOK_URL (the client's sub-account inbound webhook).
- * Wired at: app/api/lead/route.ts — already calls deliverToGhl() below.
- * On arrival: set the env var. No code change.
+ * ── GoHighLevel ──────────────────────────────────────────────────────────────
+ * WIRED. The client's sub-account inbound webhook is a public, unguessable trigger URL rather than
+ * a credential, and it is the SAME url on local, preview and production by request — one trigger,
+ * one automation, one place to look when a lead is missing. `source` on the payload is what tells
+ * a local test submission apart from a real one. GHL_WEBHOOK_URL still overrides it, so a preview
+ * can be pointed somewhere else without a code change.
+ * Wired at: app/api/lead/route.ts and app/api/contact/route.ts — both call deliverToGhl() below
+ * with the SAME payload shape; see lib/lead-payload.ts.
  *
  * ── Sweep&Go ─────────────────────────────────────────────────────────────────
  * Needs: SWEEPANDGO_API_TOKEN (Bearer token, generated in their dashboard).
@@ -48,15 +52,27 @@ function isProductionDeploy(): boolean {
 }
 
 /**
+ * The client's GoHighLevel inbound webhook trigger. The same url in every environment — see the
+ * header. It lives in the source rather than in an env var because it is not a secret and because
+ * a lead sink that only works where someone remembered to set a variable is a lead sink that
+ * silently stops working on the deployment nobody checked.
+ */
+const GHL_WEBHOOK_DEFAULT =
+  "https://services.leadconnectorhq.com/hooks/0uR28ovg1XKQChcudZEP/webhook-trigger/517bb045-09b0-422b-a248-b762cf37a366";
+
+/**
  * Post a lead to GoHighLevel, where an automation texts and emails the owner.
  *
- * When the webhook is not configured, this reports `not-configured` rather than throwing. The
- * caller decides what that means: during design and development the form should still complete so
- * the success state is reviewable, but on production a missing credential is a real outage and is
- * surfaced as one. Silently accepting a lead nobody receives is the worst possible behaviour.
+ * Every caller sends the SAME payload shape — build it with `toWebhookLead`, never by hand — so
+ * the trigger on the far side maps one set of fields no matter which form fired it.
+ *
+ * `not-configured` is now only reachable by blanking the override with whitespace; it is kept
+ * because the routes already handle it and it costs nothing to leave the state defined.
  */
 export async function deliverToGhl(payload: unknown): Promise<DeliveryResult> {
-  const webhook = process.env.GHL_WEBHOOK_URL;
+  // `||`, not `??`: .env.local ships the key with an empty value, and "" must fall through to the
+  // default rather than be treated as a configured webhook.
+  const webhook = (process.env.GHL_WEBHOOK_URL || GHL_WEBHOOK_DEFAULT).trim();
   if (!webhook) return { status: "not-configured", missing: "GHL_WEBHOOK_URL" };
 
   try {

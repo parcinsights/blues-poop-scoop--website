@@ -43,10 +43,17 @@ export const residentialFaqs: FaqItem[] = [
     answer:
       "We never enter the yard while your dog is outside, and we coordinate around your dog's schedule so it rarely comes up. Your pet's safety comes first, with no exceptions.",
   },
+  /**
+   * "…then hauled off your property" was cut on 2026-08-06, and the correction matters more than
+   * its length suggests: hauling waste away is a PAID ADD-ON (see the Haul Away service), so the
+   * old answer promised for free, in the site's most-trusted place, the thing the business sells.
+   * An FAQ that oversells a service is worse than one that undersells it — the customer finds out
+   * on the first invoice.
+   */
   {
     question: "What do you do with the waste?",
     answer:
-      "All waste is collected and double-bagged for sanitation and odor control, then hauled off your property.",
+      "All waste is collected and double-bagged for sanitation and odor control, then left in your bin. If you'd rather we took it away with us, our Haul Away add-on does exactly that — just ask and we'll price it in.",
   },
   {
     question: "How much does pet waste removal cost?",

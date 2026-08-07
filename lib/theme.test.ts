@@ -118,6 +118,13 @@ describe("palette meets WCAG AA", () => {
     ["ink on amber-dark (CTA hover)", ink, token("color-amber-dark")],
     ["ink on amber-tint", ink, token("color-amber-tint")],
     ["ink on success", ink, token("color-success")],
+    /**
+     * THE CTA BUTTON, and the one pairing on this site where white is the text. Everything else
+     * light-on-dark uses cream; a button label is the one place a true white is worth the
+     * exception, because it is the only text on the page whose job is to be seen before it is read.
+     */
+    ["white on cta", surfaceRaised, token("color-cta")],
+    ["white on cta-dark (hover)", surfaceRaised, token("color-cta-dark")],
     ["success-ink on surface", token("color-success-ink"), surface],
     ["danger-ink on surface", token("color-danger-ink"), surface],
     ["danger-ink on danger", token("color-danger-ink"), token("color-danger")],

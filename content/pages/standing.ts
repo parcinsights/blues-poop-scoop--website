@@ -283,8 +283,13 @@ export const pricingPage = {
    */
   guarantee: {
     heading: "The Blue's Poop Scoop Guarantee",
-    intro:
-      "We'd rather fix it than argue about it. Every plan comes with the same three promises, and none of them has fine print.",
+    /**
+     * "We'd rather fix it than argue about it" opened this line until 2026-08-06, when the client
+     * cut it. They were right to: it is a sentence about a dispute, printed directly under a price,
+     * and it introduces the idea of arguing with us to a reader who was not thinking about it.
+     * What is left is the promise and its terms, which is all this line was ever for.
+     */
+    intro: "Every plan comes with the same three promises. None of them have fine print.",
     points: [
       {
         icon: "guarantee",
@@ -305,22 +310,27 @@ export const pricingPage = {
   },
 
   /**
-   * The coverage band. Zips rather than town names — see the note on `ServiceZips` for why this
-   * page uses a different currency from the homepage's band.
+   * The coverage band — THE MAP, since 2026-08-07.
    *
-   * The list itself is NOT written here. It comes from `servicedZips` in content/cities.ts, which
-   * is the same list the lead form is validated against, so the page cannot advertise a zip the
-   * form would then reject.
+   * It used to be forty-five zip-code chips (`ServiceZips`, which still exists and is no longer
+   * rendered anywhere). The client asked for the same map the other pages carry, and it is the
+   * better object: a zip is a number you look up, and a shape is something you recognise. See the
+   * note on `CoverageMap`.
+   *
+   * Nothing here names a place. The map draws itself from the generated outline and the two buttons
+   * hand off to the pages that do — which is why this copy cannot go stale when a route changes.
    */
   serviceArea: {
     heading: "Where we scoop",
+    /**
+     * The client's own sentence, 2026-08-06. It replaced "We cover most of Philadelphia and the
+     * Main Line" — a claim that had drifted twice over: "most of" understated a footprint that is
+     * forty-odd towns, and "the Main Line" named one corner of it as though it were the other half.
+     */
     intro:
-      "We cover most of Philadelphia and the Main Line. Find your zip below and you're in our route.",
-    note: {
-      before: "Don't see your zip?",
-      link: "Contact us",
-      after: " — we may still be able to help!",
-    },
+      "We service Philadelphia and the surrounding areas. If you're inside the shape below, we come to you.",
+    listLabel: "See every place we cover",
+    contactLabel: "Don't see your area? Ask us",
   },
 
   /** The wall, trimmed to the homepage's set. Proof sits under coverage: it is worth most to someone who has just found their own zip. */
@@ -743,9 +753,15 @@ export const reviewsPage = {
  */
 export const locationsPage = {
   towns: {
-    heading: "Towns and neighborhoods we cover",
+    heading: "Towns and neighborhoods with their own page",
+    /**
+     * The heading gained "with their own page" on 2026-08-06, when the full forty-four-name list
+     * arrived and went into the band below this one. Before that this was the whole answer and
+     * "towns we cover" was true; with a longer list underneath it, the old heading made the shorter
+     * list look like the coverage and the longer one like a mistake.
+     */
     intro:
-      "Northwest Philadelphia and the Main Line. Find yours below and you're already on a route we drive.",
+      "These ones have a page of their own. Find yours and you're already on a route we drive — the full coverage list is underneath.",
     note: {
       before: "Somewhere close by that isn't listed?",
       link: "Ask us",
@@ -754,6 +770,25 @@ export const locationsPage = {
     form: {
       heading: "Get a free quote",
       intro: "Zip code and how many dogs. We'll text you back with a price.",
+    },
+  },
+
+  /**
+   * The full coverage list, under the band of town chips.
+   *
+   * The two bands are deliberately different answers to the same question, in the order a visitor
+   * needs them: the chips above are the places with a PAGE, so somebody who finds their town there
+   * gets taken somewhere; this is everywhere the van actually goes, so somebody who did not find
+   * their town above still gets a yes. See content/neighborhoods.ts.
+   */
+  served: {
+    heading: "Every place we scoop",
+    intro:
+      "The full list — Philadelphia and the surrounding areas. If you're on it, we come to you. There is no minimum and no sign-up fee.",
+    note: {
+      before: "Not on the list?",
+      link: "Ask us anyway",
+      after: " — we're still growing, and we'll tell you honestly whether we can reach you.",
     },
   },
 };
@@ -765,21 +800,27 @@ export const locationsPage = {
  * and a customer checking whether the business is real. Both are served by the same thing —
  * specifics. Pay, hours, the vehicle situation, whether it is seasonal.
  *
- * OUTSTANDING, and none of it can be guessed: George has to supply the pay rate, the hours, what
- * a route day looks like, whether a driver uses their own vehicle, and where an application goes.
- * Inventing a wage on a real business's careers page is the worst possible placeholder.
+ * ── WHY THE TERMS ARE VAGUE ─────────────────────────────────────────────────
+ * The client was asked for the pay rate, the hours and the vehicle situation, and on 2026-08-06
+ * said they do not have them settled yet and would rather the section stayed open than waited.
+ * That is a legitimate answer, and it is the reason the `role` band below now says "we'll talk
+ * about it on the call" instead of carrying six `todo()` strings that would fail a build.
+ *
+ * THE LINE THAT WAS HELD: nothing here invents a number, a schedule or a requirement. Every field
+ * either states something the business already knows to be true — the towns, the outdoor work, the
+ * dogs — or says plainly that the answer comes in conversation. "Competitive pay" and a made-up
+ * hourly range are the two things this page will never say. When George settles the real terms,
+ * this record is where they go, and each one replaces a sentence rather than being bolted on.
  */
 export const opportunities = {
   seo: {
-    title: todo("Now Hiring | Work With Blue's Poop Scoop"),
-    description: todo(
-      "We're hiring in Philadelphia and the Main Line. Outdoor work, your own route, and dogs all day.",
-    ),
+    title: "Now Hiring | Work With Blue's Poop Scoop",
+    description:
+      "We're hiring in Philadelphia and the surrounding areas. Outdoor work, your own route, and dogs all day.",
   } satisfies Seo,
-  heading: todo("Come work with us"),
-  intro: todo(
+  heading: "Come work with us",
+  intro:
     "We're a small local crew, and we're growing. If you like dogs, working outside, and being trusted to run your own day, we'd like to hear from you.",
-  ),
 
   /**
    * The three reasons to want this job, as a `FeatureGrid`.
@@ -790,83 +831,68 @@ export const opportunities = {
    * up as a benefit here.
    */
   perks: {
-    eyebrow: todo("Why this job"),
-    heading: todo("What you get out of it"),
+    eyebrow: "Why this job",
+    heading: "What you get out of it",
     points: [
       {
         icon: "local",
-        title: todo("A small crew, not a franchise"),
-        detail: todo(
+        title: "A small crew, not a franchise",
+        detail:
           "You would be working directly with the two people who own the business, on routes they run themselves. There is no regional manager and no script.",
-        ),
       },
       {
         icon: "schedule",
-        title: todo("Your own route"),
-        detail: todo(
+        title: "Your own route",
+        detail:
           "You get a list of yards and a day to do them in. How you order them is up to you, and nobody is tracking you between stops.",
-        ),
       },
       {
         icon: "flexible",
-        title: todo("Outside, with dogs"),
-        detail: todo(
-          "It is honest outdoor work in the same ten towns every week, and most of the customers have a dog that will be pleased to see you.",
-        ),
+        title: "Outside, with dogs",
+        detail:
+          "It is honest outdoor work in the same neighborhoods every week, and most of the customers have a dog that will be pleased to see you.",
       },
     ] satisfies Feature[],
   },
 
   /**
-   * The role itself — the facts an applicant needs before they will spend a phone call on this.
+   * The role itself — what an applicant needs before they will spend a phone call on this.
    *
-   * EVERY ONE OF THESE IS A GUESS and has to be replaced before the page can be published. The
-   * detail strings are deliberately written as the SHAPE of the answer rather than as an answer:
-   * "the rate is $X an hour" is a sentence someone can fill in, and one that cannot be mistaken
-   * for something the client actually said. See the note above the record.
+   * FOUR ENTRIES, NOT SIX. "Pay" and "Hours" used to sit at the top of this list as placeholders
+   * and they are gone, because a careers page that names a heading called Pay and then does not
+   * answer it is worse than one that never raised it — the reader draws the conclusion the silence
+   * invites. Both are now handled once, honestly, by the `intro` and the last entry: we will tell
+   * you on the call. When the real terms exist they come back as entries here, at the top.
+   *
+   * What is left is everything we DO know today, and it is not nothing: where the work is, what it
+   * physically involves, and that no experience is needed. That is enough for somebody to decide
+   * whether to pick up the phone, which is the only decision this page is asking for.
    */
   role: {
-    eyebrow: todo("The role"),
-    heading: todo("What the job actually is"),
-    intro: todo(
-      "Straight answers, so you can decide whether it is worth a call. If something here is not clear, ask us — we would rather tell you now than waste your afternoon.",
-    ),
+    eyebrow: "The role",
+    heading: "What the job actually is",
+    intro:
+      "We're still working out the details on pay and schedule, and we'd rather tell you the real numbers on a call than post a range we might have to walk back. Here's everything we can tell you now.",
     points: [
       {
-        title: todo("Pay"),
-        detail: todo(
-          "OUTSTANDING — George to supply the rate and whether it is hourly or per route.",
-        ),
+        title: "The work itself",
+        detail:
+          "You visit a list of yards, scoop them, double-bag what you collect, and text the customer before you arrive and after you finish. It is outdoors, on your feet, in whatever the weather is doing.",
       },
       {
-        title: todo("Hours"),
-        detail: todo(
-          "OUTSTANDING — George to supply the days, the start time, and whether it is full-time, part-time or seasonal.",
-        ),
+        title: "Where you would work",
+        detail:
+          "Philadelphia and the surrounding areas — Chestnut Hill, Mt. Airy, Roxborough and East Falls in the city, and the towns north and west of it. Routes are grouped, so you are not crossing the county twice in a day.",
       },
       {
-        title: todo("Getting around"),
-        detail: todo(
-          "OUTSTANDING — George to confirm whether a van is provided or a driver uses their own vehicle, and what licence and insurance that needs.",
-        ),
+        title: "Experience",
+        detail:
+          "None needed. We train on the route, and the part that actually takes learning is how to be around somebody else's dog and somebody else's gate — which is the part we would rather teach you ourselves anyway.",
       },
       {
-        title: todo("Where you would work"),
-        detail: todo(
-          "Chestnut Hill, Mt. Airy, Roxborough and East Falls in Philadelphia, plus Ardmore, Bryn Mawr, Haverford, Narberth, Gladwyne and Glenside on the Main Line.",
-        ),
-      },
-      {
-        title: todo("What we need from you"),
-        detail: todo(
-          "OUTSTANDING — George to confirm the requirements. Comfortable around dogs, and able to be on your feet outdoors in any weather, are the two that are certain.",
-        ),
-      },
-      {
-        title: todo("Experience"),
-        detail: todo(
-          "OUTSTANDING — George to confirm. Our assumption is none required and we train on the route.",
-        ),
+        title: "Pay, hours and the rest",
+        detail:
+          "Ask us. We'll give you a straight answer on the phone about what the rate is, how many days there are, and whether you would be driving your own vehicle — before either of us spends any more time on it.",
       },
     ] satisfies Feature[],
   },
@@ -879,25 +905,22 @@ export const opportunities = {
    * at the phone number, which is real. Swap it for an address the day there is one.
    */
   apply: {
-    heading: todo("How to apply"),
+    heading: "How to apply",
     steps: [
       {
-        title: todo("Get in touch"),
-        detail: todo(
+        title: "Get in touch",
+        detail:
           "Call or text us. Tell us your name, which towns you can get to, and when you can start.",
-        ),
       },
       {
-        title: todo("Talk it through"),
-        detail: todo(
+        title: "Talk it through",
+        detail:
           "A short call with George — what the days look like, what the pay is, and whatever you want to ask.",
-        ),
       },
       {
-        title: todo("Ride along"),
-        detail: todo(
+        title: "Ride along",
+        detail:
           "Come out on a route with us before either of us commits. You see the actual work, we see how you are around a dog.",
-        ),
       },
     ],
   },

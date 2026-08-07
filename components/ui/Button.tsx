@@ -15,7 +15,7 @@ import { cx } from "@/lib/cx";
  * site — see lib/cx.ts for why that door is deliberately shut.
  */
 
-export type ButtonVariant = "primary" | "secondary" | "ghost" | "link";
+export type ButtonVariant = "primary" | "cta" | "secondary" | "ghost" | "link";
 export type ButtonSize = "sm" | "md" | "lg";
 
 const base =
@@ -33,15 +33,27 @@ const base =
 const lift = "hover:scale-105 disabled:hover:scale-100 motion-reduce:hover:scale-100";
 
 /**
- * `primary` is the navy fill with cream text — 8.18:1, and the only fill on the site that can
- * carry light text at all. The three light brand colors (sky, amber, green) cannot: white on sky
- * is 2.24:1. theme.test.ts asserts that, so trying it here fails the build rather than shipping.
+ * `primary` IS THE NAVY — the brand fill with cream text, 8.18:1. It is the DEFAULT, so it is what
+ * every button on the site takes unless it says otherwise: the header, the form submits, the
+ * pricing link on a service page. A page's ordinary actions are blue.
  *
- * `secondary` is the same navy inverted — transparent fill, navy text and border, which reads as
- * the quieter of a pair sitting side by side.
+ * `cta` IS THE GREEN, and it is deliberately rationed. The client's rule (2026-08-07) is that green
+ * marks a CALL-TO-ACTION SECTION and nothing else — the hero's main button, the closing CTA band,
+ * the button under the prices. That restraint is the whole value of it: green means "this is the
+ * thing to press", and a green submit button inside a form and a green nav button would spend the
+ * signal on controls the visitor had already found.
+ *
+ * The green here is `--color-cta`, NOT the brand's ✱`--color-success`. White on the brand green is
+ * 1.93:1 and there is no size at which that is legible, so the fill moves rather than the label —
+ * see the note in theme.css. theme.test.ts holds this pair at 4.5:1.
+ *
+ * `secondary` is the navy inverted — transparent fill, navy text and border, which reads as the
+ * quieter of a pair sitting beside either fill.
  */
 const variants: Record<ButtonVariant, string> = {
   primary: "bg-brand text-ink-inverse hover:bg-brand-dark hover:text-ink-inverse",
+  // `text-surface-raised` is the white token. There is no `text-white` — see theme.css.
+  cta: "bg-cta text-surface-raised hover:bg-cta-dark hover:text-surface-raised",
   secondary:
     "bg-transparent text-brand border-2 border-brand hover:bg-brand-tint hover:text-brand-dark",
   ghost:

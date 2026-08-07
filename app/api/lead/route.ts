@@ -6,7 +6,8 @@ import {
   sweepAndGo,
   type DeliveryResult,
 } from "@/lib/integrations";
-import { quickLeadSchema, isServicedZip } from "@/lib/validation";
+import { toWebhookLead } from "@/lib/lead-payload";
+import { quickLeadSchema } from "@/lib/validation";
 
 /**
  * The short-form lead sink — one route behind both places the short form appears (the pill card on
@@ -52,14 +53,10 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: true });
   }
 
-  const inServiceArea = isServicedZip(parsed.data.zip);
-
-  const lead = {
-    ...parsed.data,
-    inServiceArea,
-    source: "website:quick-form",
-    submittedAt: new Date().toISOString(),
-  };
+  // The canonical webhook shape, identical to the one /api/contact sends. It is also what gets
+  // logged on a failure, so a recovered lead reads the same as a delivered one.
+  const lead = toWebhookLead("quick-form", parsed.data);
+  const inServiceArea = lead.inServiceArea;
 
   // Both sinks at once. They are independent — one being down is no reason to skip the other, and
   // sequential awaits would make a slow Sweep&Go into a slow form for everybody.

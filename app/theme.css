@@ -90,8 +90,26 @@
   /* ── Status ───────────────────────────────────────────────────────────────
      The supplied green is a fill, not a text color. Each has an `-ink` partner
      for the words that sit on or beside it. */
-  --color-success: #98c96c; /* ✱ fill only */
+  --color-success: #98c96c; /* ✱ fill only — carries ink (6.56:1), never white (1.93:1) */
   --color-success-ink: #3f6b23; /* derived — 5.73:1 on cream */
+
+  /* ── The CTA green ────────────────────────────────────────────────────────
+     A DARKER GREEN THAN THE BRAND'S, and the reason is white text.
+
+     The client asked (2026-08-07) for a green CTA button with a WHITE label.
+     White on the supplied ✱#98c96c is 1.93:1 — it fails AA (4.5:1), and it
+     fails even the 3:1 large-text floor, so there is no size at which that
+     pairing is legible. The colour has to move for the text to be white.
+
+     This is the same hue pulled down until white clears AA on it: 4.77:1,
+     with the hover shade at 6.29:1. It still reads as the brand's green
+     beside it — it is that green in shadow, not a different one — and it is
+     the only green on the site that may carry white.
+
+     Nothing else uses these. A green FILL under dark text is still
+     `--color-success`; this pair is the button and only the button. */
+  --color-cta: #4a8024; /* white on it is 4.77:1 */
+  --color-cta-dark: #3f6b23; /* hover — white on it is 6.29:1 */
   --color-danger: #f7d7d5; /* derived fill — no red was supplied */
   --color-danger-ink: #9e2b25; /* derived — 6.77:1 on cream, for form errors */
 
@@ -195,6 +213,21 @@
   --shadow-md: 0 4px 12px rgb(11 78 112 / 0.09), 0 2px 4px rgb(11 78 112 / 0.06);
   --shadow-lg: 0 12px 32px rgb(11 78 112 / 0.14), 0 4px 8px rgb(11 78 112 / 0.07);
 
+  /**
+   * THE GLOW. Not elevation — the three above are a light source above the page and all offset
+   * downward, and this one has no offset at all: it radiates evenly, which is what makes it read as
+   * the object emitting light rather than casting a shadow.
+   *
+   * It is `--color-sky` at two radii — a tight bloom that hugs the border and a wide one that
+   * fades into the band. Sky rather than the navy the shadows use, because the only thing wearing
+   * this is the sky-bordered quote card on /contact/, and a navy shadow under a sky outline reads
+   * as two unrelated effects.
+   *
+   * ONE OBJECT PER PAGE, at most. A glow is loud by design; a second one on the same screen turns
+   * both into decoration. See `Card tone="sky"`.
+   */
+  --shadow-glow: 0 0 16px rgb(93 173 226 / 0.45), 0 0 44px rgb(93 173 226 / 0.22);
+
   /* ── Motion ───────────────────────────────────────────────────────────── */
   --ease-out: cubic-bezier(0.2, 0.8, 0.3, 1);
 
@@ -202,8 +235,13 @@
 
   /**
    * The header bar's height, and it is a MEASUREMENT rather than a preference: the logo mark is
-   * `h-16` (4rem) inside `py-4` (1rem top and bottom), which is 6rem, at every width — the bar does
-   * not shrink on a phone. Change either of those in Header.tsx and change this in the same commit.
+   * `h-16` (4rem) inside `py-4` (1rem top and bottom), which is 6rem. Change either of those in
+   * Header.tsx and change this in the same commit.
+   *
+   * This is the PHONE value: `pt-4` + the 4rem mark + `pb-4`. From `md` the social row appears above
+   * the lockup and takes over the bar's top padding — `pt-4` plus a 24px row — so the total becomes
+   * 7.5rem; base.css carries that as a media query override rather than a second token, because
+   * everything reading this wants "however tall the bar is right now".
    *
    * It is a token because the page has to know it: the header has no background of its own, so the
    * first band of every page is pulled up UNDER the bar and gives back exactly this much space at

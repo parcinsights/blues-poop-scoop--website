@@ -1,10 +1,16 @@
 import type { Metadata } from "next";
 
-import { CtaBand, ServiceAreaMapFrame, ServiceAreaTowns } from "@/components/blocks/blocks";
+import {
+  CtaBand,
+  ServedAreas,
+  ServiceAreaMapFrame,
+  ServiceAreaTowns,
+} from "@/components/blocks/blocks";
 import { PageShell } from "@/components/blocks/PageShell";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { SectionDivider } from "@/components/ui/layout";
 import { servicedPlaces } from "@/content/cities";
+import { servedAreas } from "@/content/neighborhoods";
 import { locationsPage } from "@/content/pages/standing";
 import { routes } from "@/lib/routes";
 import { standardPageGraph, type Crumb } from "@/lib/schema";
@@ -28,12 +34,13 @@ export const metadata: Metadata = buildMetadata({ ...seo, path: routes.locations
  *
  * Somebody landing here from "pooper scooper near me" is not reading — they are looking for
  * themselves on the page. The order is widest recognition first: the SHAPE answers "is my side of
- * the city in there" at a glance, the ZIP answers it exactly, and the TOWN CARDS are for the
- * person who has already found themselves and now wants the page about their street.
+ * the city in there" at a glance, the TOWN CHIPS take the ones with a page of their own, and the
+ * FULL LIST is where everybody else finds their name.
  *
- * The zip band is the same `ServiceZips` running the same copy as /pricing/. That is on purpose
- * and not a shortcut: coverage is one fact, and a visitor who checked their zip on the pricing
- * page and then checked it here must not be able to find two different answers.
+ * There is no zip band here. It described one that had already been removed, and since 2026-08-07
+ * there is no zip band on /pricing/ either — that page carries the same map this one opens on. The
+ * only place zips are still printed is a town's own page, where the list is four numbers rather
+ * than forty-five. See `ServiceZips`.
  */
 export default function LocationsIndexPage() {
   return (
@@ -54,7 +61,7 @@ export default function LocationsIndexPage() {
       <PageShell
         crumbs={crumbs}
         heading="Areas we serve"
-        intro="We cover Northwest Philadelphia and the Main Line. If you're nearby but not listed, ask — we'll tell you honestly whether we can reach you."
+        intro="We're based in Chestnut Hill and service Philadelphia and the surrounding areas — Montgomery and Delaware counties included. If you're nearby but not listed, ask; we'll tell you honestly whether we can reach you."
       >
         <ServiceAreaMapFrame />
       </PageShell>
@@ -69,6 +76,17 @@ export default function LocationsIndexPage() {
         places={servicedPlaces}
         note={locationsPage.towns.note}
         form={locationsPage.towns.form}
+      />
+
+      {/* THE FULL LIST — forty-odd names, no pages, three columns. It sits under the chips rather
+          than replacing them because the two answer different halves of the same question: the
+          chips take you somewhere, this tells you yes. See content/neighborhoods.ts for why it is
+          a list and not forty more URLs. */}
+      <ServedAreas
+        heading={locationsPage.served.heading}
+        intro={locationsPage.served.intro}
+        areas={servedAreas}
+        note={locationsPage.served.note}
       />
 
       {/* The grid of town CARDS used to sit here and is gone. It listed the same ten towns the

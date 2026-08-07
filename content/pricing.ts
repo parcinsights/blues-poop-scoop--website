@@ -12,11 +12,40 @@
 import { todo } from "./todo";
 import type { PriceTier } from "./types";
 
+/** Rates as of 2026-08-06 — the top two tiers were cut from 160/100 and 220/130 by the client. */
 export const priceTiers: PriceTier[] = [
   { id: "1-2-dogs", name: "The Sidekick", dogs: "1–2 dogs", weekly: 100, biweekly: 70, featured: true },
-  { id: "3-4-dogs", name: "The Squad", dogs: "3–4 dogs", weekly: 160, biweekly: 100 },
-  { id: "5-6-dogs", name: "The Full House", dogs: "5–6 dogs", weekly: 220, biweekly: 130 },
+  { id: "3-4-dogs", name: "The Squad", dogs: "3–4 dogs", weekly: 145, biweekly: 100 },
+  { id: "5-6-dogs", name: "The Full House", dogs: "5–6 dogs", weekly: 190, biweekly: 120 },
 ];
+
+/**
+ * The two standing discounts, supplied by the client 2026-08-06.
+ *
+ * They live here rather than in a page record because they are PRICES — the same fact as the table
+ * above, said as a percentage — and the one rule this file exists to enforce is that a rate is
+ * edited in exactly one place. Both /pricing/ and the homepage band render this array; neither
+ * types a number.
+ *
+ * The percentages are `number`, not "10% off" strings, so the copy around them can change without
+ * anyone having to find and retype the figure inside a sentence.
+ */
+export const discounts = [
+  {
+    id: "prepay",
+    percent: 10,
+    title: "Pay 6 months up front",
+    detail:
+      "Pay for six months or more in full and take 10% off the whole thing. No contract comes with it — it is a discount, not a commitment.",
+  },
+  {
+    id: "service",
+    percent: 5,
+    title: "First responders, military & teachers",
+    detail:
+      "5% off every plan, every month, for as long as you're with us. Just tell us when you get in touch.",
+  },
+] as const;
 
 export const pricing = {
   currency: "USD",

@@ -1,5 +1,6 @@
 import { cities } from "../cities";
 import { startingPrice } from "../pricing";
+import { site } from "../site";
 import { todo } from "../todo";
 import type { FaqItem, Seo, WhyUsPoint } from "../types";
 
@@ -17,7 +18,6 @@ function sentenceList(names: readonly string[]): string {
  * neighbourhoods is what a Chestnut Hill resident is actually scanning for. See cities.ts.
  */
 const philadelphia = cities.find((city) => city.slug === "philadelphia");
-const elsewhere = cities.filter((city) => city.slug !== "philadelphia").map((city) => city.name);
 
 /**
  * The homepage.
@@ -38,23 +38,44 @@ export const home = {
   } satisfies Seo,
 
   hero: {
-    heading: "We scoop, so you don't have to",
+    /**
+     * Client's own line, supplied 2026-08-06, and it replaced "We scoop, so you don't have to".
+     * The trade is deliberate: the old one was a slogan and this one is the actual offer — what we
+     * do, how often, and what you get — which is the sentence a stranger can price in their head.
+     */
+    heading: "We visit your yard weekly to keep it poop free",
     /**
      * Not a price and not a service list — both of those are a click away, and neither is the
-     * reason someone hires this. The problem is the chore and the low-grade guilt around it, so
-     * the copy names that, then answers it with the one operating policy that is actually theirs:
-     * they never enter while the dog is outside. See `about.values` in ./standing.ts — it is the
-     * same promise, and it is repeated here on purpose.
+     * reason someone hires this. The problem is the chore, so the copy names the relief rather than
+     * the work: "forever" is the word doing the selling, because what is being bought is the last
+     * time you ever have to think about it.
      */
-    subheading:
-      "Your yard should be somewhere you and your dog actually want to be. We keep it that way — on schedule, every week, and never while your pup is outside.",
+    subheading: "One less thing on your list — forever. We handle it so you never have to.",
 
     /**
-     * The objections a homeowner has in the two seconds before clicking, answered in three
+     * WHERE WE ARE, above the fold and above the h1. Client-requested 2026-08-06, and it is the
+     * first disqualifying question a local service has to answer — someone who arrives from a
+     * search for "poop scooper near me" is checking whether "near me" was true before they read a
+     * word of the offer. It is a line rather than the coverage band because the band is four
+     * screens down, which is three screens too late for the visitor it is bad news for.
+     */
+    serviceLine: `Serving ${site.baseCity} and surrounding areas`,
+
+    /**
+     * The objections a homeowner has in the two seconds before clicking, answered in four
      * fragments. Client-supplied — these are commitments the business is making, so they belong
      * here rather than being invented as copy.
+     *
+     * The refund joined the strip on 2026-08-06 and it is the strongest of the four: the other
+     * three cost the business nothing if it turns out to be lying, and this one costs it the money.
+     * It sits second rather than last because a strip is read left to right and abandoned early.
      */
-    assurances: ["No contracts", "Cancel anytime", "We reply by text"],
+    assurances: [
+      "No contracts",
+      "30-day money-back guarantee",
+      "Cancel anytime",
+      "We reply by text",
+    ],
   },
 
   /* `valueProps` USED TO LIVE HERE — the client's three "what we stand for" promises. They now
@@ -71,8 +92,14 @@ export const home = {
    */
   whyUs: {
     heading: "Why your yard is in good hands",
-    intro:
-      "We're a small local outfit, not a franchise — the people who scoop your yard are the same ones who answer the phone. If we ever leave you unhappy, we'd rather give the money back than argue about it.",
+    /**
+     * NO INTRO. There used to be a paragraph here — "we're a small local outfit, not a franchise…"
+     * — and the client cut it on 2026-08-06. It was right to go: every claim in it is made again,
+     * harder and with a medallion beside it, in the four points directly underneath. A paragraph
+     * that says what the list is about to say is a delay between a heading and its answer.
+     *
+     * `WhyUs` takes `intro` as optional for exactly this. See the note there.
+     */
     points: [
       {
         icon: "guarantee",
@@ -113,7 +140,7 @@ export const home = {
    * already answered twice above.
    */
   ctaBanner: {
-    heading: "Ready for a yard you don't think about?",
+    heading: "Ready for a clean yard you don't have to think about?",
     detail: "Tell us your zip code and how many dogs. Takes about a minute.",
   },
 
@@ -134,21 +161,28 @@ export const home = {
         detail:
           "Confirm your schedule. For your first visit, someone should be home to show us the yard.",
       },
+      /**
+       * The third step is the longest thing in the band, and it earns it. Client-supplied
+       * 2026-08-06, and every clause in it is a specific, checkable act — the text on the way, the
+       * double bag, the PHOTOGRAPH OF THE CLOSED GATE. That last one is the single most persuasive
+       * detail on the homepage: it is the answer to the fear nobody says out loud, which is that a
+       * stranger will leave the gate open and the dog will get out.
+       */
       {
         title: "Enjoy your yard",
         detail:
-          "After the first visit, no need to be home — we scoop, double-bag, and text you when done.",
+          'After the first visit, no need to be home. We send an "on the way" text, we scoop, we double bag, and text you a photo of your closed gate when we\'re done.',
       },
     ],
   },
 
   /**
-   * The coverage band, sitting between "how it works" and the prices.
+   * The coverage band, near the bottom of the page.
    *
-   * The intro names Philadelphia's four neighbourhoods rather than saying "Philadelphia", for the
-   * same reason the FAQ answer does: a Chestnut Hill resident does not scan a map for the word
-   * Philadelphia, they scan it for Chestnut Hill. It is derived from cities.ts, so adding a town
-   * there rewrites this too.
+   * The intro leads with the base and then the reach, which is the order the client answers it in
+   * out loud — see the "Where do you service?" answer above and `pricingPage.serviceArea`. It names
+   * Philadelphia's four neighbourhoods on the way past, derived from cities.ts, because a Chestnut
+   * Hill resident does not scan for the word Philadelphia, they scan for Chestnut Hill.
    *
    * The link out is worded as a question because it is the escape hatch for the one visitor this
    * band is bad news for — somebody who has just failed to find their street. "See every town we
@@ -156,8 +190,8 @@ export const home = {
    */
   serviceArea: {
     heading: "Where we scoop",
-    intro: `We cover Northwest Philadelphia — ${sentenceList(philadelphia?.neighborhoods ?? [])} — and the Main Line. If you're close by but not on this list, ask us; we'll tell you honestly whether we can reach you.`,
-    cta: "Not sure if we reach you?",
+    intro: `We're based in ${sentenceList(philadelphia?.neighborhoods?.slice(0, 1) ?? [])} and service Philadelphia and the surrounding areas — forty-odd neighborhoods and towns across Philadelphia, Montgomery and Delaware counties. If you're close by and not sure, ask us; we'll tell you honestly whether we can reach you.`,
+    cta: "See every place we cover",
   },
 
   /**
@@ -170,8 +204,8 @@ export const home = {
    */
   pricing: {
     heading: "Simple, flat-rate pricing",
-    /** The three objections a price raises, answered before they are asked. */
-    assurances: ["No hidden fees", "No contracts", "Pause anytime"],
+    /** The three objections a price raises, answered before they are asked. Client's own wording. */
+    assurances: ["No hidden fees", "No contracts", "Pause or cancel anytime"],
     promise:
       "Every plan backed by our 30-day promise. Full refund, no questions asked — and you only pay for visits we actually complete.",
     cta: "Get started now",
@@ -202,9 +236,19 @@ export const home = {
         question: "What do you do with the waste?",
         answer: "All waste is collected and double-bagged for sanitation and odor control.",
       },
+      /**
+       * The client's own answer, supplied 2026-08-06, and it replaced a derived sentence that named
+       * all fourteen towns. Naming the base — Chestnut Hill — is what the long list was never able
+       * to do: it says this is a neighbour rather than a franchise with a territory, and it is the
+       * one fact in the answer a competitor cannot also claim.
+       *
+       * It is deliberately no longer generated from cities.ts. The full list lives on /locations/,
+       * which is where somebody looking for their own street is actually going.
+       */
       {
         question: "Where do you service?",
-        answer: `${sentenceList(philadelphia?.neighborhoods ?? [])} in Philadelphia, plus ${sentenceList(elsewhere)}. If you're nearby but not on that list, ask us — we'll tell you honestly whether we can reach you.`,
+        answer:
+          "We are based in Chestnut Hill, and service Philadelphia and the surrounding areas.",
       },
     ] satisfies FaqItem[],
     cta: "See all questions",

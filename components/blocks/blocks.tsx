@@ -40,7 +40,7 @@ import {
   Text,
 } from "@/components/ui/typography";
 import type { AssetKey } from "@/content/assets";
-import { priceTiers, pricing } from "@/content/pricing";
+import { discounts, priceTiers, pricing } from "@/content/pricing";
 import { phoneCtaLabel, primaryCta } from "@/content/nav";
 import { site } from "@/content/site";
 import type {
@@ -108,6 +108,7 @@ import type { Crumb } from "@/lib/schema";
 export function Hero({
   heading,
   subheading,
+  serviceLine,
   image,
   crumbs,
   rating,
@@ -119,6 +120,16 @@ export function Hero({
 }: {
   heading: string;
   subheading?: string;
+  /**
+   * WHERE WE ARE — "Serving Philadelphia and surrounding areas", above the h1 and above the fold.
+   *
+   * It is a `Badge`-shaped pill rather than an `Eyebrow` because it is a FACT about the business,
+   * not a label for the heading under it: an eyebrow is read as the category a title belongs to,
+   * and this has to survive being read on its own by somebody who is scanning for one word. The
+   * sky fill is the second reason — it is the only coloured object above the fold, so the eye
+   * lands on it before the h1 and gets the disqualifying question answered first.
+   */
+  serviceLine?: string;
   /** A key into the image registry. See content/assets.ts. */
   image?: AssetKey;
   /** The breadcrumb trail, when this hero is standing in for `PageShell` on an inner page. */
@@ -150,7 +161,32 @@ export function Hero({
   /** Everything except the trail and the picture. Identical in both arrangements. */
   const words = (
     <Stack gap={6} align={stacked ? "center" : undefined}>
-      {rating && <Rating stars={rating.stars} label={rating.label} />}
+      {/* The stars and the service line share a row and wrap onto two on a phone. They are the two
+          things a visitor checks before reading anything: is this any good, and do they come here.
+          `gap-x-4` is wider than the `Cluster` default because the two are unrelated claims sitting
+          side by side rather than a pair. */}
+      {(rating || serviceLine) && (
+        <div
+          className={cx(
+            "flex flex-wrap items-center gap-x-4 gap-y-3",
+            stacked && "justify-center",
+          )}
+        >
+          {rating && <Rating stars={rating.stars} label={rating.label} />}
+          {serviceLine && (
+            /* Outlined, not filled: a brand hairline on the band's own colour rather than a solid
+               sky chip. It sits beside the star rating, which is also unfilled, so the two read as
+               one row of facts instead of a badge next to a label — and on the hero the only filled
+               object above the fold should be the button. Brand on canvas is 8.18:1 for the words
+               and well past the 3:1 a border needs. */
+            <span className="inline-flex items-center gap-1.5 rounded-pill border border-brand bg-transparent px-3 py-1 text-caption font-semibold text-brand">
+              {/* Decoration — the words beside it already say "serving". */}
+              <MapPin size={14} aria-hidden="true" />
+              {serviceLine}
+            </span>
+          )}
+        </div>
+      )}
       {/* `display` is the oversized treatment, and a front door is the only thing that gets it. */}
       <Heading level={1} size={image ? "display" : "h1"}>
         {heading}
@@ -164,7 +200,9 @@ export function Hero({
           them, not the next thing down the page. */}
       <Stack gap={4} align={stacked ? "center" : undefined}>
         <Cluster gap={4} justify={stacked ? "center" : "start"}>
-          <Button href={cta.href} size="lg">
+          {/* Green — the hero's own button is the page's primary call to action, which is the one
+              thing the green is for. See `variants` in ui/Button. */}
+          <Button href={cta.href} variant="cta" size="lg">
             {cta.label}
           </Button>
           {showPhone && (
@@ -380,24 +418,34 @@ export function ServiceHero({
 // ── Why us ───────────────────────────────────────────────────────────────────
 
 /**
- * The medallion behind a point's glyph or a step's number. Four hues that are NOT the brand
- * palette — see the accent block in theme.css for why. They cycle in source order, so an item's
+ * The medallion behind a point's glyph or a step's number. They cycle in source order, so an item's
  * colour is a property of its position in the band rather than of what it says: nothing here means
- * "green equals safe", and a fifth item would simply start the cycle again.
+ * "green equals safe", and a seventh item would simply start the cycle again.
  *
  * Shared by "why us" and "how it works" on purpose — two bands of the same page using two different
  * sets of circles would read as two unrelated things.
  *
- * `edge` is the same hue as a card outline. It is only ever a BORDER: these fills are pastels and
- * carry accent ink at 4.5:1, but nothing else — muted body text on one of them lands around 4.2:1,
- * so a step card stays white and wears its colour on the rim.
+ * ── THE FIRST TWO ARE THE BRAND'S OWN ────────────────────────────────────────
+ * `--color-sky` and `--color-success` lead the cycle, and that is a 2026-08-06 change: the client
+ * asked for more of those two specific brand colours around the site, and the medallions are where
+ * a hue gets seen most — every band that has them puts three or four on one screen. Leading with
+ * them means the three-step band is blue/peach/green rather than four pastels the brand does not own.
+ *
+ * They carry `text-ink` rather than an `-ink` partner because they ARE brand tokens, already held to
+ * 4.5:1 against ink in theme.test.ts (5.14:1 and 6.56:1). The four `accent-*` pastels that follow
+ * are not brand colours and each has exactly one ink it may carry; never mix the halves.
+ *
+ * `edge` is the same hue as a card outline. It is only ever a BORDER: these fills carry their own
+ * ink at 4.5:1 and nothing else — muted body text on one of them lands around 4.2:1, so a step card
+ * stays white and wears its colour on the rim.
  */
 const medallionAccents = [
-  { fill: "bg-accent-mint text-accent-mint-ink", edge: "border-accent-mint" },
+  { fill: "bg-sky text-ink", edge: "border-sky" },
   {
     fill: "bg-accent-peach text-accent-peach-ink",
     edge: "border-accent-peach",
   },
+  { fill: "bg-success text-ink", edge: "border-success" },
   {
     fill: "bg-accent-lilac text-accent-lilac-ink",
     edge: "border-accent-lilac",
@@ -406,6 +454,7 @@ const medallionAccents = [
     fill: "bg-accent-lemon text-accent-lemon-ink",
     edge: "border-accent-lemon",
   },
+  { fill: "bg-accent-mint text-accent-mint-ink", edge: "border-accent-mint" },
 ] as const;
 
 /** The cycle. The modulo cannot miss, but a number index is still `| undefined` to the compiler. */
@@ -476,7 +525,12 @@ export function WhyUs({
   image,
 }: {
   heading: string;
-  intro: string;
+  /**
+   * OPTIONAL, and the homepage no longer passes one — see the note on `home.whyUs`. A paragraph
+   * between this heading and its four points is a paragraph that says what the points are about to
+   * say; with it gone the title sits straight on the list, which is where a band of claims wants it.
+   */
+  intro?: string;
   points: readonly WhyUsPoint[];
   /** The label on the button through to the about page. */
   cta: string;
@@ -509,7 +563,7 @@ export function WhyUs({
               <Heading level={2} align="center-mobile">
                 {heading}
               </Heading>
-              <Text tone="muted">{intro}</Text>
+              {intro && <Text tone="muted">{intro}</Text>}
             </Stack>
 
             {/* A real list: four parallel claims are a list, and a screen reader saying "four
@@ -793,7 +847,10 @@ export function HowItWorks({
 }) {
   return (
     <Section tone="raised">
-      <Container>
+      {/* The positioning parent for the paws and nothing else — see `BandPaws`. */}
+      <div className="relative">
+        <BandPaws />
+        <Container>
         <Stack gap={10} align="center">
           {/* Centred at every width, not `center-mobile`: the whole band is centred, so a title
               that snapped left at `md` would be the only thing in it that did. */}
@@ -841,7 +898,8 @@ export function HowItWorks({
             ))}
           </ol>
         </Stack>
-      </Container>
+        </Container>
+      </div>
     </Section>
   );
 }
@@ -1053,6 +1111,7 @@ export function FormCard({
   heading,
   intro,
   mark = true,
+  tone = "canvas",
   children,
 }: {
   heading: string;
@@ -1063,11 +1122,19 @@ export function FormCard({
    * the page is for reads as branding on a form instead of as the form itself.
    */
   mark?: boolean;
+  /**
+   * `canvas` is the house panel — quiet, and correct where the form is the sidebar to an argument
+   * (the service pages, /locations/). `sky` is the loud one, for /contact/, where the form IS the
+   * page and has to be the first thing found rather than the thing beside the first thing. See the
+   * note on `Card tone="sky"`; it is deliberately not available anywhere a second form could be on
+   * screen with it.
+   */
+  tone?: "canvas" | "sky";
   /** The form. `pill` variant, always — see the note on `FieldVariant`. */
   children: ReactNode;
 }) {
   return (
-    <Card tone="canvas">
+    <Card tone={tone}>
       {/* Centred throughout, and the mark at the top is why: the logo is a symmetrical object, and
           left-hanging the words under a centred mark would read as two blocks that had come apart.
           The form's own controls are centred to match — see the `pill` variant in Field.
@@ -1472,7 +1539,10 @@ export function PricingBand({
 }) {
   return (
     <Section tone="canvas" spacing={spacing}>
-      <Container>
+      {/* The positioning parent for the paws and nothing else — see `BandPaws`. */}
+      <div className="relative">
+        <BandPaws />
+        <Container>
         {/* The trail hangs LEFT while the band it introduces is centred, and the two are separate
             stacks for exactly that reason. A centred breadcrumb reads as part of the title block —
             it is not; it is where you are, and it belongs on the page's own left edge, the same
@@ -1579,6 +1649,48 @@ export function PricingBand({
               ))}
             </ul>
 
+            {/* ── The two standing discounts ────────────────────────────────
+                Directly under the cards, and that is the only place they work. A discount printed
+                ABOVE a price is a distraction from the number somebody came to read; printed after
+                it, it is the answer to the sentence every buyer says in their head at the bottom of
+                a price table — "is that the best you can do".
+
+                They are NOT a third row of plan cards, and the shape is what says so: two wide
+                panels, no price on either, a percentage worn as a badge. Three plan cards and two
+                discount cards in one band would read as five things you choose between, when the
+                discounts apply to whichever of the three you already picked.
+
+                The green is the site's "go" colour, the same one the button under them takes — see
+                `primary` in ui/Button. It is the only place on the page it appears twice, which is
+                the point: the saving and the way to claim it are visibly one thing. */}
+            {discounts.length > 0 && (
+              <ul className="grid w-full list-none grid-cols-1 gap-4 pl-0 md:grid-cols-2">
+                {discounts.map((discount) => (
+                  <li
+                    key={discount.id}
+                    className="flex items-start gap-4 rounded-lg border-2 border-success bg-surface-raised p-5 text-left shadow-sm"
+                  >
+                    {/* The figure, not an icon. `shrink-0` or the badge squashes into an oval as
+                        the words beside it wrap. Ink on green is 6.56:1 — see theme.css. */}
+                    <span
+                      aria-hidden="true"
+                      className="flex size-12 shrink-0 flex-col items-center justify-center rounded-pill bg-success font-display text-h5 font-bold leading-none text-ink"
+                    >
+                      {`${discount.percent}%`}
+                    </span>
+                    <Stack gap={2}>
+                      <Heading level={level === 1 ? 2 : 3} size="h6">
+                        {discount.title}
+                      </Heading>
+                      <Text size="small" tone="muted">
+                        {discount.detail}
+                      </Text>
+                    </Stack>
+                  </li>
+                ))}
+              </ul>
+            )}
+
             <Stack gap={5} align="center">
               <Text tone="muted" measure>
                 {promise}
@@ -1587,14 +1699,16 @@ export function PricingBand({
                   is choosing between them, and the next thing they want is a person, not a second
                   form asking the questions the prices already answered. */}
               <Cluster gap={4} justify="center">
-                <Button href={routes.contact()} size="lg">
+                {/* Green: this is the CTA that closes the pricing section. */}
+                <Button href={routes.contact()} variant="cta" size="lg">
                   {cta}
                 </Button>
               </Cluster>
             </Stack>
           </Stack>
         </Stack>
-      </Container>
+        </Container>
+      </div>
     </Section>
   );
 }
@@ -1662,13 +1776,15 @@ export function PhotoBand({
 /**
  * The coverage answer as zip codes rather than town names.
  *
- * WHY ZIPS HERE, when the homepage band lists towns. A town name is what someone recognises, and
- * that is the right currency on a landing page. But this business's footprint is most of
- * Philadelphia — fifty-odd zips against ten town pages — so a list of towns on the pricing page
- * would understate the coverage badly, and a visitor in South Philly would read "Chestnut Hill,
- * Ardmore, Bryn Mawr…" and correctly conclude we do not come to them. The zip is also the exact
- * thing the quote form asks for two clicks later, so someone who finds theirs here already has
- * their answer typed.
+ * ONLY A TOWN'S OWN PAGE USES THIS NOW. It ran on /pricing/ until 2026-08-07, printing all
+ * forty-five serviced zips; that band is a map today (see `CoverageMap`), because a zip is a number
+ * you look up and a shape is something you recognise, and forty-five numbers in a block read as a
+ * boundary being enforced rather than a territory being offered.
+ *
+ * On /locations/[city]/ it still earns its place, and the difference is the count: four zips under
+ * a page about Ardmore is a precise answer to "is my street in it", and the visitor is already
+ * holding the town name that got them there. The zip is also the exact thing the quote form asks
+ * for two clicks later, so someone who finds theirs here already has their answer typed.
  *
  * Chips, not links: a zip is not a page, and making these look clickable would promise fifty
  * routes that do not exist. The town names are still links, on the homepage band, where they point
@@ -1733,6 +1849,178 @@ export function ServiceZips({
             <Link href={routes.contact()}>{note.link}</Link>
             {note.after}
           </Text>
+        </Stack>
+      </Container>
+    </Section>
+  );
+}
+
+// ── Coverage map ─────────────────────────────────────────────────────────────
+
+/**
+ * The territory as a PICTURE, with the two exits a map cannot provide.
+ *
+ * It replaced the wall of forty-five zip chips on /pricing/ (2026-08-07). The chips were the exact
+ * answer and the wrong shape for the question: a five-digit number is a thing you look up, not a
+ * thing you recognise, and a block of forty-five of them reads as a boundary being enforced rather
+ * than a territory being offered. The map answers "do you come to me" in the currency a person
+ * actually holds — where they live, relative to where they know things are.
+ *
+ * It is the SAME map as /locations/ and the homepage, from the same generated outline, so the three
+ * cannot disagree about where the van goes. See `ServiceAreaMapFrame` and lib/maps.ts.
+ *
+ * ── The two buttons are the point ────────────────────────────────────────────
+ * A map is only good news for the people inside it. The band therefore never ends on the picture:
+ *   · the FULL LIST, for somebody who cannot place themselves on a shape — which is most people,
+ *     because a town's outline is not something anyone has memorised.
+ *   · CONTACT, for the one visitor this band is bad news for. They are the reason it exists in this
+ *     form at all: the old zip wall turned that person away with a number, and a number cannot be
+ *     argued with. "Ask us" can.
+ * `secondary` on both — they are exits from a band, not the page's call to action, and two filled
+ * buttons here would compete with the green one under the prices.
+ *
+ * With the Maps Static API switched off (see lib/maps.ts) the frame renders nothing and the band
+ * degrades to a heading, a line and two buttons — which is still a working answer, and is why the
+ * words never refer to the picture.
+ */
+export function CoverageMap({
+  heading,
+  intro,
+  listLabel,
+  contactLabel,
+  tone = "canvas",
+}: {
+  heading: string;
+  intro?: string;
+  /** Words on the button through to the full coverage list. */
+  listLabel: string;
+  /** Words on the button through to /contact/, for somebody who is not on the map. */
+  contactLabel: string;
+  tone?: SectionTone;
+}) {
+  return (
+    <Section tone={tone}>
+      <Container>
+        <Stack gap={8} align="center">
+          <Stack gap={3} align="center">
+            <Heading level={2} align="center">
+              {heading}
+            </Heading>
+            {intro && (
+              <Text tone="muted" measure>
+                {intro}
+              </Text>
+            )}
+          </Stack>
+
+          <ServiceAreaMapFrame />
+
+          <Cluster gap={4} justify="center">
+            <Button href={routes.locations()} variant="secondary" size="md">
+              {listLabel}
+            </Button>
+            <Button href={routes.contact()} variant="secondary" size="md">
+              {contactLabel}
+            </Button>
+          </Cluster>
+        </Stack>
+      </Container>
+    </Section>
+  );
+}
+
+// ── Served areas ─────────────────────────────────────────────────────────────
+
+/**
+ * THE WHOLE COVERAGE LIST, forty-odd names in three groups. See content/neighborhoods.ts for why
+ * this is a list rather than forty more pages.
+ *
+ * GROUPED COLUMNS, NOT A WRAPPED CHIP ROW. `ServiceZips` puts fifty items in one justified block
+ * and that is right for zip codes, which are all five characters and which nobody reads in order —
+ * you scan for a shape. Town names are different lengths and are read alphabetically, and forty of
+ * them in a centred wrapped row is a ragged wall with no way in. Three headed columns give a
+ * visitor somewhere to start: they know which side of the city they live on before they know
+ * whether we come to it.
+ *
+ * The names are NOT links, and must not become any. Ten of these places have a page and thirty-odd
+ * do not, and a list where a third of the items are clickable reads as a list where two thirds are
+ * broken. The town chips that ARE links live in `ServiceAreaTowns` directly above this on
+ * /locations/, which is the band whose job is the pages.
+ *
+ * `columns` rather than a grid, so the three groups flow into a masonry-ish set of columns whose
+ * heights follow their own content — the north-and-west group is twice the length of the
+ * Philadelphia one, and a grid would leave the short column trailing a screen of white.
+ */
+export function ServedAreas({
+  heading,
+  intro,
+  areas,
+  note,
+}: {
+  heading: string;
+  intro?: string;
+  /** From `servedAreas` in content/neighborhoods.ts. Never typed out at a call site. */
+  areas: readonly { group: string; places: readonly { name: string }[] }[];
+  /** The "don't see yours?" escape hatch, split around the link — see `ServiceZips`. */
+  note: { before: string; link: string; after: string };
+}) {
+  return (
+    <Section tone="alt">
+      <Container>
+        <Stack gap={8}>
+          <Stack gap={3} align="center">
+            <Heading level={2} align="center">
+              {heading}
+            </Heading>
+            {intro && (
+              <Text tone="muted" measure>
+                {intro}
+              </Text>
+            )}
+          </Stack>
+
+          {/* `gap-8` is the column gutter; the group blocks below carry their own bottom margin,
+              which is what separates one group from the next when two share a column. */}
+          <div className="columns-1 gap-8 sm:columns-2 lg:columns-3">
+            {areas.map((area) => (
+              <div key={area.group} className="mb-8 break-inside-avoid">
+                <Stack gap={3}>
+                  {/* h3 — this band's own title is the h2 above. A group name is not a section. */}
+                  <Heading level={3} size="h5">
+                    {area.group}
+                  </Heading>
+                  {/* A real list, and a plain one: these are names, not controls, and a bullet on
+                      each would make forty short lines read as forty separate claims. */}
+                  <ul className="flex list-none flex-col gap-1.5 pl-0">
+                    {area.places.map((place) => (
+                      <li key={place.name} className="flex items-start gap-2">
+                        {/* The house paw as the marker. Decoration — the name beside it is the
+                            content, and a screen reader announcing a paw forty times is noise. */}
+                        <PawPrint
+                          size={14}
+                          aria-hidden="true"
+                          className="mt-1.5 shrink-0 text-success-ink"
+                        />
+                        <Text as="span" size="small">
+                          {place.name}
+                        </Text>
+                      </li>
+                    ))}
+                  </ul>
+                </Stack>
+              </div>
+            ))}
+          </div>
+
+          {/* Inside the sentence rather than a button under it: this is a footnote for the minority
+              a forty-item list just turned away. Centred, because the block above it is. */}
+          <div className="text-center">
+            <Text size="small" tone="muted">
+              {`${note.before} `}
+              <Link href={routes.contact()}>{note.link}</Link>
+              {note.after}
+            </Text>
+          </div>
         </Stack>
       </Container>
     </Section>
@@ -2089,6 +2377,38 @@ function FaqPaws() {
 }
 
 /**
+ * The SAME idea for a full-width band — the FAQ's paws were the client's favourite thing on the
+ * page and they asked for more of them on 2026-08-06, so this is the version that works where the
+ * content runs to the page container rather than to the reading measure.
+ *
+ * The difference is where they can safely go. `FaqPaws` has a prose column with 16rem of empty
+ * gutter either side and can put a 60%-opacity amber paw in it. A `Container width="page"` band has
+ * no such gutter, so these sit in the band's own vertical padding — high in the top corners and low
+ * in the bottom ones, where the only thing to collide with is air — and every one of them is drawn
+ * at `opacity-10` so that the four times a year a long heading does reach one, it reads as a
+ * watermark rather than as something stuck on top of the words.
+ *
+ * `hidden lg:block` for the same reason as the FAQ's: below `lg` the container's gutter is 20px and
+ * there is nowhere for a 64px paw to be that is not on top of a sentence.
+ *
+ * The caller must be `relative` — a `Section` is not, so these go inside a positioned wrapper. See
+ * `HowItWorks`.
+ */
+function BandPaws() {
+  return (
+    <div
+      aria-hidden="true"
+      className="pointer-events-none absolute inset-0 hidden overflow-hidden text-brand opacity-10 lg:block"
+    >
+      <PawPrint size={64} className="absolute -left-2 top-8 -rotate-12" />
+      <PawPrint size={40} className="absolute left-16 top-28 rotate-12" />
+      <PawPrint size={56} className="absolute bottom-10 right-2 rotate-6" />
+      <PawPrint size={36} className="absolute bottom-28 right-20 -rotate-12" />
+    </div>
+  );
+}
+
+/**
  * The homepage FAQ band. White, centred, and narrower than the bands above it — after three bands
  * of cards and prices this one is a single column of questions, and the change of shape is what
  * says the page is winding down rather than starting another pitch.
@@ -2220,22 +2540,26 @@ export function ReviewWall({
 /**
  * The page's closing argument. Full-bleed, an h2 at full size, two buttons, and it sits last.
  *
- * KNOWN PROBLEM with `tone="dark"`, which is still the default: `--color-surface-dark` and
- * `--color-brand` are the SAME navy — one token, two names — so `primary` is a navy fill on a navy
- * band and `ghost` is navy text on it — both buttons are all but invisible, and only the cream
- * label on the first one gives it an edge at all. Every page that closes on the dark band has
- * this. The real fix is a button variant that inverts on a dark surface; until that exists,
- * `tone="canvas"` is the way out, and it is what /services uses.
+ * THE DEFAULT IS `canvas`, changed 2026-08-07. It used to be `dark`, with a standing note that the
+ * dark band was broken: `--color-surface-dark` and `--color-brand` are the same navy, so the
+ * primary button was a navy fill on a navy band and the ghost beside it was navy text on one.
+ * Fifteen of the seventeen call sites were already passing `tone="canvas"` to escape it, which is
+ * a default nobody wants. The green CTA is the reason to settle it now — green on navy is 1.88:1,
+ * so the new button would have been the third control that could not find its own edge on that
+ * band, and the fix for all three is the same: close on the light band.
+ *
+ * `dark` remains available and is still legible for TEXT — cream on navy is 8.18:1. What it cannot
+ * currently do is carry a filled button. Don't reach for it without solving that.
  */
 export function CtaBand({
   heading,
   detail,
-  tone = "dark",
+  tone = "canvas",
   cta = primaryCta,
 }: {
   heading: string;
   detail?: string;
-  /** `canvas` is the light off-white close — same colour as a page's first band. */
+  /** `canvas` is the light off-white close — same colour as a page's first band. See above. */
   tone?: "dark" | "canvas";
   /** Override only where the page's next step is not the residential quote form. See `Hero`. */
   cta?: { label: string; href: string };
@@ -2257,7 +2581,9 @@ export function CtaBand({
             </Text>
           )}
           <Cluster gap={4} justify="center">
-            <Button href={cta.href} size="lg">
+            {/* Green. This band IS the call-to-action section — the one place on a page whose only
+                job is the button. See `variants` in ui/Button. */}
+            <Button href={cta.href} variant="cta" size="lg">
               {cta.label}
             </Button>
             <Button
@@ -2345,7 +2671,14 @@ export function CtaBanner({
             </div>
 
             {/* `shrink-0` or the label wraps mid-word as the heading beside it grows. The arrow is
-                the consequence of the action — where it takes you — which is why it sits right. */}
+                the consequence of the action — where it takes you — which is why it sits right.
+
+                THE ONE CTA THAT IS NOT GREEN, and the ribbon's own fill is why: `--color-cta` on
+                amber is 2.91:1, under the 3:1 a control needs to show its own edge, so a green
+                button here would be a green shape dissolving into an orange one. The navy clears it
+                comfortably and is already the ribbon's ink colour, so it reads as belonging to the
+                ribbon rather than as a third colour arriving. If this ever has to be green, the
+                ribbon's amber is the thing to change, not the button. */}
             <div className="shrink-0">
               <Button href={cta.href} size="lg" icon={ArrowRight}>
                 {cta.label}

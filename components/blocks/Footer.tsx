@@ -4,6 +4,7 @@ import { site } from "@/content/site";
 import { routes } from "@/lib/routes";
 import { Container } from "@/components/ui/layout";
 import { Link } from "@/components/ui/Link";
+import { SocialLinks } from "@/components/ui/SocialIcons";
 import { Text } from "@/components/ui/typography";
 
 /**
@@ -75,8 +76,22 @@ export function Footer() {
           </nav>
         </div>
 
-        <div className="border-t border-line-strong py-6 text-caption">
-          © {year} {site.legalName}. All rights reserved.
+        {/* The bottom bar. Stacked on a phone and a row from `sm`, with the copyright hard left and
+            the social icons hard right — the two things on this line have nothing to do with each
+            other, and pushing them apart is what stops the row reading as one sentence.
+
+            THE ICONS ARE THE LAST THING ON THE PAGE, which is the correct place for them. A social
+            link is the one link on this site that sends a visitor somewhere we do not control, so
+            it belongs after every other exit has been offered rather than in the middle of them. */}
+        <div className="flex flex-col items-center gap-4 border-t border-line-strong py-6 text-caption sm:flex-row sm:justify-between">
+          <span>
+            © {year} {site.legalName}. All rights reserved.
+          </span>
+          {/* `-mr-1` gives back the icons' own hover padding, so the last glyph's EDGE lands on the
+              container line rather than its hit target. */}
+          <div className="sm:-mr-1">
+            <SocialLinks tone="inverse" />
+          </div>
         </div>
       </Container>
     </footer>

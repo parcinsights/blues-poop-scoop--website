@@ -1,23 +1,22 @@
 import { NextResponse } from "next/server";
 
 import { deliverToGhl, missingIntegrationIsFatal } from "@/lib/integrations";
-import { contactRequestSchema, isServicedZip } from "@/lib/validation";
+import { toWebhookLead } from "@/lib/lead-payload";
+import { contactRequestSchema } from "@/lib/validation";
 
 /**
  * The contact form's sink. Same destination as /api/lead — GoHighLevel, where an automation texts
  * and emails George — and a separate route because it carries a different payload: a frequency and
  * an SMS consent, and no name.
  *
- * `source` is what tells the two apart once they are both sitting in the same CRM inbox, and it
- * matters: a contact-form lead has said how often it wants us out and agreed to be texted, so the
- * reply can open with a price rather than with a question.
+ * The PAYLOAD is identical — same keys, same order, `name` null here because this form does not ask
+ * for one. `source` is the only field that tells the two apart once they are both sitting in the
+ * same CRM inbox, and it matters: a contact-form lead has said how often it wants us out and may
+ * have agreed to be texted, so the reply can open with a price rather than with a question.
  *
  * Sweep&Go is not called here either. This form now collects nearly everything their onboarding
  * endpoint wants — the gap is the street address — so this is the route phase 5 will extend rather
  * than the short one. See lib/integrations.ts.
- *
- * DEFERRED: GHL_WEBHOOK_URL is not set yet. Until it is, this accepts and logs off production and
- * refuses on production, so a lead can never be silently swallowed.
  */
 export async function POST(request: Request) {
   let body: unknown;
@@ -38,12 +37,9 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: true });
   }
 
-  const lead = {
-    ...parsed.data,
-    inServiceArea: isServicedZip(parsed.data.zip),
-    source: "website:contact-form",
-    submittedAt: new Date().toISOString(),
-  };
+  // The canonical webhook shape — the same keys /api/lead sends, with `name` null and `smsConsent`
+  // carrying the box. One trigger on the GHL side reads both. See lib/lead-payload.ts.
+  const lead = toWebhookLead("contact-form", parsed.data);
 
   const result = await deliverToGhl(lead);
 

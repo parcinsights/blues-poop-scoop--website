@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/Button";
 import { Image } from "@/components/ui/Image";
 import { Container } from "@/components/ui/layout";
 import { Link } from "@/components/ui/Link";
+import { SocialLinks } from "@/components/ui/SocialIcons";
 
 /**
  * Site header. Sticky to the top of every page, and a SERVER component — there is no client
@@ -103,7 +104,30 @@ export function Header() {
     // shadow arrives. Both are one scroll-driven animation in base.css; see `.header-lift`.
     <header className="header-lift sticky top-0 z-50">
       <Container>
-        <div className="flex items-center justify-between gap-6 py-4">
+        {/* ── The social row ──────────────────────────────────────────────────
+            Its OWN row, hard right, sitting DIRECTLY on top of the lockup row — no gap between the
+            two at all, so the icons read as belonging to the navigation rather than floating above
+            it. The only air under a glyph is its own 4px of hover padding.
+
+            `pt-4` is the whole bar's top padding, and it is deliberately the same 16px as the `pb-4`
+            under the lockup below: the header is symmetrical top to bottom, with the icons and the
+            nav sharing the space between.
+
+            Heights, which must stay in step with `--header-height` in theme.css:
+              phone   16 (pt-4 on the lockup row) + 64 (logo) + 16 (pb-4)              =  96px = 6rem
+              md+     16 (pt-4 here) + 24 (16px glyph + p-1) + 64 + 16 (pb-4)          = 120px = 7.5rem
+            The page is pulled up by that token and gives it back as the first band's top border
+            (see base.css) — change a padding here and change the token in the same commit.
+
+            Hidden below `md`: on a phone this is sticky chrome spent on the lowest-value links on
+            the site, and the drawer and the footer both carry the same row. */}
+        <div className="hidden justify-end pt-4 md:flex">
+          <SocialLinks />
+        </div>
+
+        {/* `pt-4` only below `md`, where there is no social row above to supply the bar's top
+            padding. From `md` the row above owns it and this one starts flush against the icons. */}
+        <div className="flex items-center justify-between gap-6 pb-4 pt-4 md:pt-0">
           {/* The mark as an image, the wordmark as live text in the site face — so it stays crisp
               at any size and remains selectable, translatable, and readable to a screen reader. */}
           <Link href={routes.home()} variant="quiet">
@@ -121,12 +145,25 @@ export function Header() {
                   `decorative` because the company name is live text immediately to the right; a
                   screen reader that reads the alt as well says the brand twice. */}
               <Image asset="logoMark" decorative sizes="80px" className="h-16 w-auto" />
-              {/* 18px/600, the same as the nav items beside it — the lockup and the navigation are
-                  one row of type, and the mark to its left is what gives the brand its size.
-                  Fredoka is variable across 300–700, so 600 is a real design, not an interpolation
-                  the browser faked. */}
-              <span className="font-display font-semibold text-control text-brand leading-none">
-                {site.name}
+              {/* The wordmark and the trade under it, as one stacked block. `gap-1` rather than a
+                  Stack step: these are two lines of ONE lockup, and any more air between them and
+                  they read as a title with a subtitle. */}
+              <span className="flex flex-col gap-1">
+                {/* 18px/600, the same as the nav items beside it — the lockup and the navigation
+                    are one row of type, and the mark to its left is what gives the brand its size.
+                    Fredoka is variable across 300–700, so 600 is a real design, not an
+                    interpolation the browser faked. */}
+                <span className="font-display font-semibold text-control text-brand leading-none">
+                  {site.name}
+                </span>
+                {/* What the business actually is — see `site.descriptor`. Caption-sized, muted and
+                    letter-spaced: it has to sit UNDER the name in the reading order without
+                    competing with it, and at body size next to an 18px wordmark it would look like
+                    a second brand rather than a category. `whitespace-nowrap` so the header never
+                    breaks "Pet Waste Removal" across two lines on a narrow phone. */}
+                <span className="whitespace-nowrap text-caption font-semibold uppercase tracking-wide text-ink-muted leading-none">
+                  {site.descriptor}
+                </span>
               </span>
             </span>
           </Link>
@@ -199,6 +236,13 @@ export function Header() {
                       <Button href={headerCta.href} size="md" block>
                         {headerCta.label}
                       </Button>
+                    </li>
+                    {/* Under the CTA, not above it: the drawer is a menu someone opened looking for
+                        a page, and the social row is what is left when none of the pages was it.
+                        Centred, because it is the only thing in the drawer that is not a full-width
+                        row and a left-hung row of four small icons reads as a mistake. */}
+                    <li className="mt-2 flex justify-center">
+                      <SocialLinks />
                     </li>
                   </ul>
                 </nav>

@@ -11,6 +11,7 @@
  * See PLAN.md §2.
  */
 
+import { servedAreaZips } from "./neighborhoods";
 import { todo } from "./todo";
 import type { City } from "./types";
 
@@ -153,37 +154,31 @@ export const cities: City[] = [
 export const cityBySlug = new Map(cities.map((city) => [city.slug, city]));
 
 /**
- * Every zip inside the Philadelphia city line that the truck reaches — client-supplied, and much
- * wider than the four `philadelphia` carries above.
+ * `philadelphiaZips` USED TO LIVE HERE — all forty-seven zips inside the city line, on the theory
+ * that the van reached the whole city. It was removed on 2026-08-07, when the client sent the
+ * actual coverage list: ten Philadelphia NEIGHBOURHOODS, not the city. South Philadelphia, the
+ * Northeast and Center City were never served, and the site had been drawing them on the map and
+ * accepting their zips on the quote form for months.
  *
- * The two lists are not the same fact and must not be merged into one. A `City.zips` array is what
- * that CITY PAGE is about: /locations/philadelphia/ covers Chestnut Hill, Mount Airy, Roxborough
- * and East Falls, and putting South Philly's 19148 in it would claim the page speaks for a
- * neighbourhood it never mentions. This is the SERVICE FOOTPRINT: where a van will actually drive,
- * whether or not a page exists for the street. Coverage is the bigger set, and the difference is
- * why /pricing/ lists zips rather than town names.
- *
- * There is no Main Line zip here — those live on their own city entries and arrive via the union
- * below.
+ * The footprint now lives in `servedAreaZips` (content/neighborhoods.ts), which carries the whole
+ * territory — the ten neighbourhoods and the thirty-odd suburbs — as one list with a name against
+ * every zip. That is the file to edit when a route changes.
  */
-export const philadelphiaZips: string[] = [
-  "19102", "19103", "19104", "19106", "19107", "19109", "19111", "19114",
-  "19115", "19116", "19118", "19119", "19120", "19121", "19122", "19123",
-  "19124", "19125", "19126", "19127", "19128", "19129", "19130", "19131",
-  "19132", "19133", "19134", "19135", "19136", "19137", "19138", "19139",
-  "19140", "19141", "19142", "19143", "19144", "19145", "19146", "19147",
-  "19148", "19149", "19150", "19151", "19152", "19153", "19154",
-];
 
 /**
- * Every zip the business serves: the city pages' own zips UNIONED with the Philadelphia footprint,
- * de-duplicated and sorted. Derived — never maintained as a third list.
+ * Every zip the business serves: the city pages' own zips UNIONED with the coverage list,
+ * de-duplicated and sorted. Derived — never maintained as a separate list.
  *
  * This is what the lead form is checked against (see lib/validation.ts), so an entry missing here
- * is a real customer being told we do not come to their street.
+ * is a real customer being told we do not come to their street — and an entry that should not be
+ * here is a lead we cannot actually service being told we can.
+ *
+ * The union is not redundant: every city page's zip is also in the coverage list today, but a city
+ * page is allowed to exist for a place the coverage list has not caught up with, and the form
+ * should never reject a zip the site has a whole page about.
  */
 export const servicedZips: string[] = [
-  ...new Set([...cities.flatMap((city) => city.zips), ...philadelphiaZips]),
+  ...new Set([...cities.flatMap((city) => city.zips), ...servedAreaZips]),
 ].sort();
 
 /** Plain-language coverage summary, for schema `areaServed` and the footer. */

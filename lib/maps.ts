@@ -38,11 +38,14 @@
  * is what `NEXT_PUBLIC_GOOGLE_MAPS_STATIC_ENABLED` below is for.
  */
 
-import { serviceAreaOutline } from "@/content/service-area";
+import { serviceAreaOutlines } from "@/content/service-area";
 import { BRAND_HEX } from "@/lib/tokens";
 
 /** The brand navy, restated in the `0xRRGGBB` form Google's colour parameters want. */
 const brand = BRAND_HEX.replace("#", "0x");
+
+/** Google's documented ceiling on a Maps Static API request. */
+const MAX_URL_LENGTH = 16_384;
 
 export type MapSize = {
   /** CSS pixels. Google caps a free static map at 640 in either direction before `scale`. */
@@ -72,24 +75,41 @@ export function serviceAreaMapUrl({ width, height }: MapSize): string | null {
   });
 
   /**
-   * The territory. `enc:` is the encoded-polyline form — the same 300 points spelled out as
-   * `lat,lng` pairs would be an 8KB URL, and this is 1.3KB.
+   * The territory, as ONE PATH PER DISJOINT REGION. `enc:` is the encoded-polyline form — the same
+   * points spelled out as `lat,lng` pairs would be a 30KB URL, and this is about 3KB.
+   *
+   * Several paths rather than one because the coverage area is not contiguous — Media and
+   * Swarthmore are separated from the rest by unserved ground. A single path could only have been
+   * the largest piece, which silently dropped two places we actually serve. See
+   * scripts/build-service-area.mjs.
    *
    * `fillcolor` carries an alpha byte: `33` is 20%, dark enough to read as a region and light
    * enough that the road names and town labels underneath still show through, which is the entire
    * point of drawing it on a map rather than on a blank rectangle. `weight:2` keeps the edge
    * legible where the fill against cream is not.
    *
-   * No `center` and no `zoom`: given a path and no viewport, Google fits the frame to it. The map
-   * therefore re-frames itself when the boundary changes, and no number in this file secretly
-   * decides what you can see.
+   * No `center` and no `zoom`: given paths and no viewport, Google fits the frame to all of them.
+   * The map therefore re-frames itself when the boundary changes, and no number in this file
+   * secretly decides what you can see.
    */
-  params.append(
-    "path",
-    [`color:${brand}ff`, "weight:2", `fillcolor:${brand}33`, `enc:${serviceAreaOutline}`].join("|"),
-  );
+  for (const outline of serviceAreaOutlines) {
+    params.append(
+      "path",
+      [`color:${brand}ff`, "weight:2", `fillcolor:${brand}33`, `enc:${outline}`].join("|"),
+    );
+  }
 
-  return `https://maps.googleapis.com/maps/api/staticmap?${params}`;
+  const url = `https://maps.googleapis.com/maps/api/staticmap?${params}`;
+
+  /**
+   * Google rejects a static-map request over 16,384 characters, and every added region spends the
+   * budget. Returning null rather than a URL that 4xxs keeps the failure in the shape every other
+   * failure here already takes: the band drops the map and keeps the town list, which was the half
+   * doing the real work. If this ever fires, raise `TOLERANCE` in the build script.
+   */
+  if (url.length > MAX_URL_LENGTH) return null;
+
+  return url;
 }
 
 /**

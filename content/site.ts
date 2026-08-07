@@ -19,6 +19,17 @@ export const site = {
   /** Their own headline, from the current site. Their words beat ours. */
   tagline: "More than just a poop scoop service",
 
+  /**
+   * WHAT THE BUSINESS IS, in three words, sitting under the wordmark in the header lockup.
+   *
+   * Client-supplied 2026-08-06, and it is doing a real job rather than decorating the logo: "Blue's
+   * Poop Scoop" is a name that could belong to a groomer, a dog walker or a boarding kennel, and a
+   * visitor who lands on an inner page from search has nothing else above the fold that says which.
+   * It is deliberately the generic trade term and not `tagline` — a slogan is a claim, and this
+   * slot needs a category.
+   */
+  descriptor: "Pet Waste Removal",
+
   /** The owner. Named on the site because a name outperforms "our team" in a local trade. */
   owner: "George",
 
@@ -55,12 +66,34 @@ export const site = {
   /**
    * Every profile the business genuinely owns. Feeds schema `sameAs`, which is how a search
    * engine connects this site to the GBP and the Yelp listing as one entity.
+   *
+   * Client-supplied 2026-08-07 and no longer placeholders — the social icon row in the header and
+   * footer renders straight off this record, and a production build no longer throws on it.
    */
   profiles: {
-    googleBusiness: todo("https://www.google.com/maps/place/?q=place_id:TODO"),
+    /**
+     * A `share.google` SHORTENER, exactly as the client sent it, and it works: it 302s to the
+     * business on Google Maps.
+     *
+     * TWO THINGS WORTH KNOWING before anyone tidies this up.
+     *
+     * First, it resolves to a REVIEW url — the "leave us a review" flow rather than the profile
+     * page. That may well be deliberate, and it is a fine destination for a Google icon on a
+     * service business. It is worth confirming it is what George wants, because a visitor clicking
+     * the Google mark expecting hours and directions lands on a review form instead.
+     *
+     * Second, a shortener is the weaker form for `sameAs`. Entity matching wants the canonical URL,
+     * and a redirect is one more hop that can rot. The canonical form is derivable — the redirect
+     * carries the CID `0x8e2c21ab21bea186`, which in decimal is
+     * https://www.google.com/maps?cid=10244600271250301318 — but that has NOT been opened and
+     * confirmed to be this business, and Maps renders in JavaScript so it cannot be checked from a
+     * script. Open it once, and if it is Blue's Poop Scoop, swap this line for it.
+     */
+    googleBusiness: "https://share.google/nAiNmQYW0HSiAIPAk",
     yelp: "https://www.yelp.com/biz/blues-poop-scoop-philadelphia",
-    facebook: todo(""),
-    instagram: todo(""),
+    facebook: "https://www.facebook.com/profile.php?id=61579027144315",
+    instagram: "https://www.instagram.com/bluespoopscoop/",
+    tiktok: "https://www.tiktok.com/@blues.poop.scoop",
   },
 
   /** Analytics identifiers. Empty until the properties exist (phase 7). */
@@ -77,3 +110,25 @@ export const site = {
 export const sameAs: string[] = (Object.values(site.profiles) as string[]).filter(
   (url) => url.length > 0 && !url.includes("TODO"),
 );
+
+/**
+ * The four profiles that get an ICON, in the order the client named them — header row and footer
+ * row alike, so the two can never fall out of step.
+ *
+ * It is deliberately NOT `Object.values(site.profiles)`. Yelp is a real owned profile and belongs
+ * in `sameAs`, but it is not one of the four the client asked to show, and a fifth icon nobody
+ * asked for is the kind of thing that quietly appears in a footer and stays for years.
+ *
+ * `label` is the accessible name, and it names the PLACE rather than the network — "Blue's Poop
+ * Scoop on Instagram" is what a screen reader should say, because four links called "Instagram",
+ * "TikTok", "Facebook" and "Google" in a row tell you the networks and not whose they are.
+ *
+ * All four are real as of 2026-08-07. The `.filter` below is kept anyway: it is what makes adding a
+ * fifth network — or temporarily blanking one — a one-line change rather than a component edit.
+ */
+export const socialProfiles: { id: string; label: string; url: string }[] = [
+  { id: "instagram", label: `${site.name} on Instagram`, url: site.profiles.instagram },
+  { id: "tiktok", label: `${site.name} on TikTok`, url: site.profiles.tiktok },
+  { id: "facebook", label: `${site.name} on Facebook`, url: site.profiles.facebook },
+  { id: "google", label: `${site.name} on Google`, url: site.profiles.googleBusiness },
+].filter((profile) => profile.url.length > 0);

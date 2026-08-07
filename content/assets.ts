@@ -24,7 +24,21 @@ export const assets = {
    * against the file on every run.
    */
   logoMark: {
-    src: "/brand/blues-poop-scoop--logo-cropped.png",
+    /**
+     * THE DOG IS FILLED CREAM, and the file with the fill baked in is the one every call site
+     * takes. The artwork the client supplied is a navy line drawing with a TRANSPARENT body, so
+     * Blue was never a colour — he was a window onto whatever sat behind him. That worked at the
+     * top of a page, where the header is transparent and the cream hero band shows through, and it
+     * broke the moment the page scrolled: the bar fades to white (see `.header-lift` in base.css)
+     * and the dog turned white with it.
+     *
+     * The fill is a flood from the image border inwards, so only the ENCLOSED areas — the body, the
+     * ear gaps — take the cream and the space around the drawing stays transparent. Anti-aliased
+     * strokes are composited over the cream rather than replaced, which is why the outline is still
+     * soft at 76px. The transparent master is kept at `--logo-cropped.png` and is still what
+     * scripts/generate-icons.mjs builds the favicons and the OG card from.
+     */
+    src: "/brand/blues-poop-scoop--logo-cropped--cream.png",
     alt: "Blue's Poop Scoop",
     width: 483,
     height: 405,
@@ -202,14 +216,30 @@ export const assets = {
     width: 1031,
     height: 797,
   },
-  /** Haul Away. Stock — a loaded skip on a driveway. */
+  /**
+   * Haul Away. Stock — a loaded skip on a driveway.
+   *
+   * AWAITING A REPLACEMENT. The client asked on 2026-08-06 to change this and said they would send
+   * a photograph; none has arrived yet, so the stock shot stands. It is the weakest picture on the
+   * site and they are right to want it gone: a skip full of household junk is not what this add-on
+   * does — we carry off bagged pet waste — so the image actively describes the wrong service.
+   *
+   * TO SWAP: drop the file in /public, and change `src`, `alt` and the two dimensions here. Nothing
+   * else anywhere references the filename. `assets.test.ts` fails if the dimensions are wrong, so
+   * run `pnpm test` after.
+   */
   serviceHaulAway: {
     src: "/services--haul-away.webp",
     alt: "A blue skip on a driveway, filled with household junk and bagged waste",
     width: 1920,
     height: 1280,
   },
-  /** One-Time Clean. Stock — a caddy of cleaning supplies. */
+  /**
+   * One-Time Clean. Stock — a caddy of cleaning supplies.
+   *
+   * AWAITING A REPLACEMENT, same as `serviceHaulAway` above and for the same reason: brushes and
+   * spray bottles are house-cleaning, and this service is a yard. See the swap instructions there.
+   */
   serviceOneTimeClean: {
     src: "/services--one-time-clean.jpg",
     alt: "A yellow bucket packed with brushes, cloths, gloves and spray bottles",
