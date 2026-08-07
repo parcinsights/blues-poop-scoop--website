@@ -48,8 +48,17 @@ export const quickLeadSchema = z.object({
     .regex(/^\d{5}$/, "Please enter a 5-digit zip code"),
   dogs: z.coerce.number().int().min(1, "At least one dog").max(20),
   frequency: z.enum(FREQUENCIES).optional(),
-  /** Honeypot — must be empty. A bot fills it; a human never sees it. */
-  company: z.string().max(0).optional(),
+  /**
+   * Honeypot. A bot fills it; a human never sees it.
+   *
+   * The schema ACCEPTS whatever is in it and the API route is what throws the submission away —
+   * see /api/lead. Rejecting it here instead returned a 400 naming `company` as the bad field,
+   * which is a free lesson in how to get past the trap. The route answers 200 and drops it, so a
+   * bot learns nothing and does not come back with a different shape.
+   *
+   * Capped only to keep an unbounded string out of the parser.
+   */
+  company: z.string().max(200).optional(),
 });
 
 export type QuickLead = z.infer<typeof quickLeadSchema>;
@@ -107,8 +116,8 @@ export const contactRequestSchema = z.object({
    * George replies by phone or email instead.
    */
   smsConsent: z.boolean(),
-  /** Honeypot — must be empty. Same trick as the short form. */
-  company: z.string().max(0).optional(),
+  /** Honeypot. Same trick, and the same reason it is accepted here and dropped in the route. */
+  company: z.string().max(200).optional(),
 });
 
 export type ContactRequest = z.infer<typeof contactRequestSchema>;

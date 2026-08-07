@@ -7,6 +7,7 @@ import {
   type DeliveryResult,
 } from "@/lib/integrations";
 import { toWebhookLead } from "@/lib/lead-payload";
+import { clientIp, verifyTurnstile } from "@/lib/turnstile";
 import { quickLeadSchema } from "@/lib/validation";
 
 /**
@@ -51,6 +52,23 @@ export async function POST(request: Request) {
   // bot believes it succeeded and does not retry with a different shape.
   if (parsed.data.company) {
     return NextResponse.json({ ok: true });
+  }
+
+  // The bot gate, after the cheap checks and before anything is delivered — no point spending a
+  // round trip to Cloudflare on a payload that was never a valid lead. `action` must match the one
+  // the widget was rendered with; see lib/turnstile.ts for what else is checked and what a missing
+  // key does (it lets the lead through and logs, rather than closing the form).
+  const gate = await verifyTurnstile({
+    token: (body as { turnstileToken?: unknown }).turnstileToken,
+    action: "quick-lead",
+    ip: clientIp(request),
+  });
+  if (gate.status === "rejected" || gate.status === "failed") {
+    console.warn(`[lead] turnstile ${gate.status}: ${gate.detail}`);
+    return NextResponse.json({ error: "Could not verify that submission" }, { status: 403 });
+  }
+  if (gate.status === "not-configured") {
+    console.warn("[lead] TURNSTILE_SECRET_KEY not set — lead accepted without bot check");
   }
 
   // The canonical webhook shape, identical to the one /api/contact sends. It is also what gets

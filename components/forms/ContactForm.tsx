@@ -1,10 +1,11 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useRef, useState } from "react";
 
 import { Button } from "@/components/ui/Button";
 import { Checkbox, Field, Honeypot, Input, PhoneInput, Select } from "@/components/ui/Field";
+import { Turnstile, type TurnstileHandle } from "@/components/ui/Turnstile";
 import { Callout } from "@/components/ui/surfaces";
 import { Stack } from "@/components/ui/layout";
 import { routes } from "@/lib/routes";
@@ -76,6 +77,8 @@ export function ContactForm() {
   const [errors, setErrors] = useState<Record<string, string>>({});
   /** No `sent` — a success navigates to /thank-you/. See QuickLeadForm for the whole reason. */
   const [state, setState] = useState<"idle" | "sending" | "error">("idle");
+  /** The bot gate. Same component, different `action`, so a token cannot be moved between forms. */
+  const turnstile = useRef<TurnstileHandle>(null);
 
   async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -102,17 +105,21 @@ export function ContactForm() {
     setErrors({});
     setState("sending");
     try {
+      const turnstileToken = await turnstile.current?.token();
       const response = await fetch("/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(parsed.data),
+        body: JSON.stringify({ ...parsed.data, turnstileToken }),
       });
       if (!response.ok) {
+        // Single-use token: spent by the attempt that just failed, so a retry needs a fresh one.
+        turnstile.current?.reset();
         setState("error");
         return;
       }
       router.push(routes.thankYou());
     } catch {
+      turnstile.current?.reset();
       setState("error");
     }
   }
@@ -229,6 +236,12 @@ export function ContactForm() {
 
           {/* Inside the field grid — it is a field, just an invisible one. */}
           <Honeypot />
+
+          {/* Across both columns: on the rare submission where Cloudflare does show a challenge,
+              a checkbox squeezed into one half-width cell is the worst place to put it. */}
+          <div className="sm:col-span-2">
+            <Turnstile ref={turnstile} action="contact" />
+          </div>
         </div>
 
         {state === "error" && (

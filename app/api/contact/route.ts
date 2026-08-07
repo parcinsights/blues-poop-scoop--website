@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 
 import { deliverToGhl, missingIntegrationIsFatal } from "@/lib/integrations";
 import { toWebhookLead } from "@/lib/lead-payload";
+import { clientIp, verifyTurnstile } from "@/lib/turnstile";
 import { contactRequestSchema } from "@/lib/validation";
 
 /**
@@ -35,6 +36,21 @@ export async function POST(request: Request) {
   // does not come back with a different shape.
   if (parsed.data.company) {
     return NextResponse.json({ ok: true });
+  }
+
+  // The bot gate. `action` is "contact" here and "quick-lead" on the other route, which is what
+  // stops a token minted on one form being spent on the other. See lib/turnstile.ts.
+  const gate = await verifyTurnstile({
+    token: (body as { turnstileToken?: unknown }).turnstileToken,
+    action: "contact",
+    ip: clientIp(request),
+  });
+  if (gate.status === "rejected" || gate.status === "failed") {
+    console.warn(`[contact] turnstile ${gate.status}: ${gate.detail}`);
+    return NextResponse.json({ error: "Could not verify that submission" }, { status: 403 });
+  }
+  if (gate.status === "not-configured") {
+    console.warn("[contact] TURNSTILE_SECRET_KEY not set — lead accepted without bot check");
   }
 
   // The canonical webhook shape — the same keys /api/lead sends, with `name` null and `smsConsent`

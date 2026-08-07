@@ -1,10 +1,11 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useRef, useState } from "react";
 
 import { Button } from "@/components/ui/Button";
 import { Field, Honeypot, Input, PhoneInput, Select, type FieldVariant } from "@/components/ui/Field";
+import { Turnstile, type TurnstileHandle } from "@/components/ui/Turnstile";
 import { Callout } from "@/components/ui/surfaces";
 import { Stack } from "@/components/ui/layout";
 import { routes } from "@/lib/routes";
@@ -54,6 +55,8 @@ export function QuickLeadForm({
    * lands, which is also what keeps the button disabled through it.
    */
   const [state, setState] = useState<"idle" | "sending" | "error">("idle");
+  /** The bot gate. See `Turnstile` — invisible unless Cloudflare wants a look at this browser. */
+  const turnstile = useRef<TurnstileHandle>(null);
 
   const pill = variant === "pill";
   /** In `pill` the label lives in the placeholder, so every field has to carry one. */
@@ -78,17 +81,24 @@ export function QuickLeadForm({
     setErrors({});
     setState("sending");
     try {
+      // Waits for the challenge if one is still running, and resolves null if the gate is off or
+      // Cloudflare never answered — the server decides what a tokenless lead is worth.
+      const turnstileToken = await turnstile.current?.token();
       const response = await fetch("/api/lead", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(parsed.data),
+        body: JSON.stringify({ ...parsed.data, turnstileToken }),
       });
       if (!response.ok) {
+        // The token was spent by that attempt whether or not it was accepted, so a second press
+        // needs a fresh one. Without this, every retry fails as a replay.
+        turnstile.current?.reset();
         setState("error");
         return;
       }
       router.push(routes.thankYou());
     } catch {
+      turnstile.current?.reset();
       setState("error");
     }
   }
@@ -196,6 +206,11 @@ export function QuickLeadForm({
           {/* Inside the field group: it is a field, just an invisible one, and hanging it in the
               outer stack would put eight units of air around a zero-height element. */}
           <Honeypot />
+
+          {/* The same argument, for the same reason: zero height nearly always, and on the rare
+              submission where a challenge does appear it belongs with the fields rather than
+              wedged between the form and its button. */}
+          <Turnstile ref={turnstile} action="quick-lead" />
         </Stack>
 
         {/* The failure message belongs with the button rather than with the fields — it is about
