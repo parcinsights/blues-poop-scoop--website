@@ -50,10 +50,11 @@ describe("serviceAreaMapUrl", () => {
     // string has to escape. That escaping is correct and Google undoes it — the assertion is that
     // the path survives the round trip, not that it travels raw.
     const decoded = decodeURIComponent(url!);
-    // Every region, not just the first. The territory is not contiguous, and a map that drew only
-    // the largest piece would silently omit Media and Swarthmore — which is precisely the bug this
-    // replaced. See scripts/build-service-area.mjs.
-    expect(serviceAreaOutlines.length).toBeGreaterThan(1);
+    // Every region, not just the first. The territory is contiguous again as of the 2026-08-13 gap
+    // fill — one ring, no holes — but the assertion stays written against the general case: the bug
+    // this replaced drew only the largest piece and silently omitted Media and Swarthmore, and the
+    // next zip added off the edge of the footprint brings that case straight back.
+    expect(serviceAreaOutlines.length).toBeGreaterThan(0);
     for (const outline of serviceAreaOutlines) {
       expect(decoded).toContain(`enc:${outline}`);
     }

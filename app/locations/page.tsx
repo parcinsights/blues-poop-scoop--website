@@ -19,7 +19,7 @@ import { buildMetadata } from "@/lib/seo";
 const seo = {
   title: "Areas We Serve",
   description:
-    "Pet waste removal in Chestnut Hill, Mt. Airy, Roxborough, East Falls, Ardmore, Bryn Mawr, Haverford, Narberth, Gladwyne and Glenside.",
+    "Pet waste removal in Chestnut Hill, Mt. Airy, Roxborough, Manayunk, Ardmore, Bryn Mawr, Abington, Ambler, Jenkintown, Willow Grove, Blue Bell and fifty more.",
 };
 
 const crumbs: Crumb[] = [

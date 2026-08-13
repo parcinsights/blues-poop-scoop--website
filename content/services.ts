@@ -39,7 +39,7 @@ export const services: Service[] = [
     seo: {
       title: "Dog Poop Removal & Pooper Scooper Service | Philadelphia",
       description:
-        "Weekly or every-other-week dog poop removal across Chestnut Hill, Mt. Airy, Ardmore, Bryn Mawr and more. From $70 a month. No contracts.",
+        "Weekly or every-other-week dog poop removal across Chestnut Hill, Mt. Airy, Manayunk, Ardmore, Ambler, Jenkintown, Blue Bell and more. From $70 a month. No contracts.",
     },
     image: "servicePoopScoop",
     /**

@@ -882,7 +882,7 @@ export const opportunities = {
       {
         title: "Where you would work",
         detail:
-          "Philadelphia and the surrounding areas — Chestnut Hill, Mt. Airy, Roxborough and East Falls in the city, and the towns north and west of it. Routes are grouped, so you are not crossing the county twice in a day.",
+          "Philadelphia and the surrounding areas — Chestnut Hill, Mt. Airy, Roxborough, Manayunk and East Falls in the city, and the towns north and west of it: Abington, Ambler, Flourtown, Jenkintown, Willow Grove, Fort Washington, Plymouth Meeting, Blue Bell and the rest. Routes are grouped, so you are not crossing the county twice in a day.",
       },
       {
         title: "Experience",

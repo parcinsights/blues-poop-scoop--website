@@ -72,7 +72,7 @@ export const residentialFaqs: FaqItem[] = [
   {
     question: "What areas do you serve?",
     answer:
-      "Chestnut Hill, Mt. Airy, Roxborough and East Falls in Philadelphia, plus Ardmore, Bryn Mawr, Haverford, Narberth, Gladwyne and Glenside on the Main Line. If you are nearby but not on the list, get in touch and we will tell you honestly whether we can reach you.",
+      "Chestnut Hill, Mt. Airy, Roxborough, Manayunk and East Falls in Philadelphia; Ardmore, Bryn Mawr, Haverford, Narberth, Gladwyne and Glenside on the Main Line; and Abington, Ambler, Flourtown, Jenkintown, Willow Grove, Fort Washington, Plymouth Meeting and Blue Bell to the north. If you are nearby but not on the list, get in touch and we will tell you honestly whether we can reach you.",
   },
 
   // ── Outstanding. Both are questions real customers ask. ───────────────────

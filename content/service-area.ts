@@ -11,30 +11,29 @@
  * The territory, as one Google-encoded polyline PER DISJOINT REGION, largest first. Each feeds its
  * own `path=enc:` on the Maps Static API — see lib/maps.ts.
  *
- * More than one because the coverage area is not contiguous: 4 separate pieces today.
+ * More than one because the coverage area is not contiguous: 1 separate pieces today.
  */
 export const serviceAreaOutlines: string[] = [
-  "gg|rFbxzkMlt@yg@oVmr@xNiKzMz\\q@tNrL~\\~LiPpS~HjL}n@bDg}@wKeu@lHyk@{QqKkl@c`AqToq@e@s`@lFLbA}C_DyYp^aEgCsLlMoLqB{ItEsEwBjEdBdJsIbEgCdHrMzShG`^^|JaKtNjM`@w@|R`HpOfNtIzOfA`LrVrGiWvTkUbI}XfOuN~QgGpSf]fWdHkSjKsAbJyGbDmEzSpKvLbJtX~IcIfOjJvQhArOoMjZpGxD~H|RwA~FjTlIWyD`GdV`S~F`UB|c@{CnNsCm@t@jG`EeC`D{d@fTyQqEoLaIc|@_QqSmLW}BmDlLa]b\\_c@tGTjBgEmB{LnBo^}EgLnKqNbBkOu@iDgE|@_HaHhKgHrf@{AvSyK`I]dFzC_Ly@tCpU~FlTfIhKzi@}c@uBiGrDQsDoKtNaC}Uca@m[kQfE_P}m@s[eGi_@tH_DxBeGcO_Wvb@oNiZap@mXi_@_K|WwFq@cLuLdAaKeEiF}@hNyWiS}CyJsBdFqQcKCyJfHKkKwIgBgNh@~d@qDlVsGuI`EqCcQuJUgDuH\\eIfH}CcOlEcBoB{TvK_c@Ks_@qAaHwRPcCcZeNbLsOk@}D`XwNoToMlBpD|H~L~FgE~IuGkJgHrD{DfL_YmKuGnFuB~RmLuEuNrMeT}G_AnRiGvK{CaBgGvBsEoFeWzDig@qmAmCcE_G`DaK|NrPnWxH|f@sHnQrA|\\kn@|y@aHoNsFEkEaHcEnDaDtV|FtKgFpM}QgXmNgDksAewByL|IiWgTqNs\\w@`TwKeCaDlDaGgGbV{b@pIo\\sHgk@tPnD|B{D|GyNhB_Y~KmCk@oIvQeXhDyUuf@ei@qFcPbLmTgDsKzGcQkJcZdLeKoQeJ}No[`Vig@ra@o`@qJwFiBlD}R{LhD{CoFsCGeN|KfNtSoSvKfNvKyP~Dx@hFqNtRdIlJkDtFqK~AfEyAmEhE_FjPmHAcFxJgGdCw[~FgCnLi[yEs]rCqIjK{DiJgVF{N`GcUxFiAT{DyHaAUlEsHw@}AtWcR_Cp@iKdBRhDmdAspAhKqIkDuQnj@eN`RoLrGa|BajGwDByBeGv_@msAfPeFxWtAcCq]qb@~D`@_f@zBXhIynAqHdFvFaZuDi@qAlKsRrPsAsFwEbEce@mlA}CnIkS~Hd@`C_HaHm@uLoLWiO_^t@{KiBSbJuFlEso@z@_N{HcAT}DiHaAW|DuQaCV_EkRgCb@oG}DAuBf\\kKiPmPqIX}Csn@p@hAw_@uH_AViE}QcChA_QvMjBp@cKcd@sEzl@snAcU_Qem@}lAui@oh@u`@dy@q}Ac`BiIeTw|BsxB{cDakFwb@ka@uGdMgi@{h@w|@jvCuSqX}FpqAyNzi@@vg@}tAlqCsEmEuLzSmEy@{AzC|JxJogE~nIfh@fAfw@kI`Jw]vz@}aBtJwElLkU|N}A~GjCbC~HuGlMqAvQ`CjLp~BjdCctCbyF_w@_@}XnEaAwCiBlDeWnBoQzK{A{RsToNmDy]rEwJiSqVmH|GmXqx@nK`M~LePxFhD`Ts`@vb@sc@}`@ab@lAkIpPwItGwKuA}EyHp@iBnNqD_MwKrBkKuCzE|X}^e]{Kp^pJlm@c_@ba@uPm[{|A~xCt|@j_A_a@hOgi@vGvtAlsAbMnA~_@~\\beAhlAmTva@fPbUoGdRneAlbAag@|z@sLr]vrBfvBep@~yAmLkKy`Ale@}HaBpF}Es@eJmELwNmMiCxB_EuEuFz@yMkFqJfParA}c@|EsJxHpFjFiN|FrDfZkXaL_VuYgWlCcGwN}MzDeReJ_NdHmN_KeJaOyf@yVbh@iH_IiJn@sNmPkQfIiJsHtCwGzFhC~BgI~GWQuS|C}K_NkJnAqVcNrAaQoPlN_YuOaI{KmNsBiKkKoGNiE~GOtOfSnDX`MqUuBuElGwL_`AabAciBntDnv@bx@jArBoJ|Gl_@di@|CmGrBrAcCxJfNtR}Und@lEdErCsDnTpWyJp[bH~GwVbc@za@nd@uKtPlb@pb@qKxSog@ig@cZ`o@}HxByNeNgUr`@d}@f~@hSh]qGfJwDvUgN|M|ZjPgK`Q}UlD`Av\\v\\fj@jy@okBpj@lj@nFhOjm@eZ|d@vpAcCfMrFa@rWxW_FpJxiBlpBtD}LyAgM`Hol@hGcArD|BjT}b@eL{FoOw`@l\\kl@nt@p\\vd@j^fJmEhF~GaDfIxs@tp@qNb[xe@jn@lLzV_l@`jAbl@fi@hOzFtChSaFfTwF~DdGaBfIbLnGeJvE|FyEzKvHrH}Qjc@vk@dk@pLiTlH`JzHiFBk`@l_@~u@o@xy@wIt^GfUhI~FjMuM|Z_D~^mMnJx@nHhG~DkKb\\pBnByHpGjDbRwVfXdw@|DuEjEhFnLoGJbHsNzLhQ~_@jJcKjCgPkE}f@tBpGiFe_BfL^`Ige@hG`Hj@qCnApAnBoVeBcXe}@c_DeAuhAh]qoBfWi_AO}S}HwBtW_iAzHyl@tNuQr_@{SxcB{FjEgCbDdKcd@z^jCm@bm@li@`Pz\\vg@rPaA~FtHxD`Ha@h@p_@pNrv@iRjSbCfEsi@bb@mYwA}_@vrCcOr@bFlYnI__@fWd~@aWbT|H`[ojBnoAtn@zmBu\\zPzg@t_B`GcSiDwYz]{TlJlr@jR~xCdk@s^dGwKrJ`FjD}@fS`TrAyCiNg]}GysAk]wpA_Acb@vFsD_Kyl@xLdGzWoGjFnT`NcKnFArCmHuBeNpDaC|ExAU_HrNqHR_UtGgKvFkAh@eQz@xAlFoExHzW~Fyn@lFr]`N}}@rYj|@dyAqaAfmD`}FjDiEhFjI@xGiCMf[fi@wAhBsMsDK~C{BSdAhI_B_E|CgHUjD}BWpE|OoAbJmAjFaKdCnVhBra@bPeB~wAzCfSd\\dz@fKdo@fe@a]dZaGmD~^vCyAlDqb@lf@iNkApoBpJr@bCeGfGuAbCxEyGvBkBvI",
-  "glprFxb~jM|DeHN}TrKv@jBuJhVpE|JpNhOyN~R~G~EwNrMsAr@gX`KWxN_H_J{IqCbByEeI`CuAaD_IoEb@oMk[kIrF{NkVvT{JkEaVa`@zNaa@{Fe@vG_KsBgPrh@{JgR{IxCvAxD_n@bWxFrWgCPlAbm@zE`ObGtFjCkBhH`KjI{KnNpB|FjRdErB",
-  "yl|sF~wrkM~Q{e@gD}HuGwEaW`]uCgDpJiOmSaVe@cM}FO\\tLiDk@HgK_HNiCtDyCmJeLhTbHzKgHfSqEKn@rB~^|WjD_T|Y~U|PhD",
-  "qy|rFf`bkM~e@oh@kNmL{CcPoSr@v@leA",
+  "uaktFll{kMhVae@xHlDlYek@nGnCjXgg@~dAb~@bZcu@hN`Kf]qt@fY{}@rIOzAdMbKzEoDvJtIdI`x@erA|Ig[dInIyBxExCrGeAdNxDtCfGkTtIfJ~@eM{IcDvAaMvG@fE}RxMtIjD_T|Y~U|PhD~Q{e@}LuOaW`]uCgDpJiOmSaV{Gmx@nA{VrEaKb\\pBnByHpGjDpRoVxW|v@|DuEjEhFnLoGJbHsNzLhQ~_@|BwArGyJfBiRiJkrBf@uFfL^`Ige@hG`Hj@qCnApA{Mlw@hGb`A~c@doBdc@nF`Oge@de@]~FcCbDeWmDoTz]{TlJlr@jR~xCdk@s^dGwKrJ`FjD}@fS`TrAyCwNm_@oGsqAy]urAq@e`@vFsD_Kyl@xLdGzWoGjFnT`NcKnFArCmHuBeNpDaC|ExAU_HrNqHR_UtGgKvFkAh@eQz@xAlFoExHzW~Fyn@lFr]`N}}@rYj|@dyAqaAfmD`}FjDiEhFjI@xGiCMf[fi@wAhBsMsDK~C{BSdAhI_B_E|CgHUjD}BWpE|OoAbJmAjFaKdCnVhBra@bPeB~wAzCfSd\\dz@fKdo@fe@a]dZaGmD~^vCyAlDqb@lf@iNkApoBpJr@bCeGfGuAbCxEyGvBkBvIlt@yg@oVmr@xNiKzMz\\q@tNrL~\\~LiPpS~HjL}n@bDg}@wKeu@lHyk@{QqKkl@c`AqToq@e@s`@lFLbA}C_DyYf_@}E}CwKlMoLg@iNjCeAwBjEdBdJsIbEgCdHrMzShH~i@aKtNjM`@w@|R`HpOfNtIzOfA`LrVrGiWvTkUbI}XfOuN~QgGpSf]fWdHkSjKsAbJyGbDmEzSpKvLbJtX~IcIfOjJvQhArOoMjZpGxD~H|RwA~FjTlIWyD`GdV`SlH|YFjVmEdWiCoCj@lJ`EeC`D{d@fTyQqEoLaIc|@_QqSmLW}BmDlLa]b\\_c@tGTjBgEmB{LnBo^}EgLnKqNbBkOu@iDgE|@_HaHhKgHrf@{AvSyK`I]dFzC_Ly@tCpU~FlTfIhKzi@}c@uBiGrDQsDoKtNaC}Uca@m[kQfE_Pkm@kZwGq`@tH_DxBeGcO_Wvb@oNiZap@mXi_@hL|B`[aQ|MjDnEiB|JfEhEyCdF}LaJon@jAqElCt@tIc]i@jOxCtHlLkg@cGsDuIvAbEwYsI}b@hJ`Aiv@ec@`KgH_J{IqCbByEeI`CuAaD_IoEb@oMk[kIrF{NkVvT{JkEaVa`@zNaa@{Fe@vG_KsBgPrh@uLsQoCeQcF}EyCdGwEkOhJ_LcCgOwR`UeKiOqWtWwGsTdTsXd@q^lTcBe]i^yMoX{GrE}rA_EaNoLcJgBgMbE_A_BsVxc@rHp_@iItQuCnb@kVd@{B`RkOrAwM|OsZ}M|@au@`KqMgr@esBnSgNaG_R}NiDeIfGop@{iBbPoI`FuEQkErJyFjCe\\~FgCnLi[yEs]rCqIjK{DiJgVF{N`GcUxFiAT{DyHaAUlEsHw@}AtWcR_Cp@iKdBRhDmdAspAhKqIkDuQnj@eN`RoLrGa|BajGwDByBeGv_@msAfPeFxWtAcCq]qb@~D`@_f@zBXhIynAqHdFvFaZuDi@qAlKsRrPsAsFwEbEce@mlA}CnIkS~Hd@`C_HaHm@uLoLWiO_^t@{KiBSbJuFlEso@z@_N{HcAT}DiHaAW|DuQaCV_EkRgCb@oG}DAuBf\\kKiPmPqIX}Csn@p@hAw_@uH_AViE}QcChA_QvMjBp@cKcd@sEzl@snAcU_Qem@}lAui@oh@u`@dy@q}Ac`BiIeTw|BsxB{cDakFwb@ka@uGdMgi@{h@w|@jvCuSqX}FpqAyNzi@@vg@}tAlqCsEmEuLzSmEy@{AzC|JxJ{nQpx]nv@bx@jArBoJ|Gl_@di@|CmGrBrAcCxJfNtR}Und@lEdErCsDnTpWyJp[bH~GwVbc@za@nd@uKtPlb@pb@qKxSog@ig@cZ`o@}HxByNeNgUr`@d}@f~@hSh]qGfJwDvUgN|M|ZjPgK`Q}UlD`Av\\v\\fj@jy@okBpj@lj@nFhOjm@eZ|d@vpAcCfMrFa@rWxW_FpJrhAjnAsk@ttAmK~rAu`@pf@ft@tt@KbKaJbPwF\\eEsE{AhBcH}GdA{D}YwYqi@tjAfIl]qFtNdClMdLtJpPtAxFtGpNv]zL~_Aeb@iDwTpCc^uDyLxHnCzQlLaErHb~@fd@iLmBdR~DpZtHxFGbO`Pxs@yCn\\bw@lv@rPkLcIdT`JjJfR}]fb@vd@_Eph@b[vZ",
 ];
 
 /** South-west and north-east corners, for anything that needs to frame the shape itself. */
 export const serviceAreaBounds = {
   south: 39.8689,
-  west: -75.50866,
+  west: -75.51191,
   north: 40.27439,
   east: -75.01064,
 };
 
 /** The zips this shape was built from. Compared against `servicedZips` by the test. */
 export const serviceAreaZips: string[] = [
+  "18936",
   "19001",
   "19002",
   "19003",
   "19004",
   "19006",
+  "19008",
   "19009",
   "19010",
   "19012",
@@ -46,14 +45,18 @@ export const serviceAreaZips: string[] = [
   "19038",
   "19040",
   "19041",
+  "19044",
   "19046",
   "19063",
+  "19064",
   "19066",
   "19072",
   "19073",
   "19075",
   "19081",
+  "19083",
   "19085",
+  "19086",
   "19087",
   "19090",
   "19095",
@@ -67,12 +70,22 @@ export const serviceAreaZips: string[] = [
   "19138",
   "19141",
   "19144",
+  "19150",
   "19151",
   "19401",
   "19403",
+  "19405",
+  "19406",
   "19422",
+  "19426",
   "19428",
+  "19436",
+  "19437",
+  "19444",
   "19446",
+  "19454",
   "19456",
   "19462",
+  "19474",
+  "19477",
 ];

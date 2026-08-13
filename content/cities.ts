@@ -21,13 +21,19 @@ export const cities: City[] = [
     name: "Philadelphia",
     region: "PA",
     county: "Philadelphia County",
-    zips: ["19118", "19119", "19128", "19129"],
+    zips: ["19118", "19119", "19127", "19128", "19129"],
     coords: { lat: 40.045, lng: -75.2 },
-    neighborhoods: ["Chestnut Hill", "Mount Airy", "Roxborough", "East Falls"],
+    /**
+     * Manayunk joined the four on 2026-08-13, with its zip. It was already in the coverage list in
+     * content/neighborhoods.ts and already inside the drawn map; the only place it was missing was
+     * the page that names Philadelphia's neighbourhoods, which is the one a Manayunk resident
+     * actually reads.
+     */
+    neighborhoods: ["Chestnut Hill", "Mount Airy", "Roxborough", "Manayunk", "East Falls"],
     seo: {
       title: todo("Dog Poop Removal in Philadelphia, PA | Blue's Poop Scoop"),
       description: todo(
-        "Weekly pooper scooper service in Chestnut Hill, Mount Airy, Roxborough and East Falls. Reliable, insured, and local.",
+        "Weekly pooper scooper service in Chestnut Hill, Mount Airy, Roxborough, Manayunk and East Falls. Reliable, insured, and local.",
       ),
     },
     body: [],
