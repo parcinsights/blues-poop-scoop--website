@@ -1932,25 +1932,58 @@ export function CoverageMap({
 // ── Served areas ─────────────────────────────────────────────────────────────
 
 /**
- * THE WHOLE COVERAGE LIST, forty-odd names in three groups. See content/neighborhoods.ts for why
- * this is a list rather than forty more pages.
+ * THE WHOLE COVERAGE LIST, sixty-odd names in three groups. See content/neighborhoods.ts for why
+ * this is a list rather than sixty more pages.
  *
  * GROUPED COLUMNS, NOT A WRAPPED CHIP ROW. `ServiceZips` puts fifty items in one justified block
  * and that is right for zip codes, which are all five characters and which nobody reads in order —
- * you scan for a shape. Town names are different lengths and are read alphabetically, and forty of
- * them in a centred wrapped row is a ragged wall with no way in. Three headed columns give a
- * visitor somewhere to start: they know which side of the city they live on before they know
- * whether we come to it.
+ * you scan for a shape. Town names are different lengths and are read alphabetically, and sixty of
+ * them in a centred wrapped row is a ragged wall with no way in. Headed groups give a visitor
+ * somewhere to start: they know which side of the city they live on before they know whether we
+ * come to it.
  *
- * The names are NOT links, and must not become any. Ten of these places have a page and thirty-odd
+ * ── ONE GROUP PER ROW, SPLIT INTO COLUMNS ────────────────────────────────────
+ * It used to be three CSS columns, one group each, and the gap fill broke that: "north and west of
+ * the city" reached thirty-four names, so the band ran a full screen deep with the other two groups
+ * ending a third of the way down and nothing to the right of them but white.
+ *
+ * So the columns are per GROUP now, and how many there are is arithmetic rather than a breakpoint:
+ * a group is cut into as many columns as it takes to keep any one of them under `MAX_ROWS`, up to
+ * `MAX_COLUMNS`. Eleven names stay two columns; thirty-four become four. Nothing runs deeper than
+ * nine lines, and the width fills instead of the height.
+ *
+ * Chunked in JS rather than left to CSS `columns` because alphabetical order has to read DOWN each
+ * column and then across. CSS balances columns by height, which is close, but it re-flows the split
+ * on every resize — the same name lands in a different column at a different width, and a list
+ * somebody is scanning alphabetically is exactly the list where that is confusing.
+ *
+ * The names are NOT links, and must not become any. Twenty of these places have a page and forty
  * do not, and a list where a third of the items are clickable reads as a list where two thirds are
  * broken. The town chips that ARE links live in `ServiceAreaTowns` directly above this on
  * /locations/, which is the band whose job is the pages.
- *
- * `columns` rather than a grid, so the three groups flow into a masonry-ish set of columns whose
- * heights follow their own content — the north-and-west group is twice the length of the
- * Philadelphia one, and a grid would leave the short column trailing a screen of white.
  */
+
+/** Nothing in this band runs deeper than this before it spills into another column. */
+const SERVED_MAX_ROWS = 9;
+
+/**
+ * The ceiling on columns. Four 150px columns is about the point where the eye stops tracking down
+ * one and starts reading across the row, which for an alphabetical list is the wrong direction.
+ */
+const SERVED_MAX_COLUMNS = 4;
+
+/**
+ * A group's places, cut into balanced columns that read top-to-bottom. Every column gets the same
+ * number of rows (the last one short), so the block is a rectangle rather than a staircase.
+ */
+function servedColumns<T>(places: readonly T[]): T[][] {
+  const columns = Math.min(
+    SERVED_MAX_COLUMNS,
+    Math.max(1, Math.ceil(places.length / SERVED_MAX_ROWS)),
+  );
+  const rows = Math.ceil(places.length / columns);
+  return Array.from({ length: columns }, (_, i) => places.slice(i * rows, (i + 1) * rows));
+}
 export function ServedAreas({
   heading,
   intro,
@@ -1979,38 +2012,46 @@ export function ServedAreas({
             )}
           </Stack>
 
-          {/* `gap-8` is the column gutter; the group blocks below carry their own bottom margin,
-              which is what separates one group from the next when two share a column. */}
-          <div className="columns-1 gap-8 sm:columns-2 lg:columns-3">
+          {/* One block per group, stacked. Each is centred on the container and spreads its own
+              columns across it — see the note above for why the split is arithmetic. */}
+          <Stack gap={8}>
             {areas.map((area) => (
-              <div key={area.group} className="mb-8 break-inside-avoid">
-                <Stack gap={3}>
-                  {/* h3 — this band's own title is the h2 above. A group name is not a section. */}
-                  <Heading level={3} size="h5">
-                    {area.group}
-                  </Heading>
-                  {/* A real list, and a plain one: these are names, not controls, and a bullet on
-                      each would make forty short lines read as forty separate claims. */}
-                  <ul className="flex list-none flex-col gap-1.5 pl-0">
-                    {area.places.map((place) => (
-                      <li key={place.name} className="flex items-start gap-2">
-                        {/* The house paw as the marker. Decoration — the name beside it is the
-                            content, and a screen reader announcing a paw forty times is noise. */}
-                        <PawPrint
-                          size={14}
-                          aria-hidden="true"
-                          className="mt-1.5 shrink-0 text-success-ink"
-                        />
-                        <Text as="span" size="small">
-                          {place.name}
-                        </Text>
-                      </li>
-                    ))}
-                  </ul>
-                </Stack>
-              </div>
+              <Stack key={area.group} gap={4}>
+                {/* h3 — this band's own title is the h2 above. A group name is not a section. */}
+                <Heading level={3} size="h5" align="center">
+                  {area.group}
+                </Heading>
+                {/* Centred rather than stretched. `justify-center` on columns sized by their own
+                    content keeps the paws a fixed distance from their names — columns set to
+                    `grow` would fill the row by pushing a two-column group's halves to opposite
+                    edges, which is a void moved rather than a void closed. `min-w-40` is what stops
+                    a short name making a narrow column, and what lets four wrap to two on a phone
+                    instead of squeezing. */}
+                <div className="mx-auto flex w-full max-w-4xl flex-wrap justify-center gap-x-10 gap-y-6">
+                  {servedColumns(area.places).map((column, index) => (
+                    /* A real list, and a plain one: these are names, not controls, and a bullet on
+                       each would make sixty short lines read as sixty separate claims. */
+                    <ul key={index} className="flex min-w-40 list-none flex-col gap-1.5 pl-0">
+                      {column.map((place) => (
+                        <li key={place.name} className="flex items-start gap-2">
+                          {/* The house paw as the marker. Decoration — the name beside it is the
+                              content, and a screen reader announcing a paw sixty times is noise. */}
+                          <PawPrint
+                            size={14}
+                            aria-hidden="true"
+                            className="mt-1.5 shrink-0 text-success-ink"
+                          />
+                          <Text as="span" size="small">
+                            {place.name}
+                          </Text>
+                        </li>
+                      ))}
+                    </ul>
+                  ))}
+                </div>
+              </Stack>
             ))}
-          </div>
+          </Stack>
 
           {/* Inside the sentence rather than a button under it: this is a footnote for the minority
               a forty-item list just turned away. Centred, because the block above it is. */}
