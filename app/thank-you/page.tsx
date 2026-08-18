@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Mail, Phone } from "lucide-react";
 
+import { SignupConversion } from "@/components/analytics/SignupConversion";
 import { NextSteps } from "@/components/blocks/blocks";
 import { PageShell } from "@/components/blocks/PageShell";
 import { Button } from "@/components/ui/Button";
@@ -33,6 +34,9 @@ export const metadata: Metadata = buildMetadata({
 export default function ThankYouPage() {
   return (
     <>
+      {/* Reports the sign-up to Google Ads and Meta, once, and only for a real submit. */}
+      <SignupConversion />
+
       <PageShell crumbs={[]} heading={thankYou.heading} intro={thankYou.intro} />
 
       <Section tone="raised" spacing="md">

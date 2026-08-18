@@ -33,9 +33,16 @@ const nextConfig = {
    * What is deliberately NOT here is a script-src CSP. Locking scripts down properly needs a
    * per-request nonce, a nonce needs middleware, and middleware would run on every request and
    * opt this site out of being fully static — a real TTFB cost (§14.8) against a threat model of
-   * a site with no user input rendered anywhere and no third-party scripts at all. `frame-ancestors`
-   * is worth having on its own, so it ships as a one-directive policy; revisit the rest if a tag
-   * manager or a chat widget ever lands here.
+   * a site with no user input rendered anywhere. `frame-ancestors` is worth having on its own, so
+   * it ships as a one-directive policy.
+   *
+   * The Google Ads and Meta tags DO now load third-party script (see components/analytics/), which
+   * is the case this note previously said would justify revisiting. It still does not justify the
+   * middleware: both tags inject further scripts of their own at runtime, so a script-src tight
+   * enough to be worth having would break them, and one loose enough to keep them working would
+   * allow roughly what no policy allows. A tag manager or a chat widget would not change that
+   * either — if this is ever revisited, the reason will be user input reaching the page, not
+   * another marketing tag.
    */
   async headers() {
     return [

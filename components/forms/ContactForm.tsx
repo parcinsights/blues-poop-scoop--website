@@ -9,6 +9,7 @@ import { Checkbox, Field, Honeypot, Input, PhoneInput, Select } from "@/componen
 import { Turnstile, type TurnstileHandle } from "@/components/ui/Turnstile";
 import { Callout } from "@/components/ui/surfaces";
 import { Stack } from "@/components/ui/layout";
+import { markLeadPending } from "@/lib/analytics";
 import { routes } from "@/lib/routes";
 import { contactRequestSchema } from "@/lib/validation";
 
@@ -83,6 +84,8 @@ export function ContactForm() {
         setState("error");
         return;
       }
+      // See QuickLeadForm. Different source tag, same one-use flag.
+      markLeadPending("contact");
       router.push(routes.thankYou());
     } catch {
       turnstile.current?.reset();

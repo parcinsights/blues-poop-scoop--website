@@ -9,6 +9,7 @@ import { Field, Honeypot, Input, PhoneInput, Select, type FieldVariant } from "@
 import { Turnstile, type TurnstileHandle } from "@/components/ui/Turnstile";
 import { Callout } from "@/components/ui/surfaces";
 import { Stack } from "@/components/ui/layout";
+import { markLeadPending } from "@/lib/analytics";
 import { routes } from "@/lib/routes";
 import { quickLeadSchema } from "@/lib/validation";
 
@@ -82,6 +83,9 @@ export function QuickLeadForm({
         setState("error");
         return;
       }
+      // Left for /thank-you/ to spend. Set only after the API accepted the lead, so a rejected
+      // submission cannot report a conversion. See lib/analytics.ts.
+      markLeadPending("quick_lead");
       router.push(routes.thankYou());
     } catch {
       turnstile.current?.reset();

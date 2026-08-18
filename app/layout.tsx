@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Fredoka } from "next/font/google";
 
+import { Analytics } from "@/components/analytics/Analytics";
 import { Footer } from "@/components/blocks/Footer";
 import { Header } from "@/components/blocks/Header";
 import { site } from "@/content/site";
@@ -67,6 +68,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <Header />
         <main id="main">{children}</main>
         <Footer />
+        {/* The ad tags. Last in the body and deferred — see the component. */}
+        <Analytics />
       </body>
     </html>
   );
