@@ -14,11 +14,11 @@
  */
 
 import { commercial } from "./pages/standing";
-import { priceTiers } from "./pricing";
+import { perVisit, priceTiers } from "./pricing";
 import { todo } from "./todo";
 import type { FaqItem } from "./types";
 
-const [firstTier] = priceTiers;
+const [firstTier, secondTier] = priceTiers;
 
 /**
  * The homeowner's set. Ordered the way the doubt actually arrives — how it works, then what
@@ -36,7 +36,7 @@ export const residentialFaqs: FaqItem[] = [
   {
     question: "How often do you come out?",
     answer:
-      "Weekly or every other week. Weekly suits most households, especially with more than one dog or a smaller yard. Every other week works well for a single dog with plenty of space.",
+      "Once a week, on the same day every week. That is the schedule we build every plan around, and it is what keeps a yard genuinely clear rather than nearly clear. If you need something different, ask us and we'll work it out with you.",
   },
   {
     question: "What happens if my dog is outside when you arrive?",
@@ -57,7 +57,7 @@ export const residentialFaqs: FaqItem[] = [
   },
   {
     question: "How much does pet waste removal cost?",
-    answer: `Pricing depends on how many dogs you have and how often you want us out. Weekly service starts at $${firstTier?.weekly} a month for one or two dogs, and every-other-week service starts at $${firstTier?.biweekly} a month. Larger households are priced by the number of dogs.`,
+    answer: `Weekly service starts at $${firstTier?.weekly} a month for one or two dogs — about ${perVisit(firstTier?.weekly ?? 0)} a visit — and it is a flat monthly rate with no hidden fees and no contract. Three or four dogs is $${secondTier?.weekly} a month. If you have more dogs than that, or you want a different schedule, get in touch and we'll quote it.`,
   },
   {
     question: "How does billing work?",

@@ -12,15 +12,20 @@
  * CORRECTION, 2026-08-01: weekly and bi-weekly are NOT separate services. They are two frequencies
  * of one job, and they used to have a page each — which meant two near-identical pages competing
  * for the same query, and a visitor being asked to choose a frequency before being told what the
- * service is. Both are now the Poop Scoop page, which explains the work once and offers the two
- * schedules inside it. The prices for both still live in content/pricing.ts and are shown together
- * in the pricing band, which is where a frequency is actually a decision.
+ * service is. Both became the Poop Scoop page, which explains the work once.
+ *
+ * FOLLOW-ON, 2026-09-04: the client then cut the second frequency from everything published. Weekly
+ * is the offer; bi-weekly is quoted on request and is no longer sold from a page. This record was
+ * rewritten accordingly — it no longer asks the reader to choose a schedule, because there is now
+ * one. The old page still catches "every other week" intent through the FAQ below, which answers
+ * that query honestly rather than by advertising a plan the client would rather not sell.
  *
  * `hasCityPages` decides which services also generate /locations/[city]/[service]/ money pages —
  * the pages that catch local intent ("dog poop removal ardmore pa"). Only the core scooping plan
  * has them. Generating every service × every city is how a doorway network appears by accident.
  */
 
+import { perVisit, startingPrice } from "./pricing";
 import { todo } from "./todo";
 import type { Service } from "./types";
 
@@ -28,30 +33,31 @@ export const services: Service[] = [
   {
     /**
      * The core service, and the only one anyone searches for by itself. It absorbed the two
-     * frequency pages (see the correction above), so it now owns both the "weekly dog poop
-     * removal" and "every other week" intent as well as the local money-pages.
+     * frequency pages (see the correction above), so it owns the "weekly dog poop removal" and
+     * "every other week" intent as well as the local money-pages — the second of those is answered
+     * in the FAQ rather than sold in the copy.
      */
     slug: "poop-scoop",
     name: "Poop Scoop",
     heading: "Dog poop removal, done right",
     summary:
-      "Regular yard scooping, weekly or every other week. We text before we come and again when the yard is clear, double-bag everything, and never enter while your dog is outside.",
+      "Weekly yard scooping on a day you can count on. We text before we come and again when the yard is clear, double-bag everything, and never enter while your dog is outside.",
     seo: {
       title: "Dog Poop Removal & Pooper Scooper Service | Philadelphia",
       description:
-        "Weekly or every-other-week dog poop removal across Chestnut Hill, Mt. Airy, Manayunk, Ardmore, Ambler, Jenkintown, Blue Bell and more. From $70 a month. No contracts.",
+        `Weekly dog poop removal across Chestnut Hill, Mt. Airy, Manayunk, Ardmore, Ambler, Jenkintown, Blue Bell and more. From $${startingPrice} a month — ${perVisit(startingPrice)} a visit. No contracts.`,
     },
     image: "servicePoopScoop",
     /**
-     * Three chips, and not one of them is an adjective: "Weekly or bi-weekly" is the schedule,
-     * "No contracts" is the terms, "Pet-safe" is the policy of never entering while a dog is out.
+     * Three chips, and not one of them is an adjective: "Weekly service" is the schedule, "No
+     * contracts" is the terms, "Pet-safe" is the policy of never entering while a dog is out.
      * A chip is the first thing read on this page, so it is the last place to put a claim nobody
      * has committed to.
      */
-    tags: ["Weekly or bi-weekly", "No contracts", "Pet-safe"],
+    tags: ["Weekly service", "No contracts", "Pet-safe"],
     /**
      * The INCLUDES tab. Every sentence here is something the client has actually committed to —
-     * the schedule, the texts, the double-bagging, the pet-safety policy, the first-visit
+     * the weekly schedule, the texts, the double-bagging, the pet-safety policy, the first-visit
      * walkthrough. Nothing in it is a claim a franchise site could not also make; what makes it
      * worth printing is that it is true here and someone will be held to it.
      *
@@ -61,8 +67,8 @@ export const services: Service[] = [
      * this stays general until they arrive.
      */
     includes: [
-      "Every visit runs the same way, whichever schedule you're on. You get a text before we set off, so nobody is surprised by a van in the driveway. We work through the yard and collect what's there, and everything we pick up is double-bagged for sanitation and odor control. When it's clear, you get a second text — so you know the job is done without having to go and look.",
-      "The one thing we won't do is let ourselves in while your dog is outside. That holds no matter what the schedule says: if we arrive and your dog is in the yard, you get a text instead of a scooped lawn, and we sort out a better time. The only visit you need to be home for is the first one, so you can walk us around and get gate access set up. After that, come and go as you like.",
+      "Every visit runs the same way, every week. You get a text before we set off, so nobody is surprised by a van in the driveway. We work through the yard and collect what's there, and everything we pick up is double-bagged for sanitation and odor control. When it's clear, you get a second text — so you know the job is done without having to go and look.",
+      "The one thing we won't do is let ourselves in while your dog is outside. That holds every week without exception: if we arrive and your dog is in the yard, you get a text instead of a scooped lawn, and we sort out a better time. The only visit you need to be home for is the first one, so you can walk us around and get gate access set up. After that, come and go as you like.",
     ],
     /**
      * The BENEFITS tab, and the only part of this record that is not a fact somebody supplied.
@@ -76,16 +82,17 @@ export const services: Service[] = [
       "The less obvious one is that you start using the yard again. A lawn nobody has scooped in three weeks is somewhere you cross carefully on the way to the car; a clean one is somewhere the kids sit down and the dog gets played with. Through the summer it is also the difference between a garden with flies in it and one without.",
     ]),
     /**
-     * Four questions, and the first one is the one this page created by merging the frequency
-     * pages: a visitor now has to pick a schedule here rather than by clicking a different page,
-     * so the page has to help them do it. The answer refuses to guess which is right for them —
-     * it removes the cost of guessing wrong instead, which is a fact rather than an opinion.
+     * Four questions, and the first one is here for the searcher rather than for the buyer: people
+     * do look for "every other week dog poop removal", and the honest answer is that we will do it
+     * but do not sell it off the shelf. Answering that plainly is worth more than either
+     * advertising a plan the client would rather not sell, or pretending the option does not exist
+     * and losing the visitor who came looking for it.
      */
     faq: [
       {
-        question: "Weekly or every other week — which do I need?",
+        question: "Do you offer every-other-week service?",
         answer:
-          "You can switch between the two whenever you like, so it costs nothing to guess. There's no contract either way: start with whichever sounds closer and tell us by text if it turns out to be wrong.",
+          "Our published plans are weekly, because that is what keeps a yard genuinely clear and it is what almost everyone ends up on. If every other week suits your yard better, just ask — we'll quote it for you. There's no contract either way, so you can change your mind by text.",
       },
       {
         question: "Do I need to be home?",
@@ -106,8 +113,8 @@ export const services: Service[] = [
     /**
      * The ABOUT tab, and the publish gate: this is the field that decides whether the page is
      * indexed at all (see lib/content.ts). It is written from the facts already in this record —
-     * the two schedules, the no-contract terms, the coverage — rather than from anything new, which
-     * is why it needs no `todo()` and why it is the shortest honest version of this page.
+     * the weekly schedule, the no-contract terms, the coverage — rather than from anything new,
+     * which is why it needs no `todo()` and why it is the shortest honest version of this page.
      *
      * It gets richer the moment George answers the outstanding questions: how long he has been
      * doing this, how many yards he is on now, and what happens the week it snows.
@@ -116,8 +123,8 @@ export const services: Service[] = [
       {
         kind: "prose",
         paragraphs: [
-          "Poop Scoop is the recurring service most of our customers are on. We come to your yard every week, or every other week, and clear out everything the dogs have left behind since we were last there. One dog or six, a small city yard or half an acre on the Main Line — it is the same job and the same standard either way.",
-          "Which of the two schedules you want is really the only decision, and it is not a permanent one. Weekly suits most yards with more than one dog in them; every other week is usually enough for a single dog and a bit of grass. If you guess wrong, you send us a text and we change it — there is no contract to renegotiate, and nothing to cancel beyond telling us to stop.",
+          "Poop Scoop is the recurring service most of our customers are on. We come to your yard once a week, on the same day each week, and clear out everything the dogs have left behind since we were last there. One dog or four, a small city yard or half an acre on the Main Line — it is the same job and the same standard either way.",
+          "There is not much to decide beyond how many dogs you have, and that decides the price rather than the plan. Weekly is the schedule we build every route around, and it is what keeps a yard clear rather than nearly clear. If your yard genuinely wants something different — a different frequency, or more dogs than our plans list — tell us and we'll quote it. There is no contract to renegotiate, and nothing to cancel beyond telling us to stop.",
           "We are a local outfit rather than a franchise, so the person scooping your yard is the person who answers your text. If we get it wrong in your first thirty days, we refund the lot and part on good terms.",
         ],
       },

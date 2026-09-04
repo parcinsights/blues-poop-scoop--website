@@ -34,7 +34,7 @@ const philadelphia = cities.find((city) => city.slug === "philadelphia");
 export const home = {
   seo: {
     title: "Dog Poop Removal in Philadelphia & the Main Line",
-    description: `Weekly and bi-weekly pet waste removal in Chestnut Hill, Mt. Airy, Roxborough, Manayunk, Ardmore, Abington, Ambler, Jenkintown and Blue Bell. Plans from $${startingPrice} a month.`,
+    description: `Weekly pet waste removal in Chestnut Hill, Mt. Airy, Roxborough, Manayunk, Ardmore, Abington, Ambler, Jenkintown and Blue Bell. Plans from $${startingPrice} a month.`,
   } satisfies Seo,
 
   hero: {

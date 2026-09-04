@@ -13,7 +13,7 @@ import { JsonLd } from "@/components/seo/JsonLd";
 import { SectionDivider } from "@/components/ui/layout";
 import { home } from "@/content/pages/home";
 import { pricingPage } from "@/content/pages/standing";
-import { reviews } from "@/content/reviews";
+import { allReviewsCta, featuredReviews } from "@/content/reviews";
 import { routes } from "@/lib/routes";
 import { standardPageGraph, type Crumb } from "@/lib/schema";
 import { buildMetadata } from "@/lib/seo";
@@ -104,7 +104,11 @@ export default function PricingPage() {
         contactLabel={pricingPage.serviceArea.contactLabel}
       />
 
-      <ReviewWall heading={pricingPage.reviews.heading} reviews={reviews} />
+      <ReviewWall
+        heading={pricingPage.reviews.heading}
+        reviews={featuredReviews}
+        viewAllLabel={allReviewsCta.label}
+      />
 
       {/* Both bands are white, so nothing marks the seam between them. This is that mark — a
           hairline on the container line rather than a change of colour. See `SectionDivider`. */}

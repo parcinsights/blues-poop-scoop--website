@@ -14,7 +14,7 @@ import { JsonLd } from "@/components/seo/JsonLd";
 import { SectionDivider } from "@/components/ui/layout";
 import { consultationCta } from "@/content/nav";
 import { commercial } from "@/content/pages/standing";
-import { ratingSummary, reviews } from "@/content/reviews";
+import { allReviewsCta, featuredReviews, ratingSummary } from "@/content/reviews";
 import { isPublishable } from "@/lib/content";
 import { routes } from "@/lib/routes";
 import { standardPageGraph, type Crumb } from "@/lib/schema";
@@ -122,7 +122,11 @@ export default function CommercialPage() {
           they are real, and what they evidence — thoroughness, showing up, texting you — is what a
           property manager is buying too. The heading is worded so nothing here claims a commercial
           client left one. See the note in the content record. */}
-      <ReviewWall heading={commercial.reviews.heading} reviews={reviews} />
+      <ReviewWall
+        heading={commercial.reviews.heading}
+        reviews={featuredReviews}
+        viewAllLabel={allReviewsCta.label}
+      />
 
       {/* `alt`, the deeper cream: six white cards on it, and it separates the promises from the
           white band above without a border. Left-hung, unlike the services band — six items is a

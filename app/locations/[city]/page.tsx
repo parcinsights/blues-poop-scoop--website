@@ -20,7 +20,7 @@ import { answeredResidentialFaqs } from "@/content/faq";
 import { cityPage } from "@/content/pages/city-page";
 import { home } from "@/content/pages/home";
 import { residential } from "@/content/pages/standing";
-import { ratingSummary, reviews } from "@/content/reviews";
+import { allReviewsCta, featuredReviews, ratingSummary } from "@/content/reviews";
 import { isPublishable } from "@/lib/content";
 import { routes } from "@/lib/routes";
 import { standardPageGraph, type Crumb } from "@/lib/schema";
@@ -154,7 +154,11 @@ export default async function CityPage({ params }: Params) {
 
       {/* The quotes are not from this town and the heading does not pretend they are. No review on
           file carries a city; when one does, this band is where a local quote belongs. */}
-      <ReviewWall heading={cityPage.reviews.heading} reviews={reviews} />
+      <ReviewWall
+        heading={cityPage.reviews.heading}
+        reviews={featuredReviews}
+        viewAllLabel={allReviewsCta.label}
+      />
 
       {/* The sibling towns, and the only cross-link between the ten. It keeps every location one hop
           from every other instead of routing all of them through /locations/. */}

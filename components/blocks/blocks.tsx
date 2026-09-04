@@ -40,7 +40,7 @@ import {
   Text,
 } from "@/components/ui/typography";
 import type { AssetKey } from "@/content/assets";
-import { discounts, priceTiers, pricing } from "@/content/pricing";
+import { customQuote, discounts, perVisit, priceTiers, pricing } from "@/content/pricing";
 import { phoneCtaLabel, primaryCta } from "@/content/nav";
 import { site } from "@/content/site";
 import type {
@@ -350,7 +350,7 @@ export function ServiceHero({
 }: {
   heading: string;
   summary: string;
-  /** The outlined chips above the h1 — "Weekly or bi-weekly", "No contracts". */
+  /** The outlined chips above the h1 — "Weekly service", "No contracts". */
   tags?: readonly string[];
   image?: AssetKey;
   crumbs: Crumb[];
@@ -1421,6 +1421,15 @@ export function StatBand({ stats }: { stats: readonly Stat[] }) {
  * The real price grid. Rendered as a proper `<table>` with scoped headers, because it is tabular
  * data — a grid of divs would be unreadable to anyone using a screen reader, and this is the page
  * a buyer is most likely to be scrutinising.
+ *
+ * TWO COLUMNS OF MONEY, and they are the same number said twice: the monthly total that gets
+ * invoiced, and what that works out to per visit. That is not padding. "$135 a month" and "$33.75 a
+ * visit" are read by two different people — one is budgeting, the other is deciding whether a job
+ * they could do themselves is worth the money — and the per-visit figure is the one that answers
+ * the second. It is derived (see `perVisit`), so the two can never disagree.
+ *
+ * The every-other-week column came off on 2026-09-04. It is still sold; `CustomQuoteNote` under the
+ * table is how somebody asks for it.
  */
 export function PriceTable({ heading }: { heading: string }) {
   return (
@@ -1433,7 +1442,7 @@ export function PriceTable({ heading }: { heading: string }) {
           <div className="overflow-x-auto">
             <table className="w-full border-collapse text-body">
               <caption className="sr-only">
-                Monthly pricing by number of dogs and visit frequency
+                Monthly pricing for weekly service, by number of dogs
               </caption>
               <thead>
                 <tr className="border-b border-line-strong text-left">
@@ -1441,10 +1450,10 @@ export function PriceTable({ heading }: { heading: string }) {
                     Dogs
                   </th>
                   <th scope="col" className="py-3 pr-4 font-semibold">
-                    Weekly
+                    Weekly service
                   </th>
                   <th scope="col" className="py-3 font-semibold">
-                    Every other week
+                    Per visit
                   </th>
                 </tr>
               </thead>
@@ -1458,15 +1467,15 @@ export function PriceTable({ heading }: { heading: string }) {
                       {tier.dogs}
                     </th>
                     <td className="py-4 pr-4">
-                      ${tier.weekly}
+                      <span className="font-semibold">{`$${tier.weekly}`}</span>
                       <Text as="span" size="small" tone="muted">
                         {` ${pricing.unit}`}
                       </Text>
                     </td>
                     <td className="py-4">
-                      ${tier.biweekly}
+                      {perVisit(tier.weekly)}
                       <Text as="span" size="small" tone="muted">
-                        {` ${pricing.unit}`}
+                        {" per visit"}
                       </Text>
                     </td>
                   </tr>
@@ -1474,35 +1483,74 @@ export function PriceTable({ heading }: { heading: string }) {
               </tbody>
             </table>
           </div>
+
+          <CustomQuoteNote />
         </Stack>
       </Container>
     </Section>
   );
 }
 
+/**
+ * The way out of the price grid, for the visitor the grid does not describe — a fifth dog, or a
+ * schedule other than weekly.
+ *
+ * It exists as its own component because BOTH places that publish prices need it and neither may
+ * retype it: cutting rows out of a table is only safe if the page says out loud that the missing
+ * rows are still served. Without this, a five-dog household reads the table and concludes it is not
+ * a customer, which is the one outcome simplifying the grid was not supposed to buy.
+ *
+ * Deliberately NOT a card and NOT a fourth plan. It is a note — a hairline box, no price on it, the
+ * quiet register of an aside — because a visitor scanning plans should be able to skip it, and only
+ * the person it is addressed to should stop.
+ */
+function CustomQuoteNote() {
+  return (
+    <div className="mx-auto flex w-full max-w-prose flex-col items-center gap-1 rounded-lg border border-dashed border-line-strong bg-surface-alt px-6 py-5 text-center">
+      <Text weight="semibold">{customQuote.heading}</Text>
+      <Text size="small" tone="muted">
+        {customQuote.detail}
+      </Text>
+    </div>
+  );
+}
+
 // ── Pricing band ─────────────────────────────────────────────────────────────
 
 /**
- * The homepage pricing band. Three cards side by side, one per dog count, each carrying BOTH
- * frequencies — not one card per frequency. The choice a visitor cannot change is how many dogs
- * they own, so that is what picks the card; how often we come is the thing they are still weighing,
- * and it belongs inside the card as a comparison of two numbers.
+ * The homepage pricing band. One card per dog count, each carrying ONE price. The choice a visitor
+ * cannot change is how many dogs they own, so that is the only thing picking a card — and since
+ * 2026-09-04 it is the only choice the band asks for at all.
  *
- * Deliberately not `PriceTable`. That is the real grid on /pricing, marked up as a table because a
- * buyer scrutinising it needs rows and scoped headers. This is the landing-page version of the same
- * three facts: a list of plans, read one card at a time.
+ * WHAT THE CARD SAYS, AND IN WHAT ORDER. This is the part that was redrawn, and the order is the
+ * argument:
  *
- * Inside a card the two frequencies are NOT equals. Weekly is the plan being sold — big navy
- * numeral, the only thing on the card you can read from across the room — and every other week is a
- * quiet line under a hairline: there if you want it, not an invitation to shop down.
+ *   $100/month              ← the price, whole, unit attached. One glyph run, read at a glance.
+ *   Serviced once per week  ← what that buys. Quiet, directly under it.
+ *   just $25 per visit      ← the same money in the unit a doubter converts it to anyway.
+ *
+ * It used to lead with the word "Weekly", then the numeral, then "per month" — three lines to say
+ * one thing, and the reader had to assemble the sentence themselves. Fusing the price and its unit
+ * is the whole fix: "$100/month" is a fact, "$100" under a label is a puzzle.
+ *
+ * The per-visit line is last and it is a badge rather than a line of prose, because it is doing a
+ * different job from the two above it. Those state the offer; this one answers the objection —
+ * somebody weighing a chore they could do themselves against a monthly bill converts that bill into
+ * "what is one Saturday worth" whether the page helps or not. Better the page does the arithmetic,
+ * and does it conservatively: see `VISITS_PER_MONTH` for why dividing by four cannot overstate the
+ * value.
+ *
+ * Deliberately not `PriceTable`. That is the real grid on the money pages, marked up as a table
+ * because a buyer scrutinising it needs rows and scoped headers. This is the landing-page version
+ * of the same facts: plans, read one card at a time.
  *
  * Centred throughout, at every width — so this band is `align="center"` rather than the house
  * `center-mobile`, the same exception `HowItWorks` takes. A left-hung title over a centred row of
  * cards is the only thing in the band not on the midline, which reads as a mistake.
  *
- * One column, then three at `md` — never two, for the reason `HowItWorks` gives. The step is `md`
- * rather than `sm` because the featured card wears both a chip and a paw across its top edge, and
- * three columns at 40rem leaves the two too close to sit side by side.
+ * One column, then two at `md`, inside a capped measure. Two cards let loose across a full
+ * container are a pair of billboards — the cap is what keeps them cards. The step is `md` rather
+ * than `sm` because the featured card wears both a chip and a paw across its top edge.
  *
  * Every price comes from content/pricing.ts. Nothing in this file knows what a plan costs.
  */
@@ -1563,7 +1611,7 @@ export function PricingBand({
                 "three items" is the summary a sighted reader gets from the row of cards.
 
                 `w-full` because the Stack above centres its children by shrinking them. */}
-            <ul className="mt-2 grid w-full list-none grid-cols-1 gap-6 pl-0 md:grid-cols-3">
+            <ul className="mt-2 grid w-full max-w-3xl list-none grid-cols-1 gap-6 pl-0 md:grid-cols-2">
               {priceTiers.map((tier) => (
                 <li key={tier.id}>
                   <Card tone={tier.featured ? "featured" : "default"}>
@@ -1601,53 +1649,56 @@ export function PricingBand({
                         </Text>
                       </div>
 
-                      {/* A description list: each frequency is a term, its price is the value. The
-                          unit rides both prices — these are monthly totals, not per visit, and
-                          that is the one misread this band exists to prevent. */}
-                      <dl className="flex flex-col gap-5">
-                        <div>
-                          <Text as="dt" size="small" tone="muted">
-                            Weekly
-                          </Text>
-                          {/* The focal point of the whole band. `leading-none` because the numeral
-                              has no descenders and h2's line box would otherwise leave a gap under
-                              it wider than the one above the unit. */}
-                          {/* The unit lives INSIDE the dd, exactly as the biweekly row below
-                              already has it. A div inside a dl may only hold dt and dd elements —
-                              a stray paragraph beside them makes the whole list invalid, and that
-                              is what axe's `definition-list` rule fires on. Wrapping it keeps the
-                              price and its unit as ONE value, which is what a screen reader
-                              should read for the term: "$100 per month", not "$100" and then an
-                              orphaned "per month". */}
-                          <dd className="text-brand">
-                            <span className="font-display text-h2 font-bold leading-none">
-                              {`$${tier.weekly}`}
-                            </span>
-                            <Text size="small" tone="muted">
-                              {pricing.unit}
-                            </Text>
-                          </dd>
+                      {/* NOT a `<dl>` any more. It was one when a card held two frequencies and
+                          each price needed a term to belong to; with a single price there is no
+                          term, and a one-item description list is markup describing a structure
+                          that is not there. This is a price and two notes about it. */}
+                      <Stack gap={3} align="center">
+                        {/* The focal point of the whole band, and ONE text run: the numeral and
+                            its unit are a single sentence a reader should never have to assemble.
+                            `items-baseline` sits the small "/month" on the numeral's baseline
+                            rather than centring it against a 3rem glyph, which is what makes the
+                            two read as one price instead of as two stacked facts.
+
+                            `leading-none` because the numeral has no descenders and h2's line box
+                            would otherwise open a gap under it wider than the one above.
+
+                            A `div`, not a paragraph tag — see lib/primitives.test.ts, which
+                            reserves the literal paragraph element for the `Text` primitive. `Text`
+                            is not usable here: this line needs its own flex and baseline classes
+                            and `Text` deliberately takes no `className`. It is not a paragraph
+                            anyway, it is a price. */}
+                        <div className="flex items-baseline justify-center text-brand">
+                          <span className="font-display text-h2 font-bold leading-none">
+                            {`$${tier.weekly}`}
+                          </span>
+                          <span className="font-display text-h5 font-bold leading-none">
+                            {pricing.unitShort}
+                          </span>
                         </div>
 
-                        {/* The quieter option, under a hairline and at body weight — available,
-                            not advertised. */}
-                        <div className="border-t border-line pt-4">
-                          <Text as="dt" size="small" tone="muted">
-                            Every other week
-                          </Text>
-                          <Text as="dd" size="small" tone="muted">
-                            <Text as="span" weight="semibold" tone="default">
-                              {`$${tier.biweekly}`}
-                            </Text>
-                            {` ${pricing.unit}`}
-                          </Text>
-                        </div>
-                      </dl>
+                        {/* What the money buys. Muted and small — it is the caption to the number
+                            above, not a competing claim. */}
+                        <Text size="small" tone="muted">
+                          {pricing.cadence}
+                        </Text>
+
+                        {/* The same money in the unit a sceptic converts it to anyway. Amber, so
+                            it reads as the card's one piece of good news rather than as a third
+                            price to compare. Derived — see `perVisit`. */}
+                        <Badge tone="accent">{`just ${perVisit(tier.weekly)} per visit`}</Badge>
+                      </Stack>
                     </Stack>
                   </Card>
                 </li>
               ))}
             </ul>
+
+            {/* Directly under the cards and ABOVE the discounts, because it belongs to the grid
+                rather than to the offer: it names the two visitors the two cards do not describe.
+                A discount is read by someone who has already found their row; this is read by
+                someone who has just failed to. See `CustomQuoteNote`. */}
+            <CustomQuoteNote />
 
             {/* ── The two standing discounts ────────────────────────────────
                 Directly under the cards, and that is the only place they work. A discount printed
@@ -2533,9 +2584,19 @@ export function FaqBand({
 export function ReviewWall({
   heading,
   reviews,
+  viewAllLabel,
 }: {
   heading: string;
   reviews: readonly { quote: string; name: string; city?: string }[];
+  /**
+   * The label on the button under the wall — "Read all 17 reviews". Present on every page that
+   * shows the trimmed six, absent on /reviews/ itself, which IS the destination and must not offer
+   * a button back to the page you are standing on.
+   *
+   * A LABEL rather than a boolean, because the count inside it is content and content/ is the only
+   * place English lives. See `allReviewsCta` in content/reviews.ts.
+   */
+  viewAllLabel?: string;
 }) {
   if (reviews.length === 0) return null;
   return (
@@ -2570,6 +2631,20 @@ export function ReviewWall({
               </div>
             ))}
           </div>
+
+          {/* Under the wall, centred, and `ghost` rather than a filled button: this is an exit to
+              more of the same evidence, not the page's call to action. A primary or cta-green
+              button here would compete with the one that actually closes the sale further down,
+              and a visitor who has just read six five-star quotes should be moving toward the
+              quote form, not sideways into a longer list. It is there for the sceptic who wants to
+              check there is no cherry-picking — which is exactly the person a count convinces. */}
+          {viewAllLabel && (
+            <Cluster gap={4} justify="center">
+              <Button href={routes.reviews()} variant="ghost">
+                {viewAllLabel}
+              </Button>
+            </Cluster>
+          )}
         </Stack>
       </Container>
     </Section>

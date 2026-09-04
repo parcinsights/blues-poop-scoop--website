@@ -15,7 +15,8 @@ import type { NavGroup, NavLink } from "./types";
  * separate "Services" link — two menus covering the same ground, with One-Time appearing in both.
  *
  * The frequency pages are gone entirely as of 2026-08-01 (see the note in content/services.ts).
- * Weekly and every-other-week are two prices for one job, and the Poop Scoop page carries both —
+ * Weekly and every-other-week were two prices for one job, and the Poop Scoop page carries both —
+ * as of 2026-09-04 only weekly is published, which makes the case below stronger, not weaker —
  * a visitor who has not read anything yet does not know which they want, and a nav is the wrong
  * place to make them choose.
  *

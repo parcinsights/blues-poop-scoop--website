@@ -15,7 +15,7 @@ import { JsonLd } from "@/components/seo/JsonLd";
 import { SectionDivider } from "@/components/ui/layout";
 import { cities } from "@/content/cities";
 import { home } from "@/content/pages/home";
-import { ratingSummary, reviews } from "@/content/reviews";
+import { allReviewsCta, featuredReviews, ratingSummary } from "@/content/reviews";
 import { routes } from "@/lib/routes";
 import { homeGraph } from "@/lib/schema";
 import { buildMetadata } from "@/lib/seo";
@@ -77,7 +77,11 @@ export default function HomePage() {
         image="whyUs"
       />
 
-      <ReviewWall heading="See what our friends are saying about us" reviews={reviews} />
+      <ReviewWall
+        heading="See what our friends are saying about us"
+        reviews={featuredReviews}
+        viewAllLabel={allReviewsCta.label}
+      />
 
       {/* Both bands are white, so nothing marks the seam between them. This is that mark — a
           hairline on the container line rather than a change of colour. See `SectionDivider`. */}

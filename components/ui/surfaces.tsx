@@ -64,7 +64,7 @@ export function Card({
 
 /**
  * The outlined pill. A hairline border, a full radius, and a short phrase inside it — the service
- * hero's qualities ("Weekly or bi-weekly", "No contracts") and the tab toggles under it.
+ * hero's qualities ("Weekly service", "No contracts") and the tab toggles under it.
  *
  * Deliberately not `Badge`: a badge is a FILLED chip that labels the thing it sits on ("Most
  * popular" on a price card). This is an outline that reads as a tag in a row of tags, which is why

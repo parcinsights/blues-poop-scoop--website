@@ -36,8 +36,8 @@ export const cityPage = {
    */
   intro: (city: City) =>
     city.neighborhoods && city.neighborhoods.length > 0
-      ? `Weekly and every-other-week yard cleanups across ${city.neighborhoods.join(", ")} — same crew, same route, every week.`
-      : `Weekly and every-other-week yard cleanups across ${city.name} and the rest of ${city.county}, on a route we already drive.`,
+      ? `Weekly yard cleanups across ${city.neighborhoods.join(", ")} — same crew, same route, every week.`
+      : `Weekly yard cleanups across ${city.name} and the rest of ${city.county}, on a route we already drive.`,
 
   /**
    * The town's OWN zips, not the site-wide list /pricing/ carries. One or four numbers rather than

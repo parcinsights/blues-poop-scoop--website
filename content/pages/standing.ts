@@ -1,3 +1,4 @@
+import { perVisit, startingPrice } from "../pricing";
 import { ratingSummary } from "../reviews";
 import { site } from "../site";
 import { todo } from "../todo";
@@ -263,7 +264,7 @@ export const pricingPage = {
   seo: {
     title: "Pricing | Blue's Poop Scoop",
     description:
-      "Straightforward monthly pricing by number of dogs. Weekly from $100 a month, every other week from $70.",
+      `Straightforward flat-rate pricing by number of dogs. Weekly service from $${startingPrice} a month — that's ${perVisit(startingPrice)} a visit. No contracts, no hidden fees.`,
   } satisfies Seo,
   /**
    * NO `heading` AND NO `intro`. The page opens on the photograph, directly under the header, and
@@ -361,7 +362,7 @@ export const residential = {
   seo: {
     title: "Residential Dog Poop Removal | Philadelphia & the Main Line",
     description:
-      "Weekly and bi-weekly yard scooping for Philadelphia homeowners. No contracts, a text before and after every visit, and we never enter while your dog is outside.",
+      "Weekly yard scooping for Philadelphia homeowners. No contracts, a text before and after every visit, and we never enter while your dog is outside.",
   } satisfies Seo,
 
   /**
@@ -375,7 +376,7 @@ export const residential = {
    */
   heading: "Philadelphia's most trusted residential poop scoop service",
   intro:
-    "We scoop so you don't have to. Reliable weekly or bi-weekly service for your yard.",
+    "We scoop so you don't have to. Reliable weekly service for your yard, on the same day every week.",
 
   /**
    * The strip under the hero. Three facts and NO rating — the hero above already carries the stars,
@@ -409,8 +410,8 @@ export const residential = {
       },
       {
         icon: "schedule",
-        title: "Flexible scheduling",
-        detail: "Weekly or bi-weekly cleanups to fit your routine.",
+        title: "A day you can count on",
+        detail: "Weekly cleanups on the same day each week, so the yard is never a surprise.",
       },
       {
         icon: "updates",
@@ -641,7 +642,7 @@ export const commercial = {
         icon: "schedule",
         title: "Flexible scheduling",
         detail:
-          "Weekly, bi-weekly, or a custom plan that fits your property's needs.",
+          "Weekly service, or a custom plan built around what your property actually needs.",
       },
       {
         icon: "updates",
@@ -691,7 +692,7 @@ export const commercial = {
       {
         question: "How often do you service the stations?",
         answer:
-          "We customize the schedule based on your property's needs. Most communities choose weekly or bi-weekly service, which includes bag restocking, liner changes, and waste removal.",
+          "We customize the schedule based on your property's needs. Most communities are on weekly service, which includes bag restocking, liner changes, and waste removal. If your grounds need something different, we'll work it out on the walkthrough.",
       },
       {
         question: "Is there a contract or commitment?",

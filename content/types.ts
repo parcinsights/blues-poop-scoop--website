@@ -64,9 +64,9 @@ export type Service = {
    */
   image?: AssetKey;
   /**
-   * The outlined chips above the h1 — two to four words each: "Weekly or bi-weekly", "No
-   * contracts", "Pet-safe". They are read before the heading is, so they are qualities of the work
-   * rather than a second summary, and every one has to be something the business will stand behind.
+   * The outlined chips above the h1 — two to four words each: "Weekly service", "No contracts",
+   * "Pet-safe". They are read before the heading is, so they are qualities of the work rather than
+   * a second summary, and every one has to be something the business will stand behind.
    */
   tags?: readonly string[];
   /**
@@ -262,13 +262,27 @@ export type Review = {
   city?: string;
   /** ISO date the review was left, when known. */
   date?: string;
+  /**
+   * Shown in the six-quote wall every page except /reviews/ carries.
+   *
+   * A FLAG ON THE REVIEW, not a separate hand-picked array, because the alternative is a second
+   * list of quotes that has to be kept in step with this one — and the day they drift, the site is
+   * publishing a testimonial that is no longer in the source of truth. Here there is exactly one
+   * copy of every quote and `featured` only decides where it appears.
+   *
+   * See `featuredReviews` in content/reviews.ts for what is picked and why.
+   */
+  featured?: boolean;
 };
 
 /**
- * Pricing is a matrix: number of dogs × visit frequency. That is how the client actually quotes,
- * so it is how the site states it. Publishing the real grid is worth more than a "call for a
- * quote" button — price is one of the top query intents in this vertical, and a page that answers
- * it is the page that gets the call.
+ * Pricing is a LIST: one monthly rate per dog count, on the weekly schedule. It was a matrix of
+ * dogs × frequency until 2026-09-04, when the client cut the second frequency to make the choice
+ * simpler — the number of dogs you own is not a decision, so the grid now only asks the visitor to
+ * find their own row rather than to pick a column as well.
+ *
+ * Publishing the real numbers is worth more than a "call for a quote" button — price is one of the
+ * top query intents in this vertical, and a page that answers it is the page that gets the call.
  */
 export type PriceTier = {
   id: string;
@@ -279,10 +293,15 @@ export type PriceTier = {
   name: string;
   /** Human label for the row, e.g. "1–2 dogs". */
   dogs: string;
-  /** Whole dollars per month, weekly visits. */
+  /**
+   * Whole dollars per month, weekly visits — and the ONLY rate on the type.
+   *
+   * There was a `biweekly` beside it until 2026-09-04. It came off at the client's request, and the
+   * field went with the column rather than being left as a number nothing renders: an unrendered
+   * price is a price nobody checks, and the day it is wrong is the day someone puts the table back.
+   * Bi-weekly is still sold on request — see `customQuote` in content/pricing.ts.
+   */
   weekly: number;
-  /** Whole dollars per month, every-other-week visits. */
-  biweekly: number;
   featured?: boolean;
 };
 

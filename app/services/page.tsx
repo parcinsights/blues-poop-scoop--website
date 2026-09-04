@@ -27,7 +27,7 @@ import { buildMetadata } from "@/lib/seo";
 const seo = {
   title: "Our Services",
   description:
-    "Weekly and every-other-week dog waste removal across Philadelphia and the Main Line, plus one-time yard cleanups.",
+    "Weekly dog waste removal across Philadelphia and the Main Line, plus one-time yard cleanups.",
 };
 
 /** The standfirst under the h1. Says what the four cards below it are, before they are scrolled to. */

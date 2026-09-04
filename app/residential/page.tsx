@@ -18,7 +18,7 @@ import { cities } from "@/content/cities";
 import { answeredResidentialFaqs } from "@/content/faq";
 import { home } from "@/content/pages/home";
 import { pricingPage, residential } from "@/content/pages/standing";
-import { ratingSummary, reviews } from "@/content/reviews";
+import { allReviewsCta, featuredReviews, ratingSummary } from "@/content/reviews";
 import { routes } from "@/lib/routes";
 import { standardPageGraph, type Crumb } from "@/lib/schema";
 import { buildMetadata } from "@/lib/seo";
@@ -164,7 +164,11 @@ export default function ResidentialPage() {
 
       {/* The proof goes last, under the questions rather than above them: someone who has read the
           price and had their doubts answered is the reader a testimonial is worth most to. */}
-      <ReviewWall heading={residential.reviews.heading} reviews={reviews} />
+      <ReviewWall
+        heading={residential.reviews.heading}
+        reviews={featuredReviews}
+        viewAllLabel={allReviewsCta.label}
+      />
 
       {/* `canvas`, not the site-default dark navy: on the dark band the navy buttons disappear into
           it, because --color-surface-dark and --color-brand are the same hex. See CtaBand. */}
