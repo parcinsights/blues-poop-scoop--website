@@ -7,9 +7,21 @@ export function Card({
   children,
   tone = "default",
   aspect = "auto",
+  bleed = false,
+  interactive = false,
   as: _as,
 }: {
   children: ReactNode;
+  /**
+   * No padding, corners clipped — for a card whose picture runs edge to edge across the top. The
+   * content below the picture then carries its own padding (see blog/PostCard).
+   */
+  bleed?: boolean;
+  /**
+   * The whole card is one link, via a stretched `<Link stretched>` inside it. Lifts on hover so the
+   * card, not just its title, reads as the click target.
+   */
+  interactive?: boolean;
   tone?: "default" | "featured" | "canvas" | "sky";
   /**
    * `square` locks the card to a 1:1 box — but only from `lg`, and that qualifier is the whole
@@ -25,7 +37,9 @@ export function Card({
     <div
       className={cx(
         // `relative` so a card can position its own decoration — see the paw on a review card.
-        "relative rounded-lg p-6 h-full",
+        "relative rounded-lg h-full",
+        bleed ? "overflow-hidden" : "p-6",
+        interactive && "transition-shadow duration-150 ease-out hover:shadow-md",
         aspect === "square" && "lg:aspect-square lg:p-8",
         // White on the cream page background — the card lifts by going lighter, not darker.
         tone === "default" && "bg-surface-raised border border-line shadow-sm",

@@ -13,7 +13,6 @@
  * next.config.mjs and must never change after launch — it is a full URL migration if it does.
  */
 
-import { posts } from "@/content/blog";
 import { cities } from "@/content/cities";
 import { moneyPage } from "@/content/money-pages";
 import { opportunities } from "@/content/pages/standing";
@@ -132,25 +131,18 @@ export function allRoutes(): RouteEntry[] {
     // current site says "Coming Soon", and a page offering a service nobody performs is worse
     // than no page.
     { path: routes.commercial(), priority: 0.7, changeFrequency: "monthly", implemented: false },
-    // The blog index is only worth submitting once it indexes something. An empty archive page in
-    // the sitemap is a soft-404 invitation, and it stays that way for as long as nobody writes a
-    // post — which, on a site this size, can be a long time. See content/blog.ts.
+    // The blog index. Registered here so nav links to it are checked, but `implemented: false`
+    // keeps it out of the STATIC sitemap: posts come from the Blog Poster database, and whether the
+    // index lists anything is only known at request time. app/sitemap.ts adds /blog/ and every
+    // post once the database returns one — an empty archive in the sitemap is a soft-404
+    // invitation. Posts are deliberately NOT in this registry; it stays synchronous.
     {
       path: routes.blog(),
       priority: 0.5,
       changeFrequency: "weekly",
-      implemented: posts.length > 0,
+      implemented: false,
     },
   ];
-
-  for (const post of posts) {
-    entries.push({
-      path: routes.blogPost(post.slug),
-      priority: 0.5,
-      changeFrequency: "yearly",
-      implemented: isPublishable(post.body),
-    });
-  }
 
   /**
    * From here down, CONTENT decides publication, not a developer's memory. A page whose body has

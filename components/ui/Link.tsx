@@ -67,6 +67,7 @@ export function Link({
   size,
   weight,
   block = false,
+  stretched = false,
   newTab,
   ariaLabel,
   ariaCurrent,
@@ -79,6 +80,12 @@ export function Link({
   weight?: "semibold";
   /** Fill the width of the container, so the whole row is a click target in a stacked list. */
   block?: boolean;
+  /**
+   * Stretch the click target over the nearest positioned ancestor — a whole `Card` becomes the
+   * link while the anchor text stays the title. One real `<a>`, so there is no nested-link markup
+   * and the link's words are still what a crawler and a screen reader get.
+   */
+  stretched?: boolean;
   /**
    * Open elsewhere. Defaults to `true` for off-site URLs and `false` for our own pages — do not
    * set it on an internal link, which should never steal a tab from the visitor.
@@ -97,6 +104,7 @@ export function Link({
       size === "caption" && "text-caption",
       weight === "semibold" && "font-semibold",
       block && "block",
+      stretched && "after:absolute after:inset-0",
     ) || undefined;
 
   const opensNewTab = newTab ?? isOffSiteUrl(href);

@@ -18,7 +18,8 @@
 
 import { cities, areaServedNames } from "@/content/cities";
 import { sameAs, site } from "@/content/site";
-import type { BlogPost, FaqItem, OpeningHours, Service } from "@/content/types";
+import type { FaqItem, OpeningHours, Service } from "@/content/types";
+import type { Post } from "./blog/types";
 import { SITE_URL, absoluteUrl, routes } from "./routes";
 
 type JsonLdNode = Record<string, unknown>;
@@ -201,41 +202,39 @@ export function servicePageGraph(args: {
  * A blog post. `BlogPosting` rather than `Article`, which is the specific type for this and costs
  * nothing to be accurate about.
  *
- * `author` is a `Person` and `publisher` points at the business. Both are required for the post to
- * be eligible as an article result, and the author being a named human rather than the company is
- * the honest description of who wrote it — which is also what E-E-A-T is asking for.
+ * `author` is the named `Person` when the post has one, else the business itself by @id. A named
+ * human is the honest description of who wrote it and what E-E-A-T asks for; the business is the
+ * truthful fallback, never an invented name.
  *
- * `dateModified` is set equal to `datePublished` because nothing here tracks edits. That is
- * truthful for a post that has not been revised, and it is deliberately NOT wired to a build
- * timestamp: a `dateModified` that advances on every deploy claims an update that never happened,
- * and it is the single most common way a small site's article markup becomes a lie.
+ * `dateModified` is the database's `updated_at` — a real content edit date, and the same value the
+ * page shows as "Updated". It is never a build timestamp: a `dateModified` that advances on every
+ * deploy claims an update that never happened.
  */
-export function blogPostGraph(args: {
-  path: string;
-  post: BlogPost;
-  crumbs: Crumb[];
-}): JsonLdNode {
+export function blogPostGraph(args: { path: string; post: Post; crumbs: Crumb[] }): JsonLdNode {
+  const { post } = args;
   const url = absoluteUrl(args.path);
+  const description = post.metaDescription ?? post.excerpt ?? "";
   return graph([
     businessNode(),
     websiteNode(),
-    webPageNode({
-      path: args.path,
-      name: args.post.title,
-      description: args.post.seo.description,
-      hasBreadcrumb: true,
-    }),
+    webPageNode({ path: args.path, name: post.title, description, hasBreadcrumb: true }),
     breadcrumbNode(args.path, args.crumbs),
     {
       "@type": "BlogPosting",
       "@id": `${url}#post`,
-      headline: args.post.title,
-      description: args.post.excerpt,
-      datePublished: args.post.date,
-      dateModified: args.post.date,
-      author: { "@type": "Person", name: args.post.author },
+      // Google truncates past 110 characters; cut it cleanly rather than let it run.
+      headline: post.title.length > 110 ? `${post.title.slice(0, 109).trimEnd()}…` : post.title,
+      description,
+      ...(post.hero ? { image: post.hero.url } : {}),
+      datePublished: post.publishedAt,
+      dateModified: post.updatedAt,
+      author: post.authorName
+        ? { "@type": "Person", name: post.authorName }
+        : { "@id": BUSINESS_ID },
       publisher: { "@id": BUSINESS_ID },
       mainEntityOfPage: { "@id": `${url}#webpage` },
+      isPartOf: { "@id": WEBSITE_ID },
+      ...(post.tags.length > 0 ? { keywords: post.tags.join(", ") } : {}),
       inLanguage: "en-US",
     },
   ]);

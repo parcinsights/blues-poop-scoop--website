@@ -28,6 +28,8 @@ type BuildMetadataArgs = Seo & {
    * never set this — indexability is decided by the deployment, not per page.
    */
   noindex?: boolean;
+  /** Blog posts only: `og:type=article` with the real publish and edit timestamps. */
+  article?: { publishedTime: string; modifiedTime: string };
 };
 
 export const metadataBase = new URL(SITE_URL);
@@ -49,6 +51,7 @@ export function buildMetadata({
   path,
   ogImage,
   noindex = false,
+  article,
 }: BuildMetadataArgs): Metadata {
   const canonical = absoluteUrl(path);
   const image = ogImage ?? defaultOgImage;
@@ -75,7 +78,9 @@ export function buildMetadata({
       },
     },
     openGraph: {
-      type: "website",
+      ...(article
+        ? { type: "article" as const, publishedTime: article.publishedTime, modifiedTime: article.modifiedTime }
+        : { type: "website" as const }),
       siteName: site.name,
       title,
       description,

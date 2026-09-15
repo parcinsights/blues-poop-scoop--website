@@ -79,3 +79,43 @@ export function Image({
     />
   );
 }
+
+/**
+ * An image whose record lives in a database rather than `content/assets.ts` — blog heroes from
+ * Supabase Storage. The same guarantees, enforced by the type instead of the registry: `alt`,
+ * `width` and `height` are required, so it cannot shift layout or ship without alt text.
+ *
+ * The host must be allowlisted in `images.remotePatterns` in next.config.mjs.
+ */
+export function RemoteImage({
+  url,
+  alt,
+  width,
+  height,
+  priority = false,
+  sizes,
+  className,
+}: {
+  url: string;
+  alt: string;
+  width: number;
+  height: number;
+  priority?: boolean;
+  sizes: string;
+  /** Layout only — sizing and positioning. Never color or type. */
+  className?: string;
+}) {
+  return (
+    <NextImage
+      src={url}
+      alt={alt}
+      width={width}
+      height={height}
+      priority={priority}
+      fetchPriority={priority ? "high" : undefined}
+      quality={68}
+      sizes={sizes}
+      className={cx(className)}
+    />
+  );
+}

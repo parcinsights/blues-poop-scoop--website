@@ -3,13 +3,14 @@ import type { Metadata } from "next";
 import { CtaBand } from "@/components/blocks/blocks";
 import { PageShell } from "@/components/blocks/PageShell";
 import { JsonLd } from "@/components/seo/JsonLd";
+import { PostCard } from "@/components/blog/PostCard";
 import { Button } from "@/components/ui/Button";
 import { Image } from "@/components/ui/Image";
 import { Cluster, Container, Grid, Section, Stack } from "@/components/ui/layout";
 import { Badge, Card, Chip } from "@/components/ui/surfaces";
 import { Heading, Text } from "@/components/ui/typography";
-import { formatPostDate, postsByDate } from "@/content/blog";
 import { blogIndex } from "@/content/pages/standing";
+import { listPosts } from "@/lib/blog/posts";
 import { routes } from "@/lib/routes";
 import { standardPageGraph, type Crumb } from "@/lib/schema";
 import { buildMetadata } from "@/lib/seo";
@@ -20,24 +21,30 @@ const crumbs: Crumb[] = [
   { name: "Blog", path: routes.blog() },
 ];
 
-export const metadata: Metadata = buildMetadata({
-  ...blogIndex.seo,
-  path: routes.blog(),
-  // An archive with nothing in it is a soft 404 to a crawler. It renders — the route has to exist
-  // for the first post to land somewhere — but it is not offered to the index until it lists
-  // something. Same rule, same reason, as every unauthored page here.
-  noindex: postsByDate.length === 0,
-});
+/** A safety net: a missed publish webhook costs an hour of staleness, not a deploy. */
+export const revalidate = 3600;
+
+export async function generateMetadata(): Promise<Metadata> {
+  const posts = await listPosts();
+  return buildMetadata({
+    ...blogIndex.seo,
+    path: routes.blog(),
+    // An archive with nothing in it is a soft 404 to a crawler. It renders — the route has to exist
+    // for the first post to land somewhere — but it is not offered to the index until it lists
+    // something. app/sitemap.ts applies the same rule.
+    noindex: posts.length === 0,
+  });
+}
 
 /**
- * The blog index.
- *
- * There are no posts yet, deliberately — content/blog.ts explains what is worth publishing on a
- * site this size and why a padded archive costs more than an empty one. So the empty state below
- * is not a placeholder waiting to be replaced; it is what this page correctly shows until someone
- * has something real to say.
+ * The blog index. Posts come from the Blog Poster database, newest first, all on one page — past
+ * ~24 posts this wants /blog/page/2/ with self-referencing canonicals, never a client-side "load
+ * more". Until the first post is published, the empty state below is what this page correctly
+ * shows: a position, not a placeholder.
  */
-export default function BlogIndexPage() {
+export default async function BlogIndexPage() {
+  const posts = await listPosts();
+
   return (
     <>
       <JsonLd
@@ -51,27 +58,12 @@ export default function BlogIndexPage() {
       />
       <PageShell crumbs={crumbs} heading={blogIndex.heading} intro={blogIndex.intro} />
 
-      <Section tone={postsByDate.length > 0 ? "alt" : "raised"}>
-        {postsByDate.length > 0 ? (
+      <Section tone={posts.length > 0 ? "alt" : "raised"}>
+        {posts.length > 0 ? (
           <Container>
             <Grid columns={3}>
-              {postsByDate.map((post) => (
-                <Card key={post.slug}>
-                  <Stack gap={3}>
-                    {/* The date as a real <time>, so the machine-readable value and the words a
-                        person reads are the same fact rather than two copies of it. */}
-                    <Text size="caption" tone="muted">
-                      <time dateTime={post.date}>{formatPostDate(post.date)}</time>
-                    </Text>
-                    <Heading level={2} size="h4">
-                      {post.title}
-                    </Heading>
-                    <Text tone="muted">{post.excerpt}</Text>
-                    <Button href={routes.blogPost(post.slug)} variant="link">
-                      Read more
-                    </Button>
-                  </Stack>
-                </Card>
+              {posts.map((post) => (
+                <PostCard key={post.slug} post={post} />
               ))}
             </Grid>
           </Container>

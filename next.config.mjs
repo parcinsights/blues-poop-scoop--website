@@ -4,6 +4,12 @@ import { redirects } from "./lib/redirects.mjs";
  * One trailing-slash policy, decided once. Changing it after launch is a URL migration,
  * so it is pinned here and every internal URL is built from `lib/routes.ts` to match.
  */
+/**
+ * Blog heroes are served from the Blog Poster's Supabase Storage bucket. The host is read from the
+ * same SUPABASE_URL the blog client uses, so the allowlist cannot point at a different project.
+ */
+const supabaseHost = process.env.SUPABASE_URL ? new URL(process.env.SUPABASE_URL).hostname : null;
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   trailingSlash: true,
@@ -21,6 +27,15 @@ const nextConfig = {
      * ui/Image must appear in this array or every image on the site 400s.
      */
     qualities: [68, 75],
+    remotePatterns: supabaseHost
+      ? [
+          {
+            protocol: "https",
+            hostname: supabaseHost,
+            pathname: "/storage/v1/object/public/blog-images/**",
+          },
+        ]
+      : [],
   },
   async redirects() {
     return redirects;

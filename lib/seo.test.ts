@@ -14,9 +14,14 @@ async function loadSeo(vercelEnv?: string) {
   return { buildMetadata, routes };
 }
 
+/** The sitemap reads posts from Supabase; tests never touch the network. */
+const blog = vi.hoisted(() => ({ listPosts: vi.fn(async () => [] as unknown[]) }));
+vi.mock("./blog/posts", () => blog);
+
 afterEach(() => {
   vi.unstubAllEnvs();
   vi.resetModules();
+  blog.listPosts.mockClear();
 });
 
 const page = { title: "T", description: "D" };
@@ -77,15 +82,39 @@ describe("the sitemap follows the same rule", () => {
     vi.resetModules();
     vi.stubEnv("VERCEL_ENV", "preview");
     const sitemap = (await import("../app/sitemap")).default;
-    expect(sitemap()).toEqual([]);
+    expect(await sitemap()).toEqual([]);
+    expect(blog.listPosts).not.toHaveBeenCalled();
   });
 
-  it("lists only published routes in production", async () => {
+  it("lists only published routes in production, and no empty blog", async () => {
     vi.resetModules();
     vi.stubEnv("VERCEL_ENV", "production");
     const sitemap = (await import("../app/sitemap")).default;
     const { publishedRoutes } = await import("./routes");
-    expect(sitemap().length).toBe(publishedRoutes().length);
+    const entries = await sitemap();
+    expect(entries.length).toBe(publishedRoutes().length);
+    expect(entries.some((entry) => entry.url.includes("/blog/"))).toBe(false);
+  });
+
+  it("adds the blog index and each post, with the post's real edit date", async () => {
+    vi.resetModules();
+    vi.stubEnv("VERCEL_ENV", "production");
+    vi.stubEnv("NEXT_PUBLIC_SITE_URL", "https://bluespoopscoop.com");
+    blog.listPosts.mockResolvedValueOnce([
+      {
+        slug: "spring-thaw",
+        title: "Spring thaw",
+        excerpt: null,
+        publishedAt: "2026-03-01T12:00:00Z",
+        updatedAt: "2026-03-04T12:00:00Z",
+        hero: null,
+      },
+    ]);
+    const sitemap = (await import("../app/sitemap")).default;
+    const entries = await sitemap();
+    expect(entries.find((e) => e.url === "https://bluespoopscoop.com/blog/")).toBeTruthy();
+    const post = entries.find((e) => e.url === "https://bluespoopscoop.com/blog/spring-thaw/");
+    expect(post?.lastModified).toEqual(new Date("2026-03-04T12:00:00Z"));
   });
 });
 

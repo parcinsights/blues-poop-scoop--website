@@ -117,27 +117,6 @@ export type Service = {
   addOn?: boolean;
 };
 
-/**
- * One blog post. Same `ContentBlock` body as every other page, so a post cannot smuggle in raw
- * HTML and cannot skip its meta description.
- *
- * Posts are the one part of the site with a genuine publication date, which is why `date` is
- * required and ISO: it drives the ordering, the visible byline, and the `datePublished` in
- * structured data, and those three must never disagree.
- */
-export type BlogPost = {
-  slug: string;
-  title: string;
-  /** One or two sentences for the index card and link previews. */
-  excerpt: string;
-  /** ISO `YYYY-MM-DD`, the day it went live. Newest first on the index. */
-  date: string;
-  /** Who wrote it. A real person — an unattributed post is worth less than no post. */
-  author: string;
-  seo: Seo;
-  body: ContentBlock[];
-};
-
 /** One place served. Municipalities get their own page; neighbourhoods are sections of one. */
 export type City = {
   slug: string;

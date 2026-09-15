@@ -930,8 +930,14 @@ export const opportunities = {
 };
 
 /**
- * /blog/ — the index. Posts live in content/blog.ts and there are none yet, deliberately; the note
- * there explains what is worth publishing and why an empty blog beats a padded one.
+ * /blog/ — the index. Posts are written in the Blog Poster app and read from its database (see
+ * lib/blog/); only the page furniture around them lives here.
+ *
+ * What is worth publishing, in rough order of value: seasonal, local and specific ("what the March
+ * thaw does to a Philly backyard", written from route days); the health questions customers
+ * genuinely ask, which George can answer from experience; jobs with before-and-afters and the
+ * owner's permission on record. A post is worth publishing when it holds a fact a franchise site
+ * could not copy.
  */
 export const blogIndex = {
   seo: {
@@ -972,6 +978,16 @@ export const blogIndex = {
     faqLabel: "Read the FAQ",
     pricingLabel: "See our pricing",
   },
+};
+
+/** The furniture around every post at /blog/[slug]/. The post's own words come from the database. */
+export const blogPostPage = {
+  crumb: "Blog",
+  byline: "By",
+  published: "Published",
+  updated: "Updated",
+  moreHeading: "More from the blog",
+  ctaHeading: "Want your yard handled?",
 };
 
 /**

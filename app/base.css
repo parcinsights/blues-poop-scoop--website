@@ -154,6 +154,14 @@
     font-weight: 600;
   }
 
+  /* Underline in a blog post. Ink-coloured and thin, so it cannot pass for the brand-coloured
+     link below — an underline that looks clickable and is not is a broken link to a visitor. */
+  u {
+    text-decoration-color: var(--color-ink-muted);
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.18em;
+  }
+
   /* ── Links ─────────────────────────────────────────────────────────────────
      The default is the INLINE link — underlined, brand-colored, the style used
      inside body copy. Navigation and buttons opt out via their components. */

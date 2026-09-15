@@ -14,8 +14,9 @@ export function JsonLd({ graph }: { graph: Record<string, unknown> }) {
   return (
     <script
       type="application/ld+json"
-      // Content is generated from typed config, never user input.
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(validated) }}
+      // Blog titles and descriptions come from a database, so `<` is escaped: a "</script>" inside
+      // a string must not be able to close this tag. `<` is the same character to a JSON parser.
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(validated).replace(/</g, "\\u003c") }}
     />
   );
 }
