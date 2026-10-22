@@ -5,7 +5,8 @@ import { useEffect } from "react";
 import { reportSignup } from "@/lib/analytics";
 
 /**
- * Fires the sign-up conversion on /thank-you/, and only for someone who actually submitted a form.
+ * Reports the lead to Meta on a thank-you page, and only for someone who actually submitted a form.
+ * (Google Ads counts it by URL instead — see lib/analytics.ts.)
  *
  * The whole decision — why this is here rather than inside the form's submit handler, and why it
  * cannot simply fire on mount — is written out on `reportSignup` in lib/analytics.ts. The short

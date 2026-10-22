@@ -67,6 +67,13 @@ export const routes = {
    */
   campaign: (slug: string) => `/lp/${slug}/`,
   /**
+   * Where a landing page's form lands — the same page as `thankYou`, at a different URL. Google Ads'
+   * "Submit lead form" conversion is a URL rule matching /thank-you/, and the landing pages' leads
+   * belong to the Meta campaign, so they must land somewhere that rule cannot see. Never move this
+   * under /thank-you/. See components/blocks/ThankYou.tsx.
+   */
+  campaignThankYou: (slug: string) => `/lp/${slug}/thank-you/`,
+  /**
    * NO `getStarted`. /get-started/ was a second quote page carrying a second quote form, and two
    * pages competing for one conversion is two pages nobody links to consistently. Its form and its
    * job both moved to /contact/ on 2026-08-02, and the old URL 301s there — see lib/redirects.mjs.

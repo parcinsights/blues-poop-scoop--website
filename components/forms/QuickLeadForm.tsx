@@ -105,7 +105,9 @@ export function QuickLeadForm({
       // Left for /thank-you/ to spend. Set only after the API accepted the lead, so a rejected
       // submission cannot report a conversion. See lib/analytics.ts.
       markLeadPending(campaign ? "campaign" : "quick_lead");
-      router.push(routes.thankYou());
+      // A landing page's lead lands on its own thank-you URL, which Google Ads does not count —
+      // see `routes.campaignThankYou`.
+      router.push(campaign ? routes.campaignThankYou(campaign) : routes.thankYou());
     } catch {
       turnstile.current?.reset();
       setState("error");

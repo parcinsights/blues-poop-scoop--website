@@ -1,21 +1,13 @@
 import type { Metadata } from "next";
-import { Mail, Phone } from "lucide-react";
 
-import { SignupConversion } from "@/components/analytics/SignupConversion";
-import { NextSteps } from "@/components/blocks/blocks";
-import { BlueCelebration } from "@/components/blocks/BlueCelebration";
-import { Button } from "@/components/ui/Button";
-import { Cluster, Container, Section, Stack } from "@/components/ui/layout";
-import { Card } from "@/components/ui/surfaces";
-import { Heading, Text } from "@/components/ui/typography";
-import { phoneCtaLabel } from "@/content/nav";
+import { ThankYou } from "@/components/blocks/ThankYou";
 import { thankYou } from "@/content/pages/standing";
-import { site } from "@/content/site";
 import { routes } from "@/lib/routes";
 import { buildMetadata } from "@/lib/seo";
 
 /**
- * /thank-you/ — the one landing spot for every form on the site.
+ * /thank-you/ — where every form on the main site lands. The ad landing pages' form lands on its
+ * own copy of this page instead, so Google Ads does not count those leads; see `ThankYou`.
  *
  * NO BREADCRUMBS AND NO STRUCTURED DATA, unlike every other page here. Both describe where a page
  * sits in a site people browse, and this one is not browsed: there is exactly one way in, and it
@@ -24,15 +16,6 @@ import { buildMetadata } from "@/lib/seo";
  *
  * `noindex` for the reason spelled out on `thankYou` in content/pages/standing.ts, and it is why
  * this route is missing from `allRoutes()` — see the note there.
- *
- * THE TOP IS A CELEBRATION. Blue drops in, scoops his own pile, and the confetti goes off — see
- * `BlueCelebration`. It is the one page on the site where somebody has just done the thing we
- * wanted, and a moment of delight there is what turns "I filled in a form" into "I like these
- * people" before the first text arrives. Everything under it is the page it always was: the
- * heading, the three steps, and the phone for anyone who does not want to wait.
- *
- * Centred, unlike `PageShell` which it replaces: the dog is a symmetrical object at the top of the
- * band, and a left-hung heading under a centred picture reads as two things that came apart.
  */
 export const metadata: Metadata = buildMetadata({
   ...thankYou.seo,
@@ -41,68 +24,5 @@ export const metadata: Metadata = buildMetadata({
 });
 
 export default function ThankYouPage() {
-  return (
-    <>
-      {/* Reports the sign-up to Google Ads and Meta, once, and only for a real submit. */}
-      <SignupConversion />
-
-      <Section tone="canvas" spacing="md">
-        <Container>
-          <Stack gap={6} align="center">
-            <BlueCelebration />
-            <Stack gap={4} align="center">
-              <Heading level={1}>{thankYou.heading}</Heading>
-              <Text size="lead" tone="muted" measure>
-                {thankYou.intro}
-              </Text>
-            </Stack>
-          </Stack>
-        </Container>
-      </Section>
-
-      <Section tone="raised" spacing="md">
-        <Container>
-          {/* The steps take two thirds and the phone panel one, the same split /contact/ uses —
-              this page is that page's second half, and a visitor who has just come from it should
-              recognise the shape rather than land somewhere new. */}
-          <div className="grid items-start gap-10 lg:grid-cols-3 lg:gap-16">
-            <div className="lg:col-span-2">
-              <NextSteps heading={thankYou.stepsHeading} steps={thankYou.steps} />
-            </div>
-
-            <div>
-              {/* Same cream panel as /contact/'s "prefer to talk?", and it earns its place here for
-                  a different reason: this is the page where waiting starts, so the way to stop
-                  waiting belongs on it. */}
-              <Card tone="canvas">
-                <Stack gap={4}>
-                  <Stack gap={2}>
-                    <Heading level={2} size="h4">
-                      {thankYou.aside.heading}
-                    </Heading>
-                    <Text tone="muted">{thankYou.aside.detail}</Text>
-                  </Stack>
-                  <Cluster gap={3}>
-                    {/* The shared phone label, with the number appended in the accessible name —
-                        WCAG 2.5.3, as on every other phone button. See content/nav.ts. */}
-                    <Button
-                      href={`tel:${site.phone.e164}`}
-                      variant="secondary"
-                      icon={Phone}
-                      ariaLabel={`${phoneCtaLabel} — ${site.phone.display}`}
-                    >
-                      {phoneCtaLabel}
-                    </Button>
-                    <Button href={`mailto:${site.email}`} variant="ghost" icon={Mail}>
-                      Email us
-                    </Button>
-                  </Cluster>
-                </Stack>
-              </Card>
-            </div>
-          </div>
-        </Container>
-      </Section>
-    </>
-  );
+  return <ThankYou />;
 }

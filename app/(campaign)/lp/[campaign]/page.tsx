@@ -28,8 +28,9 @@ import { buildMetadata } from "@/lib/seo";
  * NO STRUCTURED DATA AND NO BREADCRUMBS, for the reason /thank-you/ has none: both describe a page's
  * place in a site somebody browses, and this page is deliberately not part of one.
  *
- * Conversions are counted where they are for every other form — on /thank-you/ — but reported as
- * `campaign` rather than `quick_lead`, so Meta's Lead events can be split by where they came from.
+ * The form lands on /lp/<slug>/thank-you/, not /thank-you/, so Google Ads does not count these
+ * leads — see `routes.campaignThankYou`. Meta's Lead event reports them as `campaign`, so they can
+ * be split from the site's own forms there.
  */
 
 type Params = { params: Promise<{ campaign: string }> };

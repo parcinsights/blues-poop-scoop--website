@@ -161,5 +161,6 @@ describe("campaign landing pages", () => {
     expect(new Set(slugs).size).toBe(slugs.length);
     for (const slug of slugs) expect(slug, slug).toMatch(/^[a-z0-9]+(-[a-z0-9]+)*$/);
     expect(existsSync(join(ROOT, "app/(campaign)/lp/[campaign]/page.tsx"))).toBe(true);
+    expect(existsSync(join(ROOT, "app/(campaign)/lp/[campaign]/thank-you/page.tsx"))).toBe(true);
   });
 });
