@@ -59,6 +59,14 @@ export const routes = {
    */
   thankYou: () => "/thank-you/",
   /**
+   * A paid-traffic landing page — the URL an ad points at. One per record in content/campaigns.ts.
+   *
+   * Like `thankYou`, deliberately NOT in `allRoutes()`: these pages are `noindex` and nothing on the
+   * site links to them. An ad is the only way in, which is what keeps the page's numbers the ad's
+   * numbers — an organic visitor arriving from search would be counted as a campaign lead.
+   */
+  campaign: (slug: string) => `/lp/${slug}/`,
+  /**
    * NO `getStarted`. /get-started/ was a second quote page carrying a second quote form, and two
    * pages competing for one conversion is two pages nobody links to consistently. Its form and its
    * job both moved to /contact/ on 2026-08-02, and the old URL 301s there — see lib/redirects.mjs.

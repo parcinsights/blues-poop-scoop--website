@@ -61,4 +61,32 @@ describe("toWebhookLead", () => {
     expect(out.inServiceArea).toBe(false);
     expect(toWebhookLead("quick-form", quick).inServiceArea).toBe(true);
   });
+
+  it("files a campaign lead under its slug and UTM tags, and every other lead under null", () => {
+    const fromAd = toWebhookLead(
+      "quick-form",
+      quickLeadSchema.parse({
+        ...quick,
+        campaign: "poop-free-yard",
+        utm_source: "facebook",
+        utm_campaign: "fall",
+      }),
+    );
+    expect(fromAd).toMatchObject({
+      campaign: "poop-free-yard",
+      utmSource: "facebook",
+      utmCampaign: "fall",
+      utmMedium: null,
+    });
+
+    // Present and null, not absent — a CRM mapping reads null; a missing key maps to nothing.
+    expect(toWebhookLead("contact-form", contact)).toMatchObject({
+      campaign: null,
+      utmSource: null,
+      utmMedium: null,
+      utmCampaign: null,
+      utmContent: null,
+      utmTerm: null,
+    });
+  });
 });

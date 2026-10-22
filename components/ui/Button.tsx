@@ -165,7 +165,15 @@ export function Button(props: ButtonProps) {
      */
     const isProtocolHref = /^(tel:|mailto:|sms:)/.test(href);
 
-    if (isProtocolHref) {
+    /**
+     * An in-page jump — `#quote`, the ad landing pages' "take me to the form" buttons. Not a
+     * navigation either, so it goes to the browser rather than the router: a plain anchor scrolls
+     * (smoothly — see `scroll-behavior` in base.css) and leaves the URL's query string exactly as
+     * the ad link wrote it, UTM tags and all.
+     */
+    const isInPageHref = href.startsWith("#");
+
+    if (isProtocolHref || isInPageHref) {
       return (
         <a href={href} className={classes} aria-label={ariaLabel}>
           {content}

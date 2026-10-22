@@ -5,7 +5,7 @@
  * alongside it. Commercial is listed last and is a different segment — it has its own top-level
  * page at /commercial/ and does not appear in the services menu.
  *
- * Every one of these renders through a SINGLE shared template (app/services/[service]/page.tsx) —
+ * Every one of these renders through a SINGLE shared template (app/(site)/services/[service]/page.tsx) —
  * identical layout, identical styling, service to service. What differs is only what is written
  * here: the copy and the image keys. Read that file's header before adding a field.
  *

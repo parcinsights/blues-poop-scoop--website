@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 import { servicedZips } from "@/content/cities";
+import { ATTRIBUTION_MAX_LENGTH } from "@/lib/attribution";
 
 /**
  * One schema, used by the browser and the API route.
@@ -92,7 +93,21 @@ const leadFields = {
   company: z.string().max(200).optional(),
 } as const;
 
-export const quickLeadSchema = z.object(leadFields);
+/**
+ * WHERE THE LEAD CAME FROM, not a question about the yard — see lib/attribution.ts. Every key is
+ * optional: only the ad landing pages send them, and a form that sends none is still a valid lead.
+ * They are spread into both schemas anyway, so the payload has one shape whichever form it left.
+ */
+const attributionFields = {
+  campaign: z.string().trim().max(ATTRIBUTION_MAX_LENGTH).optional(),
+  utm_source: z.string().trim().max(ATTRIBUTION_MAX_LENGTH).optional(),
+  utm_medium: z.string().trim().max(ATTRIBUTION_MAX_LENGTH).optional(),
+  utm_campaign: z.string().trim().max(ATTRIBUTION_MAX_LENGTH).optional(),
+  utm_content: z.string().trim().max(ATTRIBUTION_MAX_LENGTH).optional(),
+  utm_term: z.string().trim().max(ATTRIBUTION_MAX_LENGTH).optional(),
+} as const;
+
+export const quickLeadSchema = z.object({ ...leadFields, ...attributionFields });
 
 export type QuickLead = z.infer<typeof quickLeadSchema>;
 
@@ -124,6 +139,7 @@ export type QuickLead = z.infer<typeof quickLeadSchema>;
  */
 export const contactRequestSchema = z.object({
   ...leadFields,
+  ...attributionFields,
   /**
    * Whether they agreed to be texted. OPTIONAL, deliberately: consent that is required in order to
    * submit is not consent, and a form that withholds a quote until you accept marketing texts is

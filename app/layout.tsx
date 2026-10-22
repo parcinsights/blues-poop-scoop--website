@@ -2,8 +2,6 @@ import type { Metadata, Viewport } from "next";
 import { Fredoka } from "next/font/google";
 
 import { Analytics } from "@/components/analytics/Analytics";
-import { Footer } from "@/components/blocks/Footer";
-import { Header } from "@/components/blocks/Header";
 import { site } from "@/content/site";
 import { metadataBase } from "@/lib/seo";
 import { BRAND_HEX } from "@/lib/tokens";
@@ -65,9 +63,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <a href="#main" className="skip-link">
           Skip to main content
         </a>
-        <Header />
-        <main id="main">{children}</main>
-        <Footer />
+        {/* The header, `<main id="main">` and footer come from the route group's own layout —
+            app/(site)/layout.tsx for the browsable site, app/(campaign)/layout.tsx for the ad
+            landing pages, which wear stripped-down chrome. Both render the `main` this skip link
+            points at. */}
+        {children}
         {/* The ad tags. Last in the body and deferred — see the component. */}
         <Analytics />
       </body>

@@ -42,7 +42,7 @@ export type Seo = {
  * below are not "some copy for the page", they are the page: each one fills a specific band, and
  * the optional ones simply drop their band when absent. Anything that would need a NEW band on one
  * service and not another belongs here as another optional field, never as a second layout.
- * See app/services/[service]/page.tsx.
+ * See app/(site)/services/[service]/page.tsx.
  */
 export type Service = {
   slug: string;
@@ -322,4 +322,78 @@ export type NavGroup = {
   label: string;
   href?: string;
   children?: NavLink[];
+};
+
+/**
+ * A PAID-TRAFFIC LANDING PAGE — /lp/<slug>/, the URL a Facebook or Instagram ad points at.
+ *
+ * Every field below fills one band of the same template, the way `Service` does — see
+ * app/(campaign)/lp/[campaign]/page.tsx. A new campaign is a new record in content/campaigns.ts and
+ * nothing else; a new BAND is a change to this type, so that every campaign gets it or none do.
+ *
+ * The page differs from the site's own front doors in what it leaves out. There is no navigation,
+ * no link to another page, and one action — the form — with the phone as its only alternative.
+ * Someone who tapped an ad has already decided they are interested; the page's job is to confirm
+ * they landed in the right place and hand them the form before anything else can catch their eye.
+ */
+export type Campaign = {
+  /**
+   * The URL segment, and the name the CRM files every lead from this page under. STABLE once an ad
+   * points at it: renaming it breaks the live ad's link and splits the campaign's leads across two
+   * names in the CRM.
+   */
+  slug: string;
+  /** The page is `noindex` regardless; this is the title and the link preview a share would show. */
+  seo: Seo;
+  hero: {
+    /** The location pill above the h1 — the first disqualifying question a local ad gets. */
+    serviceLine: string;
+    /**
+     * The h1, minus its last few words. It should say what the AD said: someone who tapped a
+     * promise and lands on a different one assumes they are in the wrong place and leaves.
+     */
+    heading: string;
+    /** The h1's closing words, drawn with the amber swash under them. Read straight on from `heading`. */
+    highlight?: string;
+    subheading: string;
+    /** Three ticked objections answered, under the subheading. Three — a fourth is a list to read. */
+    points: readonly string[];
+    /**
+     * The words on every button that jumps to the form — in the hero on a phone, on the sticky bar
+     * and in the closing band. One label, so the visitor learns it once.
+     */
+    cta: string;
+  };
+  form: {
+    heading: string;
+    intro: string;
+    /** The submit button. First person and specific beats "Submit" — it is the last thing read. */
+    submit: string;
+    /** One line under the button: what pressing it does NOT commit them to. */
+    note: string;
+  };
+  /** The one quote pinned beside the form — evidence at the moment of doubt. */
+  spotlight: Review;
+  /** The strip under the hero. Three facts, no more — see `TrustBar`. */
+  trust: readonly { icon: PointIcon; label: string }[];
+  reviews: {
+    heading: string;
+    intro: string;
+    items: readonly Review[];
+  };
+  /** What working with the business looks like, start to finish — the photograph and the steps. */
+  process: {
+    eyebrow: string;
+    heading: string;
+    intro: string;
+    image: AssetKey;
+    /** Who is in the photograph, said the way the owners would say it. */
+    caption: string;
+    steps: readonly { title: string; detail: string }[];
+  };
+  /** The closing band, under the steps. */
+  close: {
+    heading: string;
+    detail: string;
+  };
 };

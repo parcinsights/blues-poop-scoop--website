@@ -352,7 +352,7 @@ export const pricingPage = {
  * WHAT THIS RECORD DOES NOT CONTAIN, deliberately: the three steps, the prices, the guarantee, the
  * coverage sentence and the questions. Every one of those is already written for the homepage,
  * /pricing/ or content/faq.ts, and the residential page renders those SAME records — see
- * app/residential/page.tsx. A second copy of "how it works" that happens to live on the residential
+ * app/(site)/residential/page.tsx. A second copy of "how it works" that happens to live on the residential
  * page is a second version of the client's words waiting to drift from the first.
  *
  * So what is left is what only this page says: the claim at the top, the six reasons under it, and

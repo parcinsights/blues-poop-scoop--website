@@ -92,7 +92,9 @@ export async function POST(request: Request) {
           comment: [
             `${parsed.data.dogs} dog${parsed.data.dogs === 1 ? "" : "s"}`,
             `wants ${parsed.data.frequency}`,
-            "via website quick quote form",
+            parsed.data.campaign
+              ? `via ad landing page "${parsed.data.campaign}"`
+              : "via website quick quote form",
           ].join(" · "),
           // The short form never asks for SMS consent, so it cannot claim any. The contact form is
           // where that checkbox lives.

@@ -3,7 +3,7 @@ import { Mail, Phone } from "lucide-react";
 
 import { SignupConversion } from "@/components/analytics/SignupConversion";
 import { NextSteps } from "@/components/blocks/blocks";
-import { PageShell } from "@/components/blocks/PageShell";
+import { BlueCelebration } from "@/components/blocks/BlueCelebration";
 import { Button } from "@/components/ui/Button";
 import { Cluster, Container, Section, Stack } from "@/components/ui/layout";
 import { Card } from "@/components/ui/surfaces";
@@ -24,6 +24,15 @@ import { buildMetadata } from "@/lib/seo";
  *
  * `noindex` for the reason spelled out on `thankYou` in content/pages/standing.ts, and it is why
  * this route is missing from `allRoutes()` — see the note there.
+ *
+ * THE TOP IS A CELEBRATION. Blue drops in, scoops his own pile, and the confetti goes off — see
+ * `BlueCelebration`. It is the one page on the site where somebody has just done the thing we
+ * wanted, and a moment of delight there is what turns "I filled in a form" into "I like these
+ * people" before the first text arrives. Everything under it is the page it always was: the
+ * heading, the three steps, and the phone for anyone who does not want to wait.
+ *
+ * Centred, unlike `PageShell` which it replaces: the dog is a symmetrical object at the top of the
+ * band, and a left-hung heading under a centred picture reads as two things that came apart.
  */
 export const metadata: Metadata = buildMetadata({
   ...thankYou.seo,
@@ -37,7 +46,19 @@ export default function ThankYouPage() {
       {/* Reports the sign-up to Google Ads and Meta, once, and only for a real submit. */}
       <SignupConversion />
 
-      <PageShell crumbs={[]} heading={thankYou.heading} intro={thankYou.intro} />
+      <Section tone="canvas" spacing="md">
+        <Container>
+          <Stack gap={6} align="center">
+            <BlueCelebration />
+            <Stack gap={4} align="center">
+              <Heading level={1}>{thankYou.heading}</Heading>
+              <Text size="lead" tone="muted" measure>
+                {thankYou.intro}
+              </Text>
+            </Stack>
+          </Stack>
+        </Container>
+      </Section>
 
       <Section tone="raised" spacing="md">
         <Container>

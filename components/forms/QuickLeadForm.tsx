@@ -10,6 +10,7 @@ import { Turnstile, type TurnstileHandle } from "@/components/ui/Turnstile";
 import { Callout } from "@/components/ui/surfaces";
 import { Stack } from "@/components/ui/layout";
 import { markLeadPending } from "@/lib/analytics";
+import { readUtmTags } from "@/lib/attribution";
 import { routes } from "@/lib/routes";
 import { quickLeadSchema } from "@/lib/validation";
 
@@ -30,9 +31,23 @@ import { quickLeadSchema } from "@/lib/validation";
 
 export function QuickLeadForm({
   variant = "boxed",
+  campaign,
+  submitLabel = "Get started now",
 }: {
   /** See the note on `FieldVariant`. `pill` hides the labels and carries them as placeholders. */
   variant?: FieldVariant;
+  /**
+   * Set ONLY on an ad landing page — the campaign's slug from content/campaigns.ts. It rides along
+   * with the lead, together with the UTM tags on the page's URL, so the CRM can file the lead under
+   * the ad that produced it. See lib/attribution.ts.
+   */
+  campaign?: string;
+  /**
+   * The button's words. The site-wide default stays put; a campaign page passes its own, because
+   * an ad landing page is judged on this one button and "Get my free quote" says what pressing it
+   * gets you. Comes from content/ — the default is the one string here that predates the rule.
+   */
+  submitLabel?: string;
 }) {
   const router = useRouter();
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -54,7 +69,11 @@ export function QuickLeadForm({
     const form = new FormData(event.currentTarget);
     const raw = Object.fromEntries(form.entries());
 
-    const parsed = quickLeadSchema.safeParse(raw);
+    // Attribution is not something the visitor typed, so it joins the answers here rather than as
+    // hidden inputs — a hidden field is one more thing for an autofill or a bot to write into.
+    const parsed = quickLeadSchema.safeParse(
+      campaign ? { ...raw, campaign, ...readUtmTags(window.location.search) } : raw,
+    );
     if (!parsed.success) {
       const next: Record<string, string> = {};
       for (const issue of parsed.error.issues) {
@@ -85,7 +104,7 @@ export function QuickLeadForm({
       }
       // Left for /thank-you/ to spend. Set only after the API accepted the lead, so a rejected
       // submission cannot report a conversion. See lib/analytics.ts.
-      markLeadPending("quick_lead");
+      markLeadPending(campaign ? "campaign" : "quick_lead");
       router.push(routes.thankYou());
     } catch {
       turnstile.current?.reset();
@@ -216,7 +235,7 @@ export function QuickLeadForm({
         )}
 
         <Button type="submit" size="lg" block disabled={state === "sending"}>
-          {state === "sending" ? "Sending…" : "Get started now"}
+          {state === "sending" ? "Sending…" : submitLabel}
         </Button>
       </Stack>
     </form>

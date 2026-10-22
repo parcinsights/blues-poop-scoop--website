@@ -54,7 +54,9 @@ really exists — the sitemap never lists a 404.
 ```
 app/theme.css        tokens — colors, type scale, spacing, radius, shadows
 app/base.css         element styles + .prose + skip link
-app/layout.tsx       fonts, header/footer, skip link
+app/layout.tsx       fonts, skip link, ad tags — the root every page shares
+app/(site)/          every browsable page, wrapped in the full header and footer
+app/(campaign)/      the ad landing pages (/lp/<slug>/): no nav, one action — see content/campaigns.ts
 app/sitemap.ts       generated from lib/routes.ts
 app/robots.ts        Disallow: / on every non-production deployment
 

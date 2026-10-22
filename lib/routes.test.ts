@@ -2,6 +2,7 @@ import { existsSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 
+import { campaigns } from "@/content/campaigns";
 import { cities } from "@/content/cities";
 import { headerCta, headerNav, footerNav, primaryCta } from "@/content/nav";
 import { services } from "@/content/services";
@@ -10,21 +11,29 @@ import { SITE_URL, absoluteUrl, allRoutes, publishedRoutes, routes } from "./rou
 
 const ROOT = join(import.meta.dirname, "..");
 
+/**
+ * The route groups under app/. A group is a folder in parentheses that shares a layout without
+ * adding a URL segment — `(site)` carries the full header and footer, `(campaign)` the stripped-down
+ * chrome the ad landing pages wear — so a page's file can sit under any of them and still serve the
+ * same path.
+ */
+const ROUTE_ROOTS = ["app", "app/(site)", "app/(campaign)"];
+
 /** Does a static route file serve this path? */
 function staticRouteExists(path: string): boolean {
   const segments = path.split("/").filter(Boolean);
-  return existsSync(join(ROOT, "app", ...segments, "page.tsx"));
+  return ROUTE_ROOTS.some((root) => existsSync(join(ROOT, root, ...segments, "page.tsx")));
 }
 
 /** Dynamic segments serve a whole family of paths from one file. */
 const DYNAMIC_FAMILIES: { test: (path: string) => boolean; file: string }[] = [
-  { test: (p) => /^\/services\/[^/]+\/$/.test(p), file: "app/services/[service]/page.tsx" },
-  { test: (p) => /^\/locations\/[^/]+\/$/.test(p), file: "app/locations/[city]/page.tsx" },
+  { test: (p) => /^\/services\/[^/]+\/$/.test(p), file: "app/(site)/services/[service]/page.tsx" },
+  { test: (p) => /^\/locations\/[^/]+\/$/.test(p), file: "app/(site)/locations/[city]/page.tsx" },
   {
     test: (p) => /^\/locations\/[^/]+\/[^/]+\/$/.test(p),
-    file: "app/locations/[city]/[service]/page.tsx",
+    file: "app/(site)/locations/[city]/[service]/page.tsx",
   },
-  { test: (p) => /^\/blog\/[^/]+\/$/.test(p), file: "app/blog/[slug]/page.tsx" },
+  { test: (p) => /^\/blog\/[^/]+\/$/.test(p), file: "app/(site)/blog/[slug]/page.tsx" },
 ];
 
 function isServable(path: string): boolean {
@@ -123,5 +132,34 @@ describe("301 map", () => {
     for (const rule of redirects) {
       expect(rule.source.replace(/\/$/, "")).not.toBe(rule.destination.replace(/\/$/, ""));
     }
+  });
+});
+
+/**
+ * The ad landing pages. An ad is the only way in, which is what keeps their numbers the ad's — see
+ * `routes.campaign`. These pin the three ways that can quietly stop being true.
+ */
+describe("campaign landing pages", () => {
+  const known = new Set(allRoutes().map((entry) => entry.path));
+
+  it("stays out of the sitemap", () => {
+    const leaked = [...known].filter((path) => path.startsWith("/lp/"));
+    expect(leaked).toEqual([]);
+    for (const campaign of campaigns) expect(known.has(routes.campaign(campaign.slug))).toBe(false);
+  });
+
+  it("is linked from no nav, so an organic visitor cannot wander in", () => {
+    const navHrefs = [
+      ...headerNav.flatMap((item) => [item.href, ...(item.children ?? []).map((c) => c.href)]),
+      ...footerNav.flatMap((group) => group.links.map((link) => link.href)),
+    ];
+    expect(navHrefs.filter((href) => href?.startsWith("/lp/"))).toEqual([]);
+  });
+
+  it("gives every campaign a unique, URL-safe slug and a route file to serve it", () => {
+    const slugs = campaigns.map((campaign) => campaign.slug);
+    expect(new Set(slugs).size).toBe(slugs.length);
+    for (const slug of slugs) expect(slug, slug).toMatch(/^[a-z0-9]+(-[a-z0-9]+)*$/);
+    expect(existsSync(join(ROOT, "app/(campaign)/lp/[campaign]/page.tsx"))).toBe(true);
   });
 });

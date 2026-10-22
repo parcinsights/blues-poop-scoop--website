@@ -80,6 +80,15 @@
     }
   }
 
+  /**
+   * The ad landing pages' bar has no social row, so it never grows: it is the phone height — the
+   * 4rem mark in `py-4` — at every width. Set on the wrapper in app/(campaign)/layout.tsx, so the
+   * `main` rules above read this value there and the site's everywhere else.
+   */
+  .chrome-campaign {
+    --header-height: 6rem;
+  }
+
   body {
     background-color: var(--color-surface);
     color: var(--color-ink);
@@ -551,6 +560,382 @@
     .faq-item[open]::details-content {
       block-size: auto;
       opacity: 1;
+    }
+  }
+
+  /**
+   * ── The headline swash (ad landing pages) ──────────────────────────────────
+   * The amber stroke under the h1's last words draws itself in once, left to right. `pathLength="1"`
+   * on the path is what lets the dash be written as 1 whatever the stroke's real length — so the
+   * same rule fits a short word or a long phrase.
+   */
+  .swash path {
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    animation: swash-draw 700ms var(--ease-out) 350ms forwards;
+  }
+
+  @keyframes swash-draw {
+    to {
+      stroke-dashoffset: 0;
+    }
+  }
+
+  /**
+   * ── Blue's victory lap (/thank-you/) ───────────────────────────────────────
+   * The logo dog scoops his own pile and celebrates. See components/blocks/BlueCelebration.tsx for
+   * the storyboard; this is the choreography. One clock, starting at first paint:
+   *
+   *     0 – 0.65s   Blue drops in and lands with a squash          .blue-party__drop
+   *   0.7 – 1.05s   the pile shivers                               .blue-party__pile
+   *   1.05 – 1.45s  Blue leans in with the scooper                 .blue-party__lean
+   *   1.2 – 1.45s   the pile is sucked into the scooper; puff      .blue-party__pile / __puff
+   *   1.35s         confetti (script — keep POOF_AT in step)       lib/confetti.ts
+   *   1.4s          a sparkle where the pile was, and it stays     .blue-party__sparkle
+   *   1.45 – 2.35s  a celebratory flip                             .blue-party__flip
+   *   2.35s –       hearts float up; then a wiggle every 5s        .blue-party__hearts / __dog
+   *
+   * Every element has ONE transform animation (the sparkle's twinkle takes over from its pop only
+   * once the pop has finished). That is why Blue is three nested boxes: stacking a drop, a lean and
+   * a flip on one element would have each one's fill overwrite the others'.
+   *
+   * The percentages are the artwork's: the logo is 483×405, and the pile is the only thing in the
+   * box at x ≥ 351, y ≥ 249 — the scooper's handle stops at x 349 on that row. Measured with sharp
+   * off the cream PNG; re-measure if the logo file changes.
+   */
+  .blue-party {
+    position: relative;
+    aspect-ratio: 483 / 405;
+  }
+
+  .blue-party__layer {
+    position: absolute;
+    inset: 0;
+  }
+
+  /* The two cuts of the one drawing — Blue and his scooper, and the pile. */
+  .blue-party__dog {
+    clip-path: polygon(0 0, 100% 0, 100% 61.5%, 72.7% 61.5%, 72.7% 100%, 0 100%);
+    transform-origin: 45% 92%;
+    animation: blue-idle 5s ease-in-out 3.4s infinite;
+  }
+
+  .blue-party__pile-cut {
+    clip-path: inset(61.5% 0 0 72.7%);
+  }
+
+  .blue-party__drop {
+    transform-origin: 45% 94%;
+    /* For the flip inside it: a turn about the vertical axis needs depth to read as a turn. */
+    perspective: 60rem;
+    animation: blue-drop 650ms both;
+  }
+
+  @keyframes blue-drop {
+    /* From under half his own height up — any higher and he falls through the header's logo. */
+    0% {
+      transform: translateY(-45%) scale(0.92, 1.08);
+      opacity: 0;
+      animation-timing-function: cubic-bezier(0.55, 0, 1, 0.45);
+    }
+    15% {
+      opacity: 1;
+    }
+    60% {
+      transform: translateY(0) scale(1.14, 0.84);
+      animation-timing-function: cubic-bezier(0, 0.55, 0.45, 1);
+    }
+    80% {
+      transform: translateY(-5%) scale(0.97, 1.04);
+      animation-timing-function: cubic-bezier(0.55, 0, 1, 0.45);
+    }
+    100% {
+      transform: translateY(0) scale(1, 1);
+      opacity: 1;
+    }
+  }
+
+  /* Pivots on its base, so the shiver is a wobble rather than a slide. */
+  .blue-party__pile {
+    transform-origin: 84.8% 92.8%;
+    animation: blue-pile 1450ms linear both;
+  }
+
+  @keyframes blue-pile {
+    0%,
+    48% {
+      transform: translate(0, 0) rotate(0deg) scale(1, 1);
+      opacity: 1;
+    }
+    52% {
+      transform: translate(0, 0) rotate(-7deg) scale(1, 1);
+    }
+    56% {
+      transform: translate(0, 0) rotate(6deg) scale(1, 1);
+    }
+    60% {
+      transform: translate(0, 0) rotate(-6deg) scale(1, 1);
+    }
+    64% {
+      transform: translate(0, 0) rotate(5deg) scale(1, 1);
+    }
+    68% {
+      transform: translate(0, 0) rotate(-4deg) scale(1, 1);
+    }
+    72% {
+      transform: translate(0, 0) rotate(3deg) scale(1, 1);
+    }
+    77% {
+      transform: translate(0, 0) rotate(0deg) scale(1, 1);
+      opacity: 1;
+      animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    /* The wind-up: it stretches up, as if pulled. */
+    83% {
+      transform: translate(1%, -5%) rotate(0deg) scale(1.06, 1.12);
+      opacity: 1;
+      animation-timing-function: cubic-bezier(0.6, 0, 0.9, 0.5);
+    }
+    /* Into the scooper's pan, which is about a fifth of the drawing to the left. */
+    100% {
+      transform: translate(-22%, 2%) rotate(-50deg) scale(0.1, 0.1);
+      opacity: 0;
+    }
+  }
+
+  /* Pivots on his feet, so the scooper swings toward the pile. */
+  .blue-party__lean {
+    transform-origin: 38% 96%;
+    animation: blue-lean 1450ms ease-in-out both;
+  }
+
+  @keyframes blue-lean {
+    0%,
+    72% {
+      transform: translateX(0) rotate(0deg);
+    }
+    84%,
+    92% {
+      transform: translateX(3%) rotate(7deg);
+    }
+    100% {
+      transform: translateX(0) rotate(0deg);
+    }
+  }
+
+  .blue-party__flip {
+    transform-origin: 45% 94%;
+    animation: blue-flip 900ms 1450ms both;
+  }
+
+  @keyframes blue-flip {
+    0% {
+      transform: translateY(0) rotateY(0deg) scale(1, 1);
+      animation-timing-function: ease-in-out;
+    }
+    /* Crouch. */
+    18% {
+      transform: translateY(0) rotateY(0deg) scale(1.08, 0.88);
+      animation-timing-function: cubic-bezier(0.2, 0.8, 0.3, 1);
+    }
+    /* Airborne and halfway round — he is mirrored here, which is the fun of it. */
+    52% {
+      transform: translateY(-24%) rotateY(200deg) scale(0.96, 1.05);
+      animation-timing-function: cubic-bezier(0.6, 0, 0.9, 0.5);
+    }
+    /* Lands facing front, with a squash. */
+    80% {
+      transform: translateY(0) rotateY(360deg) scale(1.1, 0.88);
+      animation-timing-function: ease-out;
+    }
+    100% {
+      transform: translateY(0) rotateY(360deg) scale(1, 1);
+    }
+  }
+
+  /* The happy wiggle, at the top of every five-second cycle and still the rest of it. */
+  @keyframes blue-idle {
+    0%,
+    20%,
+    100% {
+      transform: rotate(0deg);
+    }
+    4% {
+      transform: rotate(-4deg);
+    }
+    8% {
+      transform: rotate(4deg);
+    }
+    12% {
+      transform: rotate(-3deg);
+    }
+    16% {
+      transform: rotate(2deg);
+    }
+  }
+
+  /* The puff: five dust balls from the pile's middle, each drifting its own way. */
+  .blue-party__puff {
+    position: absolute;
+    left: 74%;
+    top: 60%;
+    width: 24%;
+    height: 34%;
+  }
+
+  .blue-party__puff > span {
+    position: absolute;
+    left: 33%;
+    top: 38%;
+    width: 34%;
+    aspect-ratio: 1;
+    border-radius: var(--radius-pill);
+    /* Invisible until it fires, and after: `forwards`, not `both`, so the delay shows this state. */
+    opacity: 0;
+    animation: blue-puff 650ms cubic-bezier(0.2, 0.8, 0.3, 1) 1300ms forwards;
+  }
+
+  .blue-party__puff > span:nth-child(1) {
+    --puff-x: -90%;
+    --puff-y: -70%;
+  }
+  .blue-party__puff > span:nth-child(2) {
+    --puff-x: 80%;
+    --puff-y: -80%;
+  }
+  .blue-party__puff > span:nth-child(3) {
+    --puff-x: 0%;
+    --puff-y: -120%;
+  }
+  .blue-party__puff > span:nth-child(4) {
+    --puff-x: -110%;
+    --puff-y: 30%;
+  }
+  .blue-party__puff > span:nth-child(5) {
+    --puff-x: 100%;
+    --puff-y: 20%;
+  }
+
+  @keyframes blue-puff {
+    0% {
+      transform: translate(0, 0) scale(0.3);
+      opacity: 0.85;
+    }
+    100% {
+      transform: translate(var(--puff-x), var(--puff-y)) scale(1.3);
+      opacity: 0;
+    }
+  }
+
+  /* Where the pile was. It pops in, stays, and twinkles. */
+  .blue-party__sparkle {
+    position: absolute;
+    left: 76%;
+    top: 63%;
+    width: 18%;
+    height: auto;
+    animation:
+      blue-sparkle 700ms cubic-bezier(0.2, 0.8, 0.3, 1) 1400ms both,
+      blue-twinkle 2.4s ease-in-out 2.1s infinite;
+  }
+
+  @keyframes blue-sparkle {
+    0% {
+      transform: scale(0) rotate(-45deg);
+      opacity: 0;
+    }
+    60% {
+      transform: scale(1.25) rotate(8deg);
+      opacity: 1;
+    }
+    100% {
+      transform: scale(1) rotate(0deg);
+      opacity: 1;
+    }
+  }
+
+  @keyframes blue-twinkle {
+    0%,
+    100% {
+      transform: scale(1) rotate(0deg);
+    }
+    50% {
+      transform: scale(0.82) rotate(-8deg);
+    }
+  }
+
+  /* Three hearts from just over his head, staggered, each drifting off its own way. */
+  .blue-party__hearts {
+    position: absolute;
+    left: 28%;
+    top: -6%;
+    width: 44%;
+    height: 24%;
+  }
+
+  .blue-party__hearts > svg {
+    position: absolute;
+    bottom: 0;
+    height: auto;
+    opacity: 0;
+    animation: blue-heart 1700ms cubic-bezier(0.2, 0.8, 0.3, 1) forwards;
+  }
+
+  .blue-party__hearts > svg:nth-child(1) {
+    left: 0;
+    width: 24%;
+    --heart-x: -40%;
+    animation-delay: 2350ms;
+  }
+  .blue-party__hearts > svg:nth-child(2) {
+    left: 38%;
+    width: 30%;
+    --heart-x: 10%;
+    animation-delay: 2550ms;
+  }
+  .blue-party__hearts > svg:nth-child(3) {
+    left: 78%;
+    width: 20%;
+    --heart-x: 50%;
+    animation-delay: 2800ms;
+  }
+
+  @keyframes blue-heart {
+    0% {
+      transform: translate(0, 40%) scale(0.4);
+      opacity: 0;
+    }
+    20% {
+      transform: translate(0, 0) scale(1);
+      opacity: 1;
+    }
+    100% {
+      transform: translate(var(--heart-x), -180%) scale(0.9);
+      opacity: 0;
+    }
+  }
+
+  /**
+   * Less motion, asked for: Blue simply stands there, the pile already gone and the sparkle in its
+   * place, and the headline's swash is already drawn. `animation: none` rather than the global
+   * 0.01ms rule above, which would still play each piece at its own delay — a pile visibly
+   * blinking out is motion too. The confetti checks the same query in script and never fires.
+   */
+  @media (prefers-reduced-motion: reduce) {
+    .blue-party,
+    .blue-party *,
+    .swash path {
+      animation: none;
+    }
+
+    .swash path {
+      stroke-dashoffset: 0;
+    }
+
+    .blue-party__pile,
+    .blue-party__puff,
+    .blue-party__hearts {
+      display: none;
     }
   }
 

@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 
+import { ATTRIBUTION_MAX_LENGTH, UTM_KEYS, readUtmTags } from "./attribution";
 import { contactRequestSchema, quickLeadSchema } from "./validation";
 
 /**
@@ -79,11 +80,15 @@ describe("contact request", () => {
  */
 describe("one field set, every form", () => {
   const questions = ["name", "email", "phone", "zip", "dogs", "frequency", "company"];
+  /** Where the lead came from — optional on both, sent only by the ad landing pages. */
+  const attribution = ["campaign", ...UTM_KEYS];
 
   it("asks the same questions on both schemas", () => {
-    expect(Object.keys(quickLeadSchema.shape).sort()).toEqual([...questions].sort());
+    expect(Object.keys(quickLeadSchema.shape).sort()).toEqual(
+      [...questions, ...attribution].sort(),
+    );
     expect(Object.keys(contactRequestSchema.shape).sort()).toEqual(
-      [...questions, "smsConsent"].sort(),
+      [...questions, ...attribution, "smsConsent"].sort(),
     );
   });
 
@@ -113,5 +118,47 @@ describe("one field set, every form", () => {
         true,
       );
     }
+  });
+});
+
+describe("attribution", () => {
+  it("is optional — a lead from any ordinary form still parses", () => {
+    expect(quickLeadSchema.safeParse(validQuickLead).success).toBe(true);
+  });
+
+  it("carries the campaign and the UTM tags through", () => {
+    const parsed = quickLeadSchema.parse({
+      ...validQuickLead,
+      campaign: "poop-free-yard",
+      utm_source: "facebook",
+      utm_content: "blue-video",
+    });
+    expect(parsed).toMatchObject({
+      campaign: "poop-free-yard",
+      utm_source: "facebook",
+      utm_content: "blue-video",
+    });
+  });
+
+  it("caps a crafted value rather than passing an unbounded string to the CRM", () => {
+    const long = "x".repeat(ATTRIBUTION_MAX_LENGTH + 1);
+    expect(quickLeadSchema.safeParse({ ...validQuickLead, utm_campaign: long }).success).toBe(false);
+  });
+});
+
+describe("readUtmTags", () => {
+  it("reads the five tags and ignores everything else on the URL", () => {
+    expect(
+      readUtmTags("?utm_source=facebook&utm_medium=paid&fbclid=abc123&utm_campaign=fall"),
+    ).toEqual({ utm_source: "facebook", utm_medium: "paid", utm_campaign: "fall" });
+  });
+
+  it("drops blanks, so an empty tag is not sent as an answer", () => {
+    expect(readUtmTags("?utm_source=&utm_content=%20")).toEqual({});
+  });
+
+  it("truncates rather than rejects a long tag, so the lead still sends", () => {
+    const tags = readUtmTags(`?utm_term=${"y".repeat(500)}`);
+    expect(tags.utm_term).toHaveLength(ATTRIBUTION_MAX_LENGTH);
   });
 });

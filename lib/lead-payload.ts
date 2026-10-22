@@ -35,6 +35,18 @@ export type WebhookLead = {
   smsConsent: boolean;
   /** Checked against our own `servicedZips`, the same list the site renders. */
   inServiceArea: boolean;
+  /**
+   * The ad landing page the form sat on — a slug from content/campaigns.ts — or null for every
+   * other form. It is the field a CRM filter is built on: "leads from the poop-free-yard ad".
+   * See lib/attribution.ts.
+   */
+  campaign: string | null;
+  /** The ad link's UTM tags, null when the link carried none. Always present, like every key here. */
+  utmSource: string | null;
+  utmMedium: string | null;
+  utmCampaign: string | null;
+  utmContent: string | null;
+  utmTerm: string | null;
 };
 
 /**
@@ -57,5 +69,12 @@ export function toWebhookLead(source: LeadSource, lead: QuickLead | ContactReque
     frequency: lead.frequency,
     smsConsent: "smsConsent" in lead ? lead.smsConsent : false,
     inServiceArea: isServicedZip(lead.zip),
+    // `|| null` rather than `?? null`: an empty string is no more an answer than a missing key.
+    campaign: lead.campaign || null,
+    utmSource: lead.utm_source || null,
+    utmMedium: lead.utm_medium || null,
+    utmCampaign: lead.utm_campaign || null,
+    utmContent: lead.utm_content || null,
+    utmTerm: lead.utm_term || null,
   };
 }

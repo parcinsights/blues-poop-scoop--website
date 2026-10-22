@@ -30,8 +30,11 @@ export const metaPixelId = process.env.NEXT_PUBLIC_META_PIXEL_ID ?? "";
  */
 const GOOGLE_ADS_SIGNUP_EVENT = "ads_conversion_Sign_up_1";
 
-/** Which form produced the lead. Reported as a parameter so the two can be told apart in-platform. */
-export type LeadSource = "quick_lead" | "contact";
+/**
+ * Which form produced the lead. Reported as a parameter so they can be told apart in-platform.
+ * `campaign` is the quick form on an ad landing page (/lp/…/) — the one a Meta campaign is judged on.
+ */
+export type LeadSource = "quick_lead" | "contact" | "campaign";
 
 declare global {
   interface Window {
@@ -77,7 +80,7 @@ function consumeLeadPending(): LeadSource | null {
   const store = session();
   const value = store?.getItem(PENDING_KEY) ?? null;
   if (value) store?.removeItem(PENDING_KEY);
-  return value === "quick_lead" || value === "contact" ? value : null;
+  return value === "quick_lead" || value === "contact" || value === "campaign" ? value : null;
 }
 
 /**

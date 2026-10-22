@@ -457,8 +457,11 @@ const medallionAccents = [
   { fill: "bg-accent-mint text-accent-mint-ink", edge: "border-accent-mint" },
 ] as const;
 
-/** The cycle. The modulo cannot miss, but a number index is still `| undefined` to the compiler. */
-function medallion(index: number) {
+/**
+ * The cycle. The modulo cannot miss, but a number index is still `| undefined` to the compiler.
+ * Exported for the campaign blocks, whose steps wear the same numbered medallions as these.
+ */
+export function medallion(index: number) {
   return (
     medallionAccents[index % medallionAccents.length] ?? medallionAccents[0]
   );

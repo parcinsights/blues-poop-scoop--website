@@ -2,7 +2,7 @@ import type { City } from "../types";
 
 /**
  * THE CITY PAGE — the words every /locations/[city]/ page shares, and the only place they are
- * written. One template, ten towns; see app/locations/[city]/page.tsx.
+ * written. One template, ten towns; see app/(site)/locations/[city]/page.tsx.
  *
  * WHAT VARIES PER TOWN, and it is deliberately a short list:
  *
