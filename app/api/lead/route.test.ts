@@ -119,6 +119,32 @@ describe("POST /api/lead", () => {
     expect(fetchSpy).not.toHaveBeenCalled();
   });
 
+  it("sends an ad landing page lead to the SAME webhook, tagged with its campaign", async () => {
+    const fetchSpy = stubNetwork({ verified: true });
+    const response = await post({ ...validLead, campaign: "poop-free-yard", utm_source: "facebook" });
+
+    expect(response.status).toBe(200);
+    const [call] = ghlCalls(fetchSpy);
+    expect(call).toBeDefined();
+    expect(JSON.parse(String((call![1] as RequestInit).body))).toMatchObject({
+      source: "quick-form",
+      campaign: "poop-free-yard",
+      utmSource: "facebook",
+    });
+  });
+
+  it("completes the form off production WITHOUT calling the webhook", async () => {
+    vi.stubEnv("VERCEL_ENV", "");
+    vi.stubEnv("GHL_WEBHOOK_URL", "");
+    vi.stubEnv("TURNSTILE_SECRET_KEY", "");
+    const fetchSpy = stubNetwork({ verified: true });
+    const response = await post({ ...validLead, campaign: "poop-free-yard", turnstileToken: undefined });
+
+    expect(response.status).toBe(200);
+    expect(await response.json()).toEqual({ ok: true, delivered: false });
+    expect(fetchSpy).not.toHaveBeenCalled();
+  });
+
   it("lets the lead through when the gate is unconfigured, rather than closing the form", async () => {
     vi.stubEnv("TURNSTILE_SECRET_KEY", "");
     const fetchSpy = stubNetwork({ verified: true });

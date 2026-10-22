@@ -6,11 +6,12 @@
  * place it will happen rather than in a chat log.
  *
  * ── GoHighLevel ──────────────────────────────────────────────────────────────
- * WIRED. The client's sub-account inbound webhook is a public, unguessable trigger URL rather than
- * a credential, and it is the SAME url on local, preview and production by request — one trigger,
- * one automation, one place to look when a lead is missing. `source` on the payload is what tells
- * a local test submission apart from a real one. GHL_WEBHOOK_URL still overrides it, so a preview
- * can be pointed somewhere else without a code change.
+ * WIRED, ON PRODUCTION ONLY. The client's sub-account inbound webhook is a public, unguessable
+ * trigger URL rather than a credential, so it lives in the source — but only the production deploy
+ * uses it. A submission from a local dev server or a Vercel preview is a test, and a test must never
+ * text the owner or put a fake contact in their CRM; off production the routes log the payload and
+ * complete the form without delivering it. To test delivery deliberately, set GHL_WEBHOOK_URL —
+ * an explicit override is honoured in every environment, so point it at a throwaway catcher.
  * Wired at: app/api/lead/route.ts and app/api/contact/route.ts — both call deliverToGhl() below
  * with the SAME payload shape; see lib/lead-payload.ts.
  *
@@ -52,10 +53,10 @@ function isProductionDeploy(): boolean {
 }
 
 /**
- * The client's GoHighLevel inbound webhook trigger. The same url in every environment — see the
- * header. It lives in the source rather than in an env var because it is not a secret and because
- * a lead sink that only works where someone remembered to set a variable is a lead sink that
- * silently stops working on the deployment nobody checked.
+ * The client's GoHighLevel inbound webhook trigger, used by the production deploy — see the header.
+ * It lives in the source rather than in an env var because it is not a secret and because a lead
+ * sink that only works where someone remembered to set a variable is a lead sink that silently
+ * stops working on the deployment nobody checked.
  */
 const GHL_WEBHOOK_DEFAULT =
   "https://services.leadconnectorhq.com/hooks/0uR28ovg1XKQChcudZEP/webhook-trigger/517bb045-09b0-422b-a248-b762cf37a366";
@@ -66,13 +67,14 @@ const GHL_WEBHOOK_DEFAULT =
  * Every caller sends the SAME payload shape — build it with `toWebhookLead`, never by hand — so
  * the trigger on the far side maps one set of fields no matter which form fired it.
  *
- * `not-configured` is now only reachable by blanking the override with whitespace; it is kept
- * because the routes already handle it and it costs nothing to leave the state defined.
+ * Off production, with no override set, this is `not-configured` and sends nothing: the routes
+ * treat that as "accepted without delivery" there, so the form still completes and the payload is
+ * in the dev server's log.
  */
 export async function deliverToGhl(payload: unknown): Promise<DeliveryResult> {
-  // `||`, not `??`: .env.local ships the key with an empty value, and "" must fall through to the
-  // default rather than be treated as a configured webhook.
-  const webhook = (process.env.GHL_WEBHOOK_URL || GHL_WEBHOOK_DEFAULT).trim();
+  // A blank override (.env.example ships the key empty) is no override.
+  const override = process.env.GHL_WEBHOOK_URL?.trim();
+  const webhook = override || (isProductionDeploy() ? GHL_WEBHOOK_DEFAULT : "");
   if (!webhook) return { status: "not-configured", missing: "GHL_WEBHOOK_URL" };
 
   try {
