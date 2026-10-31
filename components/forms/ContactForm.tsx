@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
 
-import { fieldLabels as labels, frequencyOptions } from "@/components/forms/fields";
+import { emailConsentCopy, fieldLabels as labels, frequencyOptions } from "@/components/forms/fields";
 import { Button } from "@/components/ui/Button";
 import { Checkbox, Field, Honeypot, Input, PhoneInput, Select } from "@/components/ui/Field";
 import { Turnstile, type TurnstileHandle } from "@/components/ui/Turnstile";
@@ -57,6 +57,7 @@ export function ContactForm() {
     const parsed = contactRequestSchema.safeParse({
       ...raw,
       smsConsent: raw.smsConsent === "on",
+      emailConsent: raw.emailConsent === "on",
     });
 
     if (!parsed.success) {
@@ -206,13 +207,24 @@ export function ContactForm() {
               disclosures that make the consent a real one: what the texts are for, and how to stop
               them. */}
           <div className="pt-2 sm:col-span-2">
-            <Checkbox
-              id="smsConsent"
-              align="center"
-              label="Text me about my quote and my scheduled visits."
-              hint="Message and data rates may apply. Reply STOP at any time to opt out."
-              error={errors.smsConsent}
-            />
+            <Stack gap={4}>
+              {/* The email box comes first: it is required, the text box is not — see
+                  `emailConsent` and `smsConsent` in lib/validation.ts. */}
+              <Checkbox
+                id="emailConsent"
+                align="center"
+                label={emailConsentCopy.label}
+                hint={emailConsentCopy.hint}
+                error={errors.emailConsent}
+              />
+              <Checkbox
+                id="smsConsent"
+                align="center"
+                label="Text me about my quote and my scheduled visits."
+                hint="Message and data rates may apply. Reply STOP at any time to opt out."
+                error={errors.smsConsent}
+              />
+            </Stack>
           </div>
 
           {/* Inside the field grid — it is a field, just an invisible one. */}

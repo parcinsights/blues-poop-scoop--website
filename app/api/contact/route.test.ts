@@ -19,6 +19,7 @@ const validRequest = {
   email: "george@example.com",
   phone: "2676406798",
   smsConsent: true,
+  emailConsent: true,
   turnstileToken: "token",
 };
 

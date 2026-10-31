@@ -3,9 +3,17 @@
 import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
 
-import { fieldLabels as labels, frequencyOptions } from "@/components/forms/fields";
+import { emailConsentCopy, fieldLabels as labels, frequencyOptions } from "@/components/forms/fields";
 import { Button } from "@/components/ui/Button";
-import { Field, Honeypot, Input, PhoneInput, Select, type FieldVariant } from "@/components/ui/Field";
+import {
+  Checkbox,
+  Field,
+  Honeypot,
+  Input,
+  PhoneInput,
+  Select,
+  type FieldVariant,
+} from "@/components/ui/Field";
 import { Turnstile, type TurnstileHandle } from "@/components/ui/Turnstile";
 import { Callout } from "@/components/ui/surfaces";
 import { Stack } from "@/components/ui/layout";
@@ -71,8 +79,10 @@ export function QuickLeadForm({
 
     // Attribution is not something the visitor typed, so it joins the answers here rather than as
     // hidden inputs — a hidden field is one more thing for an autofill or a bot to write into.
+    // An unchecked box is absent from the FormData, so the boolean is built here — see ContactForm.
+    const answers = { ...raw, emailConsent: raw.emailConsent === "on" };
     const parsed = quickLeadSchema.safeParse(
-      campaign ? { ...raw, campaign, ...readUtmTags(window.location.search) } : raw,
+      campaign ? { ...answers, campaign, ...readUtmTags(window.location.search) } : answers,
     );
     if (!parsed.success) {
       const next: Record<string, string> = {};
@@ -217,6 +227,16 @@ export function QuickLeadForm({
               invalid={Boolean(errors.frequency)}
             />
           </Field>
+
+          {/* Required — see `emailConsent` in lib/validation.ts. Centred in the pill card, where
+              everything else is. */}
+          <Checkbox
+            id="emailConsent"
+            align={pill ? "center" : "start"}
+            label={emailConsentCopy.label}
+            hint={emailConsentCopy.hint}
+            error={errors.emailConsent}
+          />
 
           {/* Inside the field group: it is a field, just an invisible one, and hanging it in the
               outer stack would put eight units of air around a zero-height element. */}

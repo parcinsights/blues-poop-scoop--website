@@ -1,3 +1,4 @@
+import { site } from "@/content/site";
 import { FREQUENCIES, type Frequency } from "@/lib/validation";
 
 /**
@@ -43,3 +44,12 @@ export const frequencyOptions = [
   { value: "", label: fieldLabels.frequency },
   ...FREQUENCIES.map((value) => ({ value, label: frequencyLabels[value] })),
 ];
+
+/**
+ * The marketing-email box, worded once for both forms. Plain about the marketing part — "offers"
+ * is in the sentence someone ticks, not hidden in the fine print — without reading like a contract.
+ */
+export const emailConsentCopy = {
+  label: `Yes, ${site.name} can email me about my quote, plus the occasional tip or offer.`,
+  hint: "We never sell or share your email. Unsubscribe anytime.",
+} as const;

@@ -91,6 +91,16 @@ const leadFields = {
    * Capped only to keep an unbounded string out of the parser.
    */
   company: z.string().max(200).optional(),
+  /**
+   * The marketing-email box. Every form asks for an email, so every form says what it may be used
+   * for, and this one IS required to submit — the client's call. Unlike `smsConsent` (TCPA), US
+   * email marketing has no opt-in rule that forbids a required box; what matters is that the
+   * sentence is plain and every email carries an unsubscribe link.
+   *
+   * Checked here rather than in the forms alone, so the API refuses a lead without it too. It is
+   * NOT sent on to the webhook: `toWebhookLead` picks its keys by name and this is not one of them.
+   */
+  emailConsent: z.literal(true, { error: "Please check this box to continue" }),
 } as const;
 
 /**

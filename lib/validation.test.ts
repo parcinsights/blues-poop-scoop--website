@@ -18,6 +18,7 @@ const validQuickLead = {
   zip: "19118",
   dogs: "2",
   frequency: "weekly",
+  emailConsent: true,
 };
 
 const validContactRequest = {
@@ -79,7 +80,16 @@ describe("contact request", () => {
  * impossible, and it is invisible until a lead arrives in the CRM with a hole in it.
  */
 describe("one field set, every form", () => {
-  const questions = ["name", "email", "phone", "zip", "dogs", "frequency", "company"];
+  const questions = [
+    "name",
+    "email",
+    "phone",
+    "zip",
+    "dogs",
+    "frequency",
+    "company",
+    "emailConsent",
+  ];
   /** Where the lead came from — optional on both, sent only by the ad landing pages. */
   const attribution = ["campaign", ...UTM_KEYS];
 
@@ -93,7 +103,15 @@ describe("one field set, every form", () => {
   });
 
   it("requires every question on both", () => {
-    for (const missing of ["name", "email", "phone", "zip", "dogs", "frequency"]) {
+    for (const missing of [
+      "name",
+      "email",
+      "phone",
+      "zip",
+      "dogs",
+      "frequency",
+      "emailConsent",
+    ]) {
       const { [missing]: _dropped, ...rest } = validContactRequest as Record<string, unknown>;
       expect(quickLeadSchema.safeParse(rest).success, `quick lead without ${missing}`).toBe(false);
       expect(contactRequestSchema.safeParse(rest).success, `contact without ${missing}`).toBe(
@@ -160,5 +178,14 @@ describe("readUtmTags", () => {
   it("truncates rather than rejects a long tag, so the lead still sends", () => {
     const tags = readUtmTags(`?utm_term=${"y".repeat(500)}`);
     expect(tags.utm_term).toHaveLength(ATTRIBUTION_MAX_LENGTH);
+  });
+});
+
+describe("email consent", () => {
+  it("refuses an unchecked box on either form", () => {
+    expect(quickLeadSchema.safeParse({ ...validQuickLead, emailConsent: false }).success).toBe(false);
+    expect(
+      contactRequestSchema.safeParse({ ...validContactRequest, emailConsent: false }).success,
+    ).toBe(false);
   });
 });

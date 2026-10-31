@@ -21,6 +21,7 @@ const validLead = {
   zip: "19001",
   dogs: 1,
   frequency: "weekly",
+  emailConsent: true,
   turnstileToken: "token",
 };
 

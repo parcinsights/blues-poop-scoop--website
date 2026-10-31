@@ -15,6 +15,7 @@ const quick = quickLeadSchema.parse({
   zip: "19001",
   dogs: "2",
   frequency: "not-sure",
+  emailConsent: true,
 });
 
 const contact = contactRequestSchema.parse({
@@ -25,6 +26,7 @@ const contact = contactRequestSchema.parse({
   email: "george@example.com",
   phone: "267.640.6798",
   smsConsent: true,
+  emailConsent: true,
 });
 
 describe("toWebhookLead", () => {
@@ -45,6 +47,8 @@ describe("toWebhookLead", () => {
       smsConsent: true,
     });
     expect(payload).not.toHaveProperty("company");
+    // The marketing-email box is checked on the form and the API, never forwarded to the webhook.
+    expect(payload).not.toHaveProperty("emailConsent");
   });
 
   it("claims no SMS consent for the short form, which never asks", () => {
