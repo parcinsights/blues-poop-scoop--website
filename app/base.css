@@ -54,13 +54,19 @@
    * sets a border on a section, and a transparent border still has the element's background painted
    * under it (`background-clip: border-box`), so the band's colour fills the strip.
    *
-   * `first-of-type` and not `first-child`: every page opens with a `<script>` of structured data.
+   * `nth-child(1 of :not(script))` and not `first-child`: every page opens with a `<script>` of
+   * structured data.
    */
   main {
     margin-top: calc(-1 * var(--header-height));
   }
 
-  main > section:first-of-type {
+  /* The first element after the structured-data scripts. A blog post wraps its header band in an
+     `<article>`, so there the border goes on the article's first section instead — and the plain
+     `section:first-of-type` this used to be would have put it on "More from the blog" further
+     down the page. */
+  main > section:nth-child(1 of :not(script)),
+  main > article:nth-child(1 of :not(script)) > section:first-of-type {
     border-top: var(--header-height) solid transparent;
   }
 
