@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 import { ThankYou } from "@/components/blocks/ThankYou";
-import { campaigns } from "@/content/campaigns";
+import { campaignThankYou, campaigns } from "@/content/campaigns";
 import { thankYou } from "@/content/pages/standing";
 import { routes } from "@/lib/routes";
 import { buildMetadata } from "@/lib/seo";
@@ -24,9 +24,14 @@ export function generateStaticParams() {
 
 export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const { campaign: slug } = await params;
-  return buildMetadata({ ...thankYou.seo, path: routes.campaignThankYou(slug), noindex: true });
+  return buildMetadata({
+    ...thankYou.seo,
+    description: campaignThankYou.description,
+    path: routes.campaignThankYou(slug),
+    noindex: true,
+  });
 }
 
 export default function CampaignThankYouPage() {
-  return <ThankYou />;
+  return <ThankYou intro={campaignThankYou.intro} />;
 }

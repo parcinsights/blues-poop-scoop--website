@@ -34,7 +34,7 @@ import { cx } from "@/lib/cx";
  *   are the first band after it.
  */
 
-/** The form's anchor. One id per page — every "Get my free quote" button points here. */
+/** The form's anchor. One id per page — every call-to-action button points here. */
 export const CAMPAIGN_FORM_ID = "quote";
 
 /**

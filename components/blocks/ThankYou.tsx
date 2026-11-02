@@ -31,8 +31,10 @@ import { site } from "@/content/site";
  *
  * Centred, unlike `PageShell` which it replaced: the dog is a symmetrical object at the top of the
  * band, and a left-hung heading under a centred picture reads as two things that came apart.
+ *
+ * `intro` replaces the line under the heading — the ad landing page's offer words it differently.
  */
-export function ThankYou() {
+export function ThankYou({ intro = thankYou.intro }: { intro?: string } = {}) {
   return (
     <>
       {/* Reports the lead to Meta, once, and only for a real submit. Google Ads counts it by URL. */}
@@ -45,7 +47,7 @@ export function ThankYou() {
             <Stack gap={4} align="center">
               <Heading level={1}>{thankYou.heading}</Heading>
               <Text size="lead" tone="muted" measure>
-                {thankYou.intro}
+                {intro}
               </Text>
             </Stack>
           </Stack>

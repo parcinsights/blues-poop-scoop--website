@@ -32,7 +32,7 @@ export const campaigns: Campaign[] = [
   {
     slug: "poop-free-yard",
     seo: {
-      title: "Weekly Dog Poop Removal — Free Quote",
+      title: "Weekly Dog Poop Removal — Get 30 Days Free",
       description: `Weekly yard scooping across ${site.baseCity} and the Main Line from $${startingPrice} a month. No contracts, a text before and after every visit, and a 30-day money-back guarantee.`,
     },
 
@@ -43,22 +43,20 @@ export const campaigns: Campaign[] = [
       // to the ad's own words; that continuity is what tells a visitor they tapped the right thing.
       heading: todo("Never scoop your own yard"),
       highlight: todo("again"),
-      subheading: `Weekly poop scooping from $${startingPrice} a month — that's ${perVisit(startingPrice)} a visit. Tell us about your yard and we'll text you a price, usually within the hour.`,
-      // Three of the homepage's four assurances and the residential page's text promise. Each is a
-      // commitment the client has already made in public.
+      subheading: `Weekly poop scooping from $${startingPrice} a month — that's ${perVisit(startingPrice)} a visit. Tell us about your yard and we'll call/text you a price, usually within the hour.`,
+      // The client's own three, worded to match the 30-days-free Meta ad (2026-10-31).
       points: [
-        "No contracts — pause or cancel anytime",
-        "30-day money-back guarantee",
-        "A text before and after every visit",
+        "Local, owner-operated",
+        "Every week, all year — rain, shine or snow",
+        "No contract, cancel anytime",
       ],
-      cta: "Get my free quote",
+      cta: "Get 30 Days Free",
     },
 
     form: {
-      heading: "Get your free quote",
-      intro:
-        "Six quick questions — about a minute. We'll come back with a price and a first visit date.",
-      submit: "Get my free quote",
+      heading: "Get 30 Days Free",
+      intro: "Six quick questions — about a minute. We'll come back with a first visit date.",
+      submit: "Get 30 Days Free",
       note: "No contract, no sign-up fee. Cancel whenever you like.",
     },
 
@@ -122,6 +120,16 @@ export const campaigns: Campaign[] = [
     },
   },
 ];
+
+/**
+ * The ad's thank-you copy where it differs from /thank-you/. The campaign offer leads with a first
+ * visit date rather than a price, so the line under the heading drops the price.
+ */
+export const campaignThankYou = {
+  description: "Your request is in. We'll be back to you shortly with a first visit date.",
+  intro:
+    "Your request is in and one of us has it. We'll be back to you shortly with a date for the first visit.",
+} as const;
 
 /** The record for a slug, or undefined — the page turns that into a 404. */
 export function campaignBySlug(slug: string): Campaign | undefined {
